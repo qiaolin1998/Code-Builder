@@ -90,8 +90,8 @@ IF (Time_Real >= Time_Set1) AND (Time_Real < Time_Set2) AND In_Run THEN
     // 首次进入白班时,记录初始值
     IF NOT Flag_Class1_Start THEN
         Temp[10] := In_Flow;
-        Flag_Class1_Start := TRUE;
-        Flag_Class2_Start := FALSE;
+        Flag_Class1_Start := 1;
+        Flag_Class2_Start := 0;
     END_IF;
     
     // 计算白班实时累计值
@@ -103,7 +103,7 @@ END_IF;
 IF (Hour = 21) AND (Minute = 0) AND (Second <= 1) AND In_Run THEN
     Out_Tot_Class1 := In_Flow - Temp[10];
     Out_Tot_Class1_RT := 0;
-    Flag_Class1_Start := FALSE;
+    Flag_Class1_Start := 0;
 END_IF;
 
 // ===============================================================
@@ -121,8 +121,8 @@ IF ((Time_Real >= Time_Set2) OR (Time_Real < Time_Set1)) AND In_Run THEN
     // 首次进入夜班时,记录初始值
     IF NOT Flag_Class2_Start THEN
         Temp[11] := In_Flow;
-        Flag_Class2_Start := TRUE;
-        Flag_Class1_Start := FALSE;
+        Flag_Class2_Start := 1;
+        Flag_Class1_Start := 0;
     END_IF;
     
     // 计算夜班实时累计值
@@ -134,7 +134,7 @@ END_IF;
 IF (Hour = 9) AND (Minute = 0) AND (Second <= 1) AND In_Run THEN
     Out_Tot_Class2 := In_Flow - Temp[11];
     Out_Tot_Class2_RT := 0;
-    Flag_Class2_Start := FALSE;
+    Flag_Class2_Start := 0;
 END_IF;
 
 // ===============================================================
@@ -220,8 +220,8 @@ IF HMI_CMD.Clear THEN
     Out_Tot_3H_21_24 := 0;
     
     // 清零标志位
-    Flag_Class1_Start := FALSE;
-    Flag_Class2_Start := FALSE;
+    Flag_Class1_Start := 0;
+    Flag_Class2_Start := 0;
     Last_Hour_Index := -1;
     
     // 清零临时累计变量
@@ -249,9 +249,7 @@ END_IF;
 HMI_CMD.Out_Tot := Out_Tot;
 HMI_CMD.Out_Tot_Class_RT := Out_Tot_Class_RT;
 HMI_CMD.Out_Tot_Class1 := Out_Tot_Class1;
-HMI_CMD.Out_Tot_Class1_RT := Out_Tot_Class1_RT;
 HMI_CMD.Out_Tot_Class2 := Out_Tot_Class2;
-HMI_CMD.Out_Tot_Class2_RT := Out_Tot_Class2_RT;
 HMI_CMD.Out_Tot_3H_RT := Out_Tot_3H_RT;
 HMI_CMD.Out_Tot_3H_00_03 := Out_Tot_3H_00_03;
 HMI_CMD.Out_Tot_3H_03_06 := Out_Tot_3H_03_06;
