@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- =============================================================== -->
-<!-- AOI 名称: OreOutputStatisticsSystem                                             -->
+<!-- AOI 名称: OreProdStats                                             -->
 <!-- 功能描述: 多维度累计计数器 (产量统计系统)                       -->
 <!-- 版本信息: 1.2 (优化版)                                         -->
 <!-- 软件版本: Studio 5000 v33.01                                   -->
@@ -23,17 +23,17 @@
 <!-- 5. 减少代码重复                                                -->
 <!-- =============================================================== -->
 
-<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="33.01" TargetName="OreOutputStatisticsSystem" TargetType="AddOnInstructionDefinition" TargetRevision="1.2" TargetLastEdited="2026-01-21T10:00:00.000Z" CurrentLanguage="zh-CN" ContainsContext="true" Owner="Windows 用户" ExportDate="Mon Jan 21 10:00:00 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="33.01" TargetName="OreProdStats" TargetType="AddOnInstructionDefinition" TargetRevision="1.2" TargetLastEdited="2026-01-21T10:00:00.000Z" CurrentLanguage="zh-CN" ContainsContext="true" Owner="Windows 用户" ExportDate="Mon Jan 21 10:00:00 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
 <Controller Use="Context" Name="JLKY_D_MF">
 
 <!-- =============================================================== -->
 <!-- 数据类型定义区域                                               -->
 <!-- =============================================================== -->
 <DataTypes Use="Context">
-<DataType Name="OreOutputStatisticsSystem" Family="NoFamily" Class="User">
+<DataType Name="OreProdStats_Type" Family="NoFamily" Class="User">
 <Members>
-<Member Name="ZZZZZZZZZZOreOutputStatisticsSystem0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
-<Member Name="Clear" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZOreOutputStatisticsSystem0" BitNumber="0" ExternalAccess="Read/Write">
+<Member Name="ZZZZZZZZZZOreProdStats0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="Clear" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZOreProdStats0" BitNumber="0" ExternalAccess="Read/Write">
 <Description>
 <![CDATA[清除]]>
 <LocalizedDescription Lang="zh-CN">
@@ -121,7 +121,7 @@
 <!-- AOI 定义区域                                                   -->
 <!-- =============================================================== -->
 <AddOnInstructionDefinitions Use="Context">
-<AddOnInstructionDefinition Use="Target" Name="OreOutputStatisticsSystem" Revision="1.2" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2021-10-13T07:48:01.536Z" CreatedBy="WIN-12QA0PHQ8RP\Administrator" EditedDate="2026-01-21T10:00:00.000Z" EditedBy="AI_Optimizer" SoftwareRevision="v33.00">
+<AddOnInstructionDefinition Use="Target" Name="OreProdStats" Revision="1.2" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2021-10-13T07:48:01.536Z" CreatedBy="WIN-12QA0PHQ8RP\Administrator" EditedDate="2026-01-21T10:00:00.000Z" EditedBy="AI_Optimizer" SoftwareRevision="v33.00">
 
 <!-- =============================================================== -->
 <!-- 参数定义区域                                                   -->
@@ -209,7 +209,7 @@
 <DataValue DataType="REAL" Radix="Float" Value="0.0"/>
 </DefaultData>
 </Parameter>
-<Parameter Name="HMI_CMD" TagType="Base" DataType="OreOutputStatisticsSystem" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="HMI_CMD" TagType="Base" DataType="OreProdStats_Type" Usage="InOut" Required="true" Visible="true" Constant="false"/>
 <Parameter Name="Out_Tot_Class1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="None">
 <DefaultData Format="L5K">
 <![CDATA[0.00000000e+000]]>
