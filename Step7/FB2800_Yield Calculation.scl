@@ -3,19 +3,18 @@ FUNCTION_BLOCK FB2800
  TITLE = 'YieldCalculation' 
  // 
  // 主要用于计算班、年、月、日产量， 
- // 增加白班与夜班每三小时的产量计算
+ // 增加早班、中班、晚班每两小时的产量计算
  // 
- VERSION: '1.1' 
+ VERSION: '1.3' 
  AUTHOR: QIAO 
  NAME:ProCount
  FAMILY:QFam
  
-
  
  
  //输入 
  VAR_INPUT 
- //实时皮带秤总累计量 
+ //实时实时皮带秤总累计量 
  Product_Total:REAL; 
  //初始化信号（上升沿有效）
  Initialize:BOOL;
@@ -24,10 +23,12 @@ FUNCTION_BLOCK FB2800
   
   //输出 
  VAR_OUTPUT 
- //白班产量 
- Product_White_Class:REAL:=0.0; 
- //夜班产量 
- Product_Night_Class:REAL:=0.0; 
+ //早班产量（9:00-17:00）
+ Product_Early_Class:REAL:=0.0; 
+ //中班产量（17:00-1:00）
+ Product_Middle_Class:REAL:=0.0; 
+ //晚班产量（1:00-9:00）
+ Product_Late_Class:REAL:=0.0; 
  //日产量 
  Product_Day:REAL:=0.0; 
  //月产量 
@@ -38,16 +39,21 @@ Product_Year:REAL:=0.0;
 Product_LastMonth:REAL:=0.0;
 //昨天产量
 Product_Yesterday:REAL:=0.0;
-//白班每三小时产量
- Product_White_3H_1:REAL:=0.0; //白班第一段(9:00-12:00)
- Product_White_3H_2:REAL:=0.0; //白班第二段(12:00-15:00)
- Product_White_3H_3:REAL:=0.0; //白班第三段(15:00-18:00)
- Product_White_3H_4:REAL:=0.0; //白班第四段(18:00-21:00)
- //夜班每三小时产量
- Product_Night_3H_1:REAL:=0.0; //夜班第一段(21:00-24:00)
- Product_Night_3H_2:REAL:=0.0; //夜班第二段(0:00-3:00)
- Product_Night_3H_3:REAL:=0.0; //夜班第三段(3:00-6:00)
- Product_Night_3H_4:REAL:=0.0; //夜班第四段(6:00-9:00)
+//早班每两小时产量
+ Product_Early_2H_1:REAL:=0.0; //早班第一段(9:00-11:00)
+ Product_Early_2H_2:REAL:=0.0; //早班第二段(11:00-13:00)
+ Product_Early_2H_3:REAL:=0.0; //早班第三段(13:00-15:00)
+ Product_Early_2H_4:REAL:=0.0; //早班第四段(15:00-17:00)
+ //中班每两小时产量
+ Product_Middle_2H_1:REAL:=0.0; //中班第一段(17:00-19:00)
+ Product_Middle_2H_2:REAL:=0.0; //中班第二段(19:00-21:00)
+ Product_Middle_2H_3:REAL:=0.0; //中班第三段(21:00-23:00)
+ Product_Middle_2H_4:REAL:=0.0; //中班第四段(23:00-1:00)
+ //晚班每两小时产量
+ Product_Late_2H_1:REAL:=0.0; //晚班第一段(1:00-3:00)
+ Product_Late_2H_2:REAL:=0.0; //晚班班第二段(3:00-5:00)
+ Product_Late_2H_3:REAL:=0.0; //晚班第三段(5:00-7:00)
+ Product_Late_2H_4:REAL:=0.0; //晚班第四段(7:00-9:00)
  //初始化完成标志
  Init_Done:BOOL:=FALSE; 
  END_VAR 
@@ -91,37 +97,49 @@ Product_Yesterday:REAL:=0.0;
       DayNowFormer:INT; 
  
       //开班、日、月、年时间的产量 
-      StartWhiteClassPro:REAL:=0.0; 
-      StartNightClassPro:REAL:=0.0; 
+      StartEarlyClassPro:REAL:=0.0; 
+      StartMiddleClassPro:REAL:=0.0; 
+      StartLateClassPro:REAL:=0.0; 
       StartDayClassPro:REAL:=0.0; 
       StartMonthClassPro:REAL:=0.0; 
       StartYearClassPro:REAL:=0.0; 
-      //白班每三小时产量起始值
-      StartWhite_3H_1:REAL:=0.0; //白班第一段(9:00-12:00)
-      StartWhite_3H_2:REAL:=0.0; //白班第二段(12:00-15:00)
-      StartWhite_3H_3:REAL:=0.0; //白班第三段(15:00-18:00)
-      StartWhite_3H_4:REAL:=0.0; //白班第四段(18:00-21:00)
-      //夜班每三小时产量起始值
-      StartNight_3H_1:REAL:=0.0; //夜班第一段(21:00-24:00)
-      StartNight_3H_2:REAL:=0.0; //夜班第二段(0:00-3:00)
-      StartNight_3H_3:REAL:=0.0; //夜班第三段(3:00-6:00)
-      StartNight_3H_4:REAL:=0.0; //夜班第四段(6:00-9:00)
-      //白班每三小时产量标志位
-      White_3H_1_Flag:BOOL:=FALSE;
-      White_3H_2_Flag:BOOL:=FALSE;
-      White_3H_3_Flag:BOOL:=FALSE;
-      White_3H_4_Flag:BOOL:=FALSE;
-      //夜班每三小时产量标志位
-      Night_3H_1_Flag:BOOL:=FALSE;
-      Night_3H_2_Flag:BOOL:=FALSE;
-      Night_3H_3_Flag:BOOL:=FALSE;
-      Night_3H_4_Flag:BOOL:=FALSE;
+      //早班每两小时产量起始值
+      StartEarly_2H_1:REAL:=0.0; //早班第一段(9:00-11:00)
+      StartEarly_2H_2:REAL:=0.0; //早班第二段(11:00-13:00)
+      StartEarly_2H_3:REAL:=0.0; //早班第三段(13:00-15:00)
+      StartEarly_2H_4:REAL:=0.0; //早班第四段(15:00-17:00)
+      //中班每两小时产量起始值
+      StartMiddle_2H_1:REAL:=0.0; //中班第一段(17:00-19:00)
+      StartMiddle_2H_2:REAL:=0.0; //中班第二段(19:00-21:00)
+      StartMiddle_2H_3:REAL:=0.0; //中班第三段(21:00-23:00)
+      StartMiddle_2H_4:REAL:=0.0; //中班第四段(23:00-1:00)
+      //晚班每两小时产量起始值
+      StartLate_2H_1:REAL:=0.0; //晚班第一段(1:00-3:00)
+      StartLate_2H_2:REAL:=0.0; //晚班第二段(3:00-5:00)
+      StartLate_2H_3:REAL:=0.0; //晚班第三段(5:00-7:00)
+      StartLate_2H_4:REAL:=0.0; //晚班第四段(7:00-9:00)
+      //早班每两小时产量标志位
+      Early_2H_1_Flag:BOOL:=FALSE;
+      Early_2H_2_Flag:BOOL:=FALSE;
+      Early_2H_3_Flag:BOOL:=FALSE;
+      Early_2H_4_Flag:BOOL:=FALSE;
+      //中班每两小时产量标志位
+      Middle_2H_1_Flag:BOOL:=FALSE;
+      Middle_2H_2_Flag:BOOL:=FALSE;
+      Middle_2H_3_Flag:BOOL:=FALSE;
+      Middle_2H_4_Flag:BOOL:=FALSE;
+      //晚班每两小时产量标志位
+      Late_2H_1_Flag:BOOL:=FALSE;
+      Late_2H_2_Flag:BOOL:=FALSE;
+      Late_2H_3_Flag:BOOL:=FALSE;
+      Late_2H_4_Flag:BOOL:=FALSE;
       
       //首次扫描标志
       IsFirstScan:BOOL:=TRUE;
       //班别标志
-      WhiteClassFlag:BOOL:=FALSE;
-      NightClassFlag:BOOL:=FALSE;
+      EarlyClassFlag:BOOL:=FALSE;
+      MiddleClassFlag:BOOL:=FALSE;
+      LateClassFlag:BOOL:=FALSE;
       //产量计算标志
       DayFlag:BOOL:=FALSE;
       MonthFlag:BOOL:=FALSE;
@@ -146,20 +164,27 @@ Product_Yesterday:REAL:=0.0;
  // 首次扫描初始化
  IF IsFirstScan THEN
      // 初始化所有开始产量为当前总累计量
-     StartWhiteClassPro:=Product_Total;
-     StartNightClassPro:=Product_Total;
+     StartEarlyClassPro:=Product_Total;
+     StartMiddleClassPro:=Product_Total;
+     StartLateClassPro:=Product_Total;
      StartDayClassPro:=Product_Total;
      StartMonthClassPro:=Product_Total;
      StartYearClassPro:=Product_Total;
-     // 初始化每三小时产量开始值
-     StartWhite_3H_1:=Product_Total;
-     StartWhite_3H_2:=Product_Total;
-     StartWhite_3H_3:=Product_Total;
-     StartWhite_3H_4:=Product_Total;
-     StartNight_3H_1:=Product_Total;
-     StartNight_3H_2:=Product_Total;
-     StartNight_3H_3:=Product_Total;
-     StartNight_3H_4:=Product_Total;
+     // 初始化早班每两小时产量开始值
+     StartEarly_2H_1:=Product_Total;
+     StartEarly_2H_2:=Product_Total;
+     StartEarly_2H_3:=Product_Total;
+     StartEarly_2H_4:=Product_Total;
+     // 初始化中班每两小时产量开始值
+     StartMiddle_2H_1:=Product_Total;
+     StartMiddle_2H_2:=Product_Total;
+     StartMiddle_2H_3:=Product_Total;
+     StartMiddle_2H_4:=Product_Total;
+     // 初始化晚班每两小时产量开始值
+     StartLate_2H_1:=Product_Total;
+     StartLate_2H_2:=Product_Total;
+     StartLate_2H_3:=Product_Total;
+     StartLate_2H_4:=Product_Total;
      // 保存当前时间作为上一次扫描时间
      YearLast:=YearNow;
      MonthLast:=MonthNow;
@@ -175,205 +200,303 @@ Product_Yesterday:REAL:=0.0;
  // 初始化信号处理
  IF Initialize THEN
      // 重置所有开始产量为当前总累计量
-     StartWhiteClassPro:=Product_Total;
-     StartNightClassPro:=Product_Total;
+     StartEarlyClassPro:=Product_Total;
+     StartMiddleClassPro:=Product_Total;
+     StartLateClassPro:=Product_Total;
      StartDayClassPro:=Product_Total;
      StartMonthClassPro:=Product_Total;
      StartYearClassPro:=Product_Total;
-     // 重置每三小时产量开始值
-     StartWhite_3H_1:=Product_Total;
-     StartWhite_3H_2:=Product_Total;
-     StartWhite_3H_3:=Product_Total;
-     StartWhite_3H_4:=Product_Total;
-     StartNight_3H_1:=Product_Total;
-     StartNight_3H_2:=Product_Total;
-     StartNight_3H_3:=Product_Total;
-     StartNight_3H_4:=Product_Total;
+     // 重置早班每两小时产量开始值
+     StartEarly_2H_1:=Product_Total;
+     StartEarly_2H_2:=Product_Total;
+     StartEarly_2H_3:=Product_Total;
+     StartEarly_2H_4:=Product_Total;
+     // 重置中班每两小时产量开始值
+     StartMiddle_2H_1:=Product_Total;
+     StartMiddle_2H_2:=Product_Total;
+     StartMiddle_2H_3:=Product_Total;
+     StartMiddle_2H_4:=Product_Total;
+     // 重置晚班每两小时产量开始值
+     StartLate_2H_1:=Product_Total;
+     StartLate_2H_2:=Product_Total;
+     StartLate_2H_3:=Product_Total;
+     StartLate_2H_4:=Product_Total;
      // 重置所有产量为0
-     Product_White_Class:=0.0;
-     Product_Night_Class:=0.0;
+     Product_Early_Class:=0.0;
+     Product_Middle_Class:=0.0;
+     Product_Late_Class:=0.0;
      Product_Day:=0.0;
      Product_Month:=0.0;
      Product_Year:=0.0;
-     // 重置每三小时产量为0
-     Product_White_3H_1:=0.0;
-     Product_White_3H_2:=0.0;
-     Product_White_3H_3:=0.0;
-     Product_White_3H_4:=0.0;
-     Product_Night_3H_1:=0.0;
-     Product_Night_3H_2:=0.0;
-     Product_Night_3H_3:=0.0;
-     Product_Night_3H_4:=0.0;
+     // 重置早班每两小时产量为0
+     Product_Early_2H_1:=0.0;
+     Product_Early_2H_2:=0.0;
+     Product_Early_2H_3:=0.0;
+     Product_Early_2H_4:=0.0;
+     // 重置中班每两小时产量为0
+     Product_Middle_2H_1:=0.0;
+     Product_Middle_2H_2:=0.0;
+     Product_Middle_2H_3:=0.0;
+     Product_Middle_2H_4:=0.0;
+     // 重置晚班每两小时产量为0
+     Product_Late_2H_1:=0.0;
+     Product_Late_2H_2:=0.0;
+     Product_Late_2H_3:=0.0;
+     Product_Late_2H_4:=0.0;
      // 更新标志位
      Init_Done:=TRUE;
  END_IF;
  
- // 白班产量计算（9:00-21:00） 
- // 判断是否进入白班时间（9:00:00）
+ // 早班产量计算（9:00-17:00） 
+ // 判断是否进入早班时间（9:00:00）
  IF (HourNow =9 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <9 AND HourNow>=9) THEN // 处理跨小时的情况
-     StartWhiteClassPro:=Product_Total;
-     WhiteClassFlag:=TRUE;
+     StartEarlyClassPro:=Product_Total;
+     EarlyClassFlag:=TRUE;
  END_IF;
  
- // 判断是否退出白班时间（21:00:00）
- IF (HourNow =21 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <21 AND HourNow>=21) THEN // 处理跨小时的情况
-     WhiteClassFlag:=FALSE;
+ // 判断是否退出早班时间（17:00:00）
+ IF (HourNow =17 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <17 AND HourNow>=17) THEN // 处理跨小时的情况
+     EarlyClassFlag:=FALSE;
  END_IF;
  
- // 计算白班产量
- IF HourNow>=9 AND HourNow<21 THEN
-    Product_White_Class:=Product_Total - StartWhiteClassPro;
+ // 计算早班产量
+ IF HourNow>=9 AND HourNow<17 THEN
+    Product_Early_Class:=Product_Total - StartEarlyClassPro;
  END_IF;
  
- // 白班每三小时产量计算
- // 白班第一段(9:00-12:00)
+ // 早班每两小时产量计算
+ // 早班第一段(9:00-11:00)
  IF (HourNow =9 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <9 AND HourNow>=9) THEN
-     StartWhite_3H_1:=Product_Total;
-     White_3H_1_Flag:=TRUE;
+     StartEarly_2H_1:=Product_Total;
+     Early_2H_1_Flag:=TRUE;
  END_IF;
  
- IF (HourNow =12 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <12 AND HourNow>=12) THEN
-     White_3H_1_Flag:=FALSE;
+ IF (HourNow =11 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <11 AND HourNow>=11) THEN
+     Early_2H_1_Flag:=FALSE;
  END_IF;
  
- IF HourNow>=9 AND HourNow<12 THEN
-    Product_White_3H_1:=Product_Total - StartWhite_3H_1;
+ IF HourNow>=9 AND HourNow<11 THEN
+    Product_Early_2H_1:=Product_Total - StartEarly_2H_1;
  END_IF;
  
- // 白班第二段(12:00-15:00)
- IF (HourNow =12 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <12 AND HourNow>=12) THEN
-     StartWhite_3H_2:=Product_Total;
-     White_3H_2_Flag:=TRUE;
+ // 早班第二段(11:00-13:00)
+ IF (HourNow =11 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <11 AND HourNow>=11) THEN
+     StartEarly_2H_2:=Product_Total;
+     Early_2H_2_Flag:=TRUE;
+ END_IF;
+ 
+ IF (HourNow =13 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <13 AND HourNow>=13) THEN
+     Early_2H_2_Flag:=FALSE;
+ END_IF;
+ 
+ IF HourNow>=11 AND HourNow<13 THEN
+    Product_Early_2H_2:=Product_Total - StartEarly_2H_2;
+ END_IF;
+ 
+ // 早班第三段(13:00-15:00)
+ IF (HourNow =13 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <13 AND HourNow>=13) THEN
+     StartEarly_2H_3:=Product_Total;
+     Early_2H_3_Flag:=TRUE;
  END_IF;
  
  IF (HourNow =15 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <15 AND HourNow>=15) THEN
-     White_3H_2_Flag:=FALSE;
+     Early_2H_3_Flag:=FALSE;
  END_IF;
  
- IF HourNow>=12 AND HourNow<15 THEN
-    Product_White_3H_2:=Product_Total - StartWhite_3H_2;
+ IF HourNow>=13 AND HourNow<15 THEN
+    Product_Early_2H_3:=Product_Total - StartEarly_2H_3;
  END_IF;
  
- // 白班第三段(15:00-18:00)
+ // 早班第四段(15:00-17:00)
  IF (HourNow =15 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <15 AND HourNow>=15) THEN
-     StartWhite_3H_3:=Product_Total;
-     White_3H_3_Flag:=TRUE;
+     StartEarly_2H_4:=Product_Total;
+     Early_2H_4_Flag:=TRUE;
  END_IF;
  
- IF (HourNow =18 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <18 AND HourNow>=18) THEN
-     White_3H_3_Flag:=FALSE;
+ IF (HourNow =17 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <17 AND HourNow>=17) THEN
+     Early_2H_4_Flag:=FALSE;
  END_IF;
  
- IF HourNow>=15 AND HourNow<18 THEN
-    Product_White_3H_3:=Product_Total - StartWhite_3H_3;
+ IF HourNow>=15 AND HourNow<17 THEN
+    Product_Early_2H_4:=Product_Total - StartEarly_2H_4;
  END_IF;
  
- // 白班第四段(18:00-21:00)
- IF (HourNow =18 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <18 AND HourNow>=18) THEN
-     StartWhite_3H_4:=Product_Total;
-     White_3H_4_Flag:=TRUE;
+ // 中班产量计算（17:00-1:00） 
+ // 判断是否进入中班时间（17:00:00）
+ IF (HourNow =17 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <17 AND HourNow>=17) THEN // 处理跨小时的情况
+     StartMiddleClassPro:=Product_Total;
+     MiddleClassFlag:=TRUE;
+ END_IF;
+ 
+ // 判断是否退出中班时间（1:00:00）
+ IF (HourNow =1 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast >=17) THEN // 处理跨天的情况
+     MiddleClassFlag:=FALSE;
+ END_IF;
+ 
+ // 计算中班产量
+ IF (HourNow>=17 AND HourNow<=23) OR (HourNow>=0 AND HourNow<1) THEN
+     Product_Middle_Class:=Product_Total - StartMiddleClassPro;
+ END_IF;
+ 
+ // 中班每两小时产量计算
+ // 中班第一段(17:00-19:00)
+ IF (HourNow =17 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <17 AND HourNow>=17) THEN
+     StartMiddle_2H_1:=Product_Total;
+     Middle_2H_1_Flag:=TRUE;
+ END_IF;
+ 
+ IF (HourNow =19 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <19 AND HourNow>=19) THEN
+     Middle_2H_1_Flag:=FALSE;
+ END_IF;
+ 
+ IF HourNow>=17 AND HourNow<19 THEN
+    Product_Middle_2H_1:=Product_Total - StartMiddle_2H_1;
+ END_IF;
+ 
+ // 中班第二段(19:00-21:00)
+ IF (HourNow =19 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <19 AND HourNow>=19) THEN
+     StartMiddle_2H_2:=Product_Total;
+     Middle_2H_2_Flag:=TRUE;
  END_IF;
  
  IF (HourNow =21 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <21 AND HourNow>=21) THEN
-     White_3H_4_Flag:=FALSE;
+     Middle_2H_2_Flag:=FALSE;
  END_IF;
  
- IF HourNow>=18 AND HourNow<21 THEN
-    Product_White_3H_4:=Product_Total - StartWhite_3H_4;
+ IF HourNow>=19 AND HourNow<21 THEN
+    Product_Middle_2H_2:=Product_Total - StartMiddle_2H_2;
  END_IF;
  
- // 夜班产量计算（21:00-次日9:00） 
- // 判断是否进入夜班时间（21:00:00）
+ // 中班第三段(21:00-23:00)
  IF (HourNow =21 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <21 AND HourNow>=21) THEN // 处理跨小时的情况
-     StartNightClassPro:=Product_Total;
-     NightClassFlag:=TRUE;
+    (HourLast <21 AND HourNow>=21) THEN
+     StartMiddle_2H_3:=Product_Total;
+     Middle_2H_3_Flag:=TRUE;
  END_IF;
  
- // 判断是否退出夜班时间（9:00:00）
+ IF (HourNow =23 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <23 AND HourNow>=23) THEN
+     Middle_2H_3_Flag:=FALSE;
+ END_IF;
+ 
+ IF HourNow>=21 AND HourNow<23 THEN
+    Product_Middle_2H_3:=Product_Total - StartMiddle_2H_3;
+ END_IF;
+ 
+ // 中班第四段(23:00-1:00)
+ IF (HourNow =23 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <23 AND HourNow>=23) THEN
+     StartMiddle_2H_4:=Product_Total;
+     Middle_2H_4_Flag:=TRUE;
+ END_IF;
+ 
+ IF (HourNow =1 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast >=23) THEN
+     Middle_2H_4_Flag:=FALSE;
+ END_IF;
+ 
+ IF (HourNow>=23 AND HourNow<=23) OR (HourNow>=0 AND HourNow<1) THEN
+    Product_Middle_2H_4:=Product_Total - StartMiddle_2H_4;
+ END_IF;
+ 
+ // 晚班产量计算（1:00-9:00） 
+ // 判断是否进入晚班时间（1:00:00）
+ IF (HourNow =1 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast >=17) THEN // 处理跨天的情况
+     StartLateClassPro:=Product_Total;
+     LateClassFlag:=TRUE;
+ END_IF;
+ 
+ // 判断是否退出晚班时间（9:00:00）
  IF (HourNow =9 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast >=21 AND HourNow<9) THEN // 处理跨天的情况
-     NightClassFlag:=FALSE;
+    (HourLast <9 AND HourNow>=9) THEN // 处理跨小时的情况
+     LateClassFlag:=FALSE;
  END_IF;
  
- // 计算夜班产量
- IF (HourNow>=21 AND HourNow<=23) OR (HourNow>=0 AND HourNow<9) THEN
-     Product_Night_Class:=Product_Total - StartNightClassPro;
+ // 计算晚班产量
+ IF HourNow>=1 AND HourNow<9 THEN
+     Product_Late_Class:=Product_Total - StartLateClassPro;
  END_IF;
  
- // 夜班每三小时产量计算
- // 夜班第一段(21:00-24:00)
- IF (HourNow =21 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <21 AND HourNow>=21) THEN
-     StartNight_3H_1:=Product_Total;
-     Night_3H_1_Flag:=TRUE;
- END_IF;
- 
- IF (HourNow =0 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast >=21 AND HourNow<0) THEN
-     Night_3H_1_Flag:=FALSE;
- END_IF;
- 
- IF HourNow>=21 AND HourNow<=23 THEN
-    Product_Night_3H_1:=Product_Total - StartNight_3H_1;
- END_IF;
- 
- // 夜班第二段(0:00-3:00)
- IF (HourNow =0 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast >=21 AND HourNow<0) THEN
-     StartNight_3H_2:=Product_Total;
-     Night_3H_2_Flag:=TRUE;
+ // 晚班每两小时产量计算
+ // 晚班第一段(1:00-3:00)
+ IF (HourNow =1 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast >=17) THEN
+     StartLate_2H_1:=Product_Total;
+     Late_2H_1_Flag:=TRUE;
  END_IF;
  
  IF (HourNow =3 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <3 AND HourNow>=3) THEN
-     Night_3H_2_Flag:=FALSE;
+     Late_2H_1_Flag:=FALSE;
  END_IF;
  
- IF HourNow>=0 AND HourNow<3 THEN
-    Product_Night_3H_2:=Product_Total - StartNight_3H_2;
+ IF HourNow>=1 AND HourNow<3 THEN
+    Product_Late_2H_1:=Product_Total - StartLate_2H_1;
  END_IF;
  
- // 夜班第三段(3:00-6:00)
+ // 晚班第二段(3:00-5:00)
  IF (HourNow =3 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <3 AND HourNow>=3) THEN
-     StartNight_3H_3:=Product_Total;
-     Night_3H_3_Flag:=TRUE;
+     StartLate_2H_2:=Product_Total;
+     Late_2H_2_Flag:=TRUE;
  END_IF;
  
- IF (HourNow =6 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <6 AND HourNow>=6) THEN
-     Night_3H_3_Flag:=FALSE;
+ IF (HourNow =5 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <5 AND HourNow>=5) THEN
+     Late_2H_2_Flag:=FALSE;
  END_IF;
  
- IF HourNow>=3 AND HourNow<6 THEN
-    Product_Night_3H_3:=Product_Total - StartNight_3H_3;
+ IF HourNow>=3 AND HourNow<5 THEN
+    Product_Late_2H_2:=Product_Total - StartLate_2H_2;
  END_IF;
  
- // 夜班第四段(6:00-9:00)
- IF (HourNow =6 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <6 AND HourNow>=6) THEN
-     StartNight_3H_4:=Product_Total;
-     Night_3H_4_Flag:=TRUE;
+ // 晚班第三段(5:00-7:00)
+ IF (HourNow =5 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <5 AND HourNow>=5) THEN
+     StartLate_2H_3:=Product_Total;
+     Late_2H_3_Flag:=TRUE;
+ END_IF;
+ 
+ IF (HourNow =7 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <7 AND HourNow>=7) THEN
+     Late_2H_3_Flag:=FALSE;
+ END_IF;
+ 
+ IF HourNow>=5 AND HourNow<7 THEN
+    Product_Late_2H_3:=Product_Total - StartLate_2H_3;
+ END_IF;
+ 
+ // 晚班第四段(7:00-9:00)
+ IF (HourNow =7 AND MinuteNow=0 AND SecondNow=0) OR 
+    (HourLast <7 AND HourNow>=7) THEN
+     StartLate_2H_4:=Product_Total;
+     Late_2H_4_Flag:=TRUE;
  END_IF;
  
  IF (HourNow =9 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <9 AND HourNow>=9) THEN
-     Night_3H_4_Flag:=FALSE;
+     Late_2H_4_Flag:=FALSE;
  END_IF;
  
- IF HourNow>=6 AND HourNow<9 THEN
-    Product_Night_3H_4:=Product_Total - StartNight_3H_4;
+ IF HourNow>=7 AND HourNow<9 THEN
+    Product_Late_2H_4:=Product_Total - StartLate_2H_4;
  END_IF;
  
  // 日产量计算（9:00-次日9:00） 
