@@ -1,0 +1,1098 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- =============================================================== -->
+<!-- AOI 名称: OreProdStats                                             -->
+<!-- 功能描述: 多维度累计计数器 (产量统计系统)                       -->
+<!-- 版本信息: 1.2 (优化版)                                         -->
+<!-- 软件版本: Studio 5000 v33.01                                   -->
+<!-- 创建日期: 2021-10-13                                           -->
+<!-- 最后编辑: 2026-01-21 (逻辑优化Qiao)                               -->
+<!-- 适用控制器: ControlLogix/CompactLogix                          -->
+<!-- =============================================================== -->
+<!-- 核心功能:                                                      -->
+<!-- 1. 支持多种时间维度的累计统计                                   -->
+<!-- 2. 分钟/班/天/月四级累计                                       -->
+<!-- 3. 白班/夜班自动切换                                           -->
+<!-- 4. 实时累计与历史累计分离                                       -->
+<!-- 5. 支持清除功能重置累计值                                       -->
+<!-- =============================================================== -->
+<!-- 优化内容:                                                      -->
+<!-- 1. 简化复杂条件判断逻辑                                        -->
+<!-- 2. 统一变量命名规范                                            -->
+<!-- 3. 添加清晰的功能段注释                                        -->
+<!-- 4. 优化月份天数判断逻辑                                        -->
+<!-- 5. 减少代码重复                                                -->
+<!-- =============================================================== -->
+
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="33.01" TargetName="OreProdStats" TargetType="AddOnInstructionDefinition" TargetRevision="1.2" TargetLastEdited="2026-01-21T10:00:00.000Z" CurrentLanguage="zh-CN" ContainsContext="true" Owner="Windows 用户" ExportDate="Mon Jan 21 10:00:00 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
+<Controller Use="Context" Name="JLKY_D_MF">
+
+<!-- =============================================================== -->
+<!-- 数据类型定义区域                                               -->
+<!-- =============================================================== -->
+<DataTypes Use="Context">
+<DataType Name="OreProdStats_Type" Family="NoFamily" Class="User">
+<Members>
+<Member Name="ZZZZZZZZZZOreProdStats0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="Clear" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZOreProdStats0" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[清除]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[清除]]>
+</LocalizedDescription>
+</Description>
+</Member>
+<Member Name="Out_Tot" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[总累计]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[总累计]]>
+</LocalizedDescription>
+</Description>
+</Member>
+<Member Name="Out_Tot_Min" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[分种累计]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[分种累计]]>
+</LocalizedDescription>
+</Description>
+</Member>
+<Member Name="Out_Tot_Class_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[班实时累计]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[班实时累计]]>
+</LocalizedDescription>
+</Description>
+</Member>
+<Member Name="Out_Tot_Class1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[白班累计]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[白班累计]]>
+</LocalizedDescription>
+</Description>
+</Member>
+<Member Name="Out_Tot_Class2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[夜班累计]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[夜班累计]]>
+</LocalizedDescription>
+</Description>
+</Member>
+<Member Name="Out_Tot_D" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[昨天累计]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[昨天累计]]>
+</LocalizedDescription>
+</Description>
+</Member>
+<Member Name="Out_Tot_D_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[天实时累计]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[天实时累计]]>
+</LocalizedDescription>
+</Description>
+</Member>
+<Member Name="Out_Tot_M" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[上个月累计]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[上个月累计]]>
+</LocalizedDescription>
+</Description>
+</Member>
+<Member Name="Out_Tot_M_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[月实时累计]]>
+<LocalizedDescription Lang="zh-CN">
+<![CDATA[月实时累计]]>
+</LocalizedDescription>
+</Description>
+</Member>
+</Members>
+</DataType>
+</DataTypes>
+
+<!-- =============================================================== -->
+<!-- AOI 定义区域                                                   -->
+<!-- =============================================================== -->
+<AddOnInstructionDefinitions Use="Context">
+<AddOnInstructionDefinition Use="Target" Name="OreProdStats" Revision="1.2" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2021-10-13T07:48:01.536Z" CreatedBy="WIN-12QA0PHQ8RP\Administrator" EditedDate="2026-01-21T10:00:00.000Z" EditedBy="AI_Optimizer" SoftwareRevision="v33.00">
+
+<!-- =============================================================== -->
+<!-- 参数定义区域                                                   -->
+<!-- =============================================================== -->
+<Parameters>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only"/>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only"/>
+<Parameter Name="In_Pulse" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Run" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Scale" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Min" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Class_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_D_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_M_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_D" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_M" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="HMI_CMD" TagType="Base" DataType="OreProdStats_Type" Usage="InOut" Required="true" Visible="true" Constant="false"/>
+<Parameter Name="Out_Tot_Class1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Class2" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Year" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Month" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Day" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Second" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Class1_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Class2_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Tot_Min" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Class1_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Class2_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Day_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Day_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+</Parameters>
+
+<!-- =============================================================== -->
+<!-- 本地标签定义区域                                               -->
+<!-- =============================================================== -->
+<LocalTags>
+<LocalTag Name="Temp" DataType="REAL" Dimensions="32" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Array DataType="REAL" Dimensions="32" Radix="Float">
+<Element Index="[0]" Value="0.0"/>
+<Element Index="[1]" Value="0.0"/>
+<Element Index="[2]" Value="0.0"/>
+<Element Index="[3]" Value="0.0"/>
+<Element Index="[4]" Value="0.0"/>
+<Element Index="[5]" Value="0.0"/>
+<Element Index="[6]" Value="0.0"/>
+<Element Index="[7]" Value="0.0"/>
+<Element Index="[8]" Value="0.0"/>
+<Element Index="[9]" Value="0.0"/>
+<Element Index="[10]" Value="0.0"/>
+<Element Index="[11]" Value="0.0"/>
+<Element Index="[12]" Value="0.0"/>
+<Element Index="[13]" Value="0.0"/>
+<Element Index="[14]" Value="0.0"/>
+<Element Index="[15]" Value="0.0"/>
+<Element Index="[16]" Value="0.0"/>
+<Element Index="[17]" Value="0.0"/>
+<Element Index="[18]" Value="0.0"/>
+<Element Index="[19]" Value="0.0"/>
+<Element Index="[20]" Value="0.0"/>
+<Element Index="[21]" Value="0.0"/>
+<Element Index="[22]" Value="0.0"/>
+<Element Index="[23]" Value="0.0"/>
+<Element Index="[24]" Value="0.0"/>
+<Element Index="[25]" Value="0.0"/>
+<Element Index="[26]" Value="0.0"/>
+<Element Index="[27]" Value="0.0"/>
+<Element Index="[28]" Value="0.0"/>
+<Element Index="[29]" Value="0.0"/>
+<Element Index="[30]" Value="0.0"/>
+<Element Index="[31]" Value="0.0"/>
+</Array>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TONR_01" DataType="FBD_TIMER" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[1,0,0,0,0,0,0,0,0,4,0,0]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="FBD_TIMER">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="TimerEnable" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="Reset" DataType="BOOL" Value="0"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Status" DataType="DINT" Radix="Hex" Value="16#0000_0000"/>
+<DataValueMember Name="InstructFault" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PresetInv" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="OSRI_Pulse" DataType="FBD_ONESHOT" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[1,0,5.60519386e-045]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="FBD_ONESHOT">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="InputBit" DataType="BOOL" Value="0"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="OutputBit" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time" DataType="DINT" Dimensions="8" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0,0,0,0,0,0,0,0]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Array DataType="DINT" Dimensions="8" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+<Element Index="[5]" Value="0"/>
+<Element Index="[6]" Value="0"/>
+<Element Index="[7]" Value="0"/>
+</Array>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Out_Tot_Class1_RT" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Out_Tot_Class2_RT" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time_Set1" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time_Set2" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time_Set3_Day" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time_Real" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Is_Leap_Year" DataType="BOOL" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Days_In_Month" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+</LocalTags>
+
+<!-- =============================================================== -->
+<!-- 逻辑程序区域 (ST语言)                                          -->
+<!-- =============================================================== -->
+<Routines>
+<Routine Name="Logic" Type="ST">
+<STContent>
+
+<!-- =============================================================== -->
+<!-- 功能段 1: 脉冲检测与总累计                                     -->
+<!-- 说明: 检测输入脉冲的上升沿, 并进行总累计计数                   -->
+<!-- =============================================================== -->
+<Line Number="0">
+<![CDATA[// 脉冲上升沿检测]]>
+</Line>
+<Line Number="1">
+<![CDATA[OSRI_Pulse.InputBit := In_Pulse;]]>
+</Line>
+<Line Number="2">
+<![CDATA[OSRI(OSRI_Pulse);]]>
+</Line>
+<Line Number="3">
+<![CDATA[]]>
+</Line>
+<Line Number="4">
+<![CDATA[// 总累计计数 (仅在运行状态下检测到脉冲时累加)]]>
+</Line>
+<Line Number="5">
+<![CDATA[IF OSRI_Pulse.OutputBit AND In_Run THEN]]>
+</Line>
+<Line Number="6">
+<![CDATA[    Out_Tot := Out_Tot + In_Scale;]]>
+</Line>
+<Line Number="7">
+<![CDATA[    Temp[0] := Temp[0] + In_Scale;]]>
+</Line>
+<Line Number="8">
+<![CDATA[END_IF;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 2: 分钟累计                                             -->
+<!-- 说明: 使用TONR定时器实现n分钟累计功能                          -->
+<!-- =============================================================== -->
+<Line Number="9">
+<![CDATA[]]>
+</Line>
+<Line Number="10">
+<![CDATA[// 分钟累计定时器配置]]>
+</Line>
+<Line Number="11">
+<![CDATA[TONR_01.PRE := In_Tot_Min * 60000;]]>
+</Line>
+<Line Number="12">
+<![CDATA[TONR_01.Reset := TONR_01.DN;]]>
+</Line>
+<Line Number="13">
+<![CDATA[TONR_01.TimerEnable := In_Run;]]>
+</Line>
+<Line Number="14">
+<![CDATA[TONR(TONR_01);]]>
+</Line>
+<Line Number="15">
+<![CDATA[]]>
+</Line>
+<Line Number="16">
+<![CDATA[// 定时器到达预设值时, 更新分钟累计并清零临时变量]]>
+</Line>
+<Line Number="17">
+<![CDATA[IF TONR_01.DN THEN]]>
+</Line>
+<Line Number="18">
+<![CDATA[    Out_Tot_Min := Temp[0];]]>
+</Line>
+<Line Number="19">
+<![CDATA[    Temp[0] := 0;]]>
+</Line>
+<Line Number="20">
+<![CDATA[END_IF;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 3: 时间数据准备                                         -->
+<!-- 说明: 读取系统时间, 计算时间偏移量和时间设置                   -->
+<!-- =============================================================== -->
+<Line Number="21">
+<![CDATA[]]>
+</Line>
+<Line Number="22">
+<![CDATA[// 读取系统时间到时间数组]]>
+</Line>
+<Line Number="23">
+<![CDATA[Time[0] := Year;]]>
+</Line>
+<Line Number="24">
+<![CDATA[Time[1] := Month;]]>
+</Line>
+<Line Number="25">
+<![CDATA[Time[2] := Day;]]>
+</Line>
+<Line Number="26">
+<![CDATA[Time[3] := Hour;]]>
+</Line>
+<Line Number="27">
+<![CDATA[Time[4] := Minute;]]>
+</Line>
+<Line Number="28">
+<![CDATA[Time[5] := Second;]]>
+</Line>
+<Line Number="29">
+<![CDATA[]]>
+</Line>
+<Line Number="30">
+<![CDATA[// 计算当前时间的分钟偏移量 (从00:00开始的总分钟数)]]>
+</Line>
+<Line Number="31">
+<![CDATA[Time_Real := Hour * 60 + Minute;]]>
+</Line>
+<Line Number="32">
+<![CDATA[]]>
+</Line>
+<Line Number="33">
+<![CDATA[// 计算班次切换时间的分钟偏移量]]>
+</Line>
+<Line Number="34">
+<![CDATA[Time_Set1 := In_Class1_Time_Hour * 60 + In_Class1_Time_Minute;]]>
+</Line>
+<Line Number="35">
+<![CDATA[Time_Set2 := In_Class2_Time_Hour * 60 + In_Class2_Time_Minute;]]>
+</Line>
+<Line Number="36">
+<![CDATA[Time_Set3_Day := In_Day_Time_Hour * 60 + In_Day_Time_Minute;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 4: 白班累计逻辑                                         -->
+<!-- 说明: 在白班时间段内进行累计计数                               -->
+<!-- =============================================================== -->
+<Line Number="37">
+<![CDATA[]]>
+</Line>
+<Line Number="38">
+<![CDATA[// 白班累计计数 (在白班时间段内检测到脉冲时累加)]]>
+</Line>
+<Line Number="39">
+<![CDATA[IF (Time_Real >= Time_Set1) AND (Time_Real < Time_Set2) AND OSRI_Pulse.OutputBit AND In_Run THEN]]>
+</Line>
+<Line Number="40">
+<![CDATA[    Temp[10] := Temp[10] + In_Scale;]]>
+</Line>
+<Line Number="41">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="42">
+<![CDATA[]]>
+</Line>
+<Line Number="43">
+<![CDATA[// 更新白班实时累计值]]>
+</Line>
+<Line Number="44">
+<![CDATA[IF (Time_Real >= Time_Set1) AND (Time_Real < Time_Set2) THEN]]>
+</Line>
+<Line Number="45">
+<![CDATA[    Out_Tot_Class1_RT := Temp[10];]]>
+</Line>
+<Line Number="46">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="47">
+<![CDATA[]]>
+</Line>
+<Line Number="48">
+<![CDATA[// 白班结束时, 保存累计值并清零实时累计 (在切换时刻的0-1秒执行)]]>
+</Line>
+<Line Number="49">
+<![CDATA[IF (Hour = In_Class2_Time_Hour) AND (Minute = In_Class2_Time_Minute) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="50">
+<![CDATA[    Out_Tot_Class1 := Temp[10];]]>
+</Line>
+<Line Number="51">
+<![CDATA[    Out_Tot_Class1_RT := 0;]]>
+</Line>
+<Line Number="52">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="53">
+<![CDATA[]]>
+</Line>
+<Line Number="54">
+<![CDATA[// 白班结束后2-3秒, 清零临时累计变量]]>
+</Line>
+<Line Number="55">
+<![CDATA[IF (Hour = In_Class2_Time_Hour) AND (Minute = In_Class2_Time_Minute) AND (Second >= 2) AND (Second <= 3) THEN]]>
+</Line>
+<Line Number="56">
+<![CDATA[    Temp[10] := 0;]]>
+</Line>
+<Line Number="57">
+<![CDATA[END_IF;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 5: 夜班累计逻辑                                         -->
+<!-- 说明: 在夜班时间段内进行累计计数                               -->
+<!-- =============================================================== -->
+<Line Number="58">
+<![CDATA[]]>
+</Line>
+<Line Number="59">
+<![CDATA[// 夜班累计计数 (在夜班时间段内检测到脉冲时累加)]]>
+</Line>
+<Line Number="60">
+<![CDATA[IF (Time_Real >= Time_Set2) OR (Time_Real < Time_Set1) THEN]]>
+</Line>
+<Line Number="61">
+<![CDATA[    IF OSRI_Pulse.OutputBit AND In_Run THEN]]>
+</Line>
+<Line Number="62">
+<![CDATA[        Temp[11] := Temp[11] + In_Scale;]]>
+</Line>
+<Line Number="63">
+<![CDATA[    END_IF;]]>
+</Line>
+<Line Number="64">
+<![CDATA[    Out_Tot_Class2_RT := Temp[11];]]>
+</Line>
+<Line Number="65">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="66">
+<![CDATA[]]>
+</Line>
+<Line Number="67">
+<![CDATA[// 夜班结束时, 保存累计值并清零实时累计 (在切换时刻的0-1秒执行)]]>
+</Line>
+<Line Number="68">
+<![CDATA[IF (Hour = In_Class1_Time_Hour) AND (Minute = In_Class1_Time_Minute) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="69">
+<![CDATA[    Out_Tot_Class2 := Temp[11];]]>
+</Line>
+<Line Number="70">
+<![CDATA[    Out_Tot_Class2_RT := 0;]]>
+</Line>
+<Line Number="71">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="72">
+<![CDATA[]]>
+</Line>
+<Line Number="73">
+<![CDATA[// 夜班结束后2-3秒, 清零临时累计变量]]>
+</Line>
+<Line Number="74">
+<![CDATA[IF (Hour = In_Class1_Time_Hour) AND (Minute = In_Class1_Time_Minute) AND (Second >= 2) AND (Second <= 3) THEN]]>
+</Line>
+<Line Number="75">
+<![CDATA[    Temp[11] := 0;]]>
+</Line>
+<Line Number="76">
+<![CDATA[END_IF;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 6: 班实时累计输出                                       -->
+<!-- 说明: 根据当前时间输出对应的班实时累计值                       -->
+<!-- =============================================================== -->
+<Line Number="77">
+<![CDATA[]]>
+</Line>
+<Line Number="78">
+<![CDATA[// 输出当前班次的实时累计值]]>
+</Line>
+<Line Number="79">
+<![CDATA[IF (Time_Real >= Time_Set1) AND (Time_Real < Time_Set2) THEN]]>
+</Line>
+<Line Number="80">
+<![CDATA[    Out_Tot_Class_RT := Out_Tot_Class1_RT;]]>
+</Line>
+<Line Number="81">
+<![CDATA[ELSE]]>
+</Line>
+<Line Number="82">
+<![CDATA[    Out_Tot_Class_RT := Out_Tot_Class2_RT;]]>
+</Line>
+<Line Number="83">
+<![CDATA[END_IF;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 7: 天累计逻辑                                          -->
+<!-- 说明: 在当天时间段内进行累计计数                               -->
+<!-- =============================================================== -->
+<Line Number="84">
+<![CDATA[]]>
+</Line>
+<Line Number="85">
+<![CDATA[// 天累计计数 (检测到脉冲时累加)]]>
+</Line>
+<Line Number="86">
+<![CDATA[IF OSRI_Pulse.OutputBit AND In_Run THEN]]>
+</Line>
+<Line Number="87">
+<![CDATA[    Temp[8] := Temp[8] + In_Scale;]]>
+</Line>
+<Line Number="88">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="89">
+<![CDATA[]]>
+</Line>
+<Line Number="90">
+<![CDATA[// 更新天实时累计值]]>
+</Line>
+<Line Number="91">
+<![CDATA[Out_Tot_D_RT := Temp[8];]]>
+</Line>
+<Line Number="92">
+<![CDATA[]]>
+</Line>
+<Line Number="93">
+<![CDATA[// 天结束时, 保存累计值并清零实时累计 (在切换时刻的0-1秒执行)]]>
+</Line>
+<Line Number="94">
+<![CDATA[IF (Hour = In_Day_Time_Hour) AND (Minute = In_Day_Time_Minute) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="95">
+<![CDATA[    Out_Tot_D := Temp[8];]]>
+</Line>
+<Line Number="96">
+<![CDATA[    Out_Tot_D_RT := 0;]]>
+</Line>
+<Line Number="97">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="98">
+<![CDATA[]]>
+</Line>
+<Line Number="99">
+<![CDATA[// 天结束后2-3秒, 清零临时累计变量]]>
+</Line>
+<Line Number="100">
+<![CDATA[IF (Hour = In_Day_Time_Hour) AND (Minute = In_Day_Time_Minute) AND (Second >= 2) AND (Second <= 3) THEN]]>
+</Line>
+<Line Number="101">
+<![CDATA[    Temp[8] := 0;]]>
+</Line>
+<Line Number="102">
+<![CDATA[END_IF;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 8: 月累计逻辑 (优化版)                                 -->
+<!-- 说明: 简化的月份累计逻辑, 使用统一的判断方式                  -->
+<!-- =============================================================== -->
+<Line Number="103">
+<![CDATA[]]>
+</Line>
+<Line Number="104">
+<![CDATA[// 判断是否为闰年]]>
+</Line>
+<Line Number="105">
+<![CDATA[Is_Leap_Year := (Year MOD 4 = 0) AND (Year MOD 100 <> 0) OR (Year MOD 400 = 0);]]>
+</Line>
+<Line Number="106">
+<![CDATA[]]>
+</Line>
+<Line Number="107">
+<![CDATA[// 计算当前月份的天数]]>
+</Line>
+<Line Number="108">
+<![CDATA[CASE Month OF]]>
+</Line>
+<Line Number="109">
+<![CDATA[    1, 3, 5, 7, 8, 10, 12: Days_In_Month := 31;]]>
+</Line>
+<Line Number="110">
+<![CDATA[    4, 6, 9, 11: Days_In_Month := 30;]]>
+</Line>
+<Line Number="111">
+<![CDATA[    2:]]>
+</Line>
+<Line Number="112">
+<![CDATA[        IF Is_Leap_Year THEN]]>
+</Line>
+<Line Number="113">
+<![CDATA[            Days_In_Month := 29;]]>
+</Line>
+<Line Number="114">
+<![CDATA[        ELSE]]>
+</Line>
+<Line Number="115">
+<![CDATA[            Days_In_Month := 28;]]>
+</Line>
+<Line Number="116">
+<![CDATA[        END_IF;]]>
+</Line>
+<Line Number="117">
+<![CDATA[END_CASE;]]>
+</Line>
+<Line Number="118">
+<![CDATA[]]>
+</Line>
+<Line Number="119">
+<![CDATA[// 月累计计数 (在当月有效日期内检测到脉冲时累加)]]>
+</Line>
+<Line Number="120">
+<![CDATA[IF (Day >= 1) AND (Day <= Days_In_Month) AND OSRI_Pulse.OutputBit AND In_Run THEN]]>
+</Line>
+<Line Number="121">
+<![CDATA[    Temp[4] := Temp[4] + In_Scale;]]>
+</Line>
+<Line Number="122">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="123">
+<![CDATA[]]>
+</Line>
+<Line Number="124">
+<![CDATA[// 更新月实时累计值]]>
+</Line>
+<Line Number="125">
+<![CDATA[IF (Day >= 1) AND (Day <= Days_In_Month) THEN]]>
+</Line>
+<Line Number="126">
+<![CDATA[    Out_Tot_M_RT := Temp[4];]]>
+</Line>
+<Line Number="127">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="128">
+<![CDATA[]]>
+</Line>
+<Line Number="129">
+<![CDATA[// 月结束时, 保存累计值并清零实时累计 (每月1日00:00的0-1秒执行)]]>
+</Line>
+<Line Number="130">
+<![CDATA[IF (Day = 1) AND (Hour = 0) AND (Minute = 0) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="131">
+<![CDATA[    Out_Tot_M := Temp[4];]]>
+</Line>
+<Line Number="132">
+<![CDATA[    Out_Tot_M_RT := 0;]]>
+</Line>
+<Line Number="133">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="134">
+<![CDATA[]]>
+</Line>
+<Line Number="135">
+<![CDATA[// 月结束后2-3秒, 清零临时累计变量]]>
+</Line>
+<Line Number="136">
+<![CDATA[IF (Day = 1) AND (Hour = 0) AND (Minute = 0) AND (Second >= 2) AND (Second <= 3) THEN]]>
+</Line>
+<Line Number="137">
+<![CDATA[    Temp[4] := 0;]]>
+</Line>
+<Line Number="138">
+<![CDATA[END_IF;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 9: HMI 命令处理                                        -->
+<!-- 说明: 处理HMI发送的控制命令 (如清除累计)                      -->
+<!-- =============================================================== -->
+<Line Number="139">
+<![CDATA[]]>
+</Line>
+<Line Number="140">
+<![CDATA[// 处理HMI清除命令]]>
+</Line>
+<Line Number="141">
+<![CDATA[IF HMI_CMD.Clear THEN]]>
+</Line>
+<Line Number="142">
+<![CDATA[    Out_Tot := 0;]]>
+</Line>
+<Line Number="143">
+<![CDATA[    Out_Tot_Min := 0;]]>
+</Line>
+<Line Number="144">
+<![CDATA[    Out_Tot_Class_RT := 0;]]>
+</Line>
+<Line Number="145">
+<![CDATA[    Out_Tot_D_RT := 0;]]>
+</Line>
+<Line Number="146">
+<![CDATA[    Out_Tot_M_RT := 0;]]>
+</Line>
+<Line Number="147">
+<![CDATA[    Out_Tot_D := 0;]]>
+</Line>
+<Line Number="148">
+<![CDATA[    Out_Tot_M := 0;]]>
+</Line>
+<Line Number="149">
+<![CDATA[    Out_Tot_Class1 := 0;]]>
+</Line>
+<Line Number="150">
+<![CDATA[    Out_Tot_Class2 := 0;]]>
+</Line>
+<Line Number="151">
+<![CDATA[    Out_Tot_Class1_RT := 0;]]>
+</Line>
+<Line Number="152">
+<![CDATA[    Out_Tot_Class2_RT := 0;]]>
+</Line>
+<Line Number="153">
+<![CDATA[    Temp[0] := 0;]]>
+</Line>
+<Line Number="154">
+<![CDATA[    Temp[4] := 0;]]>
+</Line>
+<Line Number="155">
+<![CDATA[    Temp[5] := 0;]]>
+</Line>
+<Line Number="156">
+<![CDATA[    Temp[6] := 0;]]>
+</Line>
+<Line Number="157">
+<![CDATA[    Temp[7] := 0;]]>
+</Line>
+<Line Number="158">
+<![CDATA[    Temp[8] := 0;]]>
+</Line>
+<Line Number="159">
+<![CDATA[    Temp[10] := 0;]]>
+</Line>
+<Line Number="160">
+<![CDATA[    Temp[11] := 0;]]>
+</Line>
+<Line Number="161">
+<![CDATA[    HMI_CMD.Clear := 0;]]>
+</Line>
+<Line Number="162">
+<![CDATA[END_IF;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 10: 输出 HMI 数据                                      -->
+<!-- 说明: 将累计值同步到HMI命令块                                 -->
+<!-- =============================================================== -->
+<Line Number="163">
+<![CDATA[]]>
+</Line>
+<Line Number="164">
+<![CDATA[// 同步累计值到HMI命令块]]>
+</Line>
+<Line Number="165">
+<![CDATA[HMI_CMD.Out_Tot := Out_Tot;]]>
+</Line>
+<Line Number="166">
+<![CDATA[HMI_CMD.Out_Tot_Min := Out_Tot_Min;]]>
+</Line>
+<Line Number="167">
+<![CDATA[HMI_CMD.Out_Tot_Class_RT := Out_Tot_Class_RT;]]>
+</Line>
+<Line Number="168">
+<![CDATA[HMI_CMD.Out_Tot_D_RT := Out_Tot_D_RT;]]>
+</Line>
+<Line Number="169">
+<![CDATA[HMI_CMD.Out_Tot_M_RT := Out_Tot_M_RT;]]>
+</Line>
+<Line Number="170">
+<![CDATA[HMI_CMD.Out_Tot_D := Out_Tot_D;]]>
+</Line>
+<Line Number="171">
+<![CDATA[HMI_CMD.Out_Tot_M := Out_Tot_M;]]>
+</Line>
+<Line Number="172">
+<![CDATA[HMI_CMD.Out_Tot_Class1 := Out_Tot_Class1;]]>
+</Line>
+<Line Number="173">
+<![CDATA[HMI_CMD.Out_Tot_Class2 := Out_Tot_Class2;]]>
+</Line>
+
+<!-- =============================================================== -->
+<!-- 功能段 11: 启用状态输出                                       -->
+<!-- 说明: 设置AOI的启用状态输出                                   -->
+<!-- =============================================================== -->
+<Line Number="174">
+<![CDATA[]]>
+</Line>
+<Line Number="175">
+<![CDATA[// 设置AOI启用状态输出]]>
+</Line>
+<Line Number="176">
+<![CDATA[EnableOut := EnableIn;]]>
+</Line>
+
+</STContent>
+</Routine>
+</Routines>
+
+</AddOnInstructionDefinition>
+</AddOnInstructionDefinitions>
+
+</Controller>
+</RSLogix5000Content>
