@@ -23,37 +23,30 @@ FUNCTION_BLOCK FB2800
   
   //输出 
  VAR_OUTPUT 
- //早班产量（9:00-17:00）
- Product_Early_Class:REAL:=0.0; 
- //中班产量（17:00-1:00）
- Product_Middle_Class:REAL:=0.0; 
- //晚班产量（1:00-9:00）
- Product_Late_Class:REAL:=0.0; 
- //日产量 
- Product_Day:REAL:=0.0; 
- //月产量 
- Product_Month:REAL:=0.0; 
- //年产量 
-Product_Year:REAL:=0.0; 
-//上月产量
-Product_LastMonth:REAL:=0.0;
-//昨天产量
-Product_Yesterday:REAL:=0.0;
+ 
+Product_Early_Class:REAL:=0.0;      //早班产量（9:00-17:00）
+Product_Middle_Class:REAL:=0.0;    //中班产量（17:00-1:00）
+Product_Late_Class:REAL:=0.0;     //晚班产量（1:00-9:00）
+Product_Day:REAL:=0.0;           //日产量 
+Product_Month:REAL:=0.0;        //月产量 
+Product_Year:REAL:=0.0;        //年产量 
+Product_LastMonth:REAL:=0.0;  //上月产量
+Product_Yesterday:REAL:=0.0; //昨天产量
 //早班每两小时产量
- Product_Early_2H_1:REAL:=0.0; //早班第一段(9:00-11:00)
- Product_Early_2H_2:REAL:=0.0; //早班第二段(11:00-13:00)
- Product_Early_2H_3:REAL:=0.0; //早班第三段(13:00-15:00)
- Product_Early_2H_4:REAL:=0.0; //早班第四段(15:00-17:00)
+ Product_Early_2H_1:REAL:=0.0;      //早班第一段(9:00-11:00)
+ Product_Early_2H_2:REAL:=0.0;      //早班第二段(11:00-13:00)
+ Product_Early_2H_3:REAL:=0.0;      //早班第三段(13:00-15:00)
+ Product_Early_2H_4:REAL:=0.0;      //早班第四段(15:00-17:00)
  //中班每两小时产量
- Product_Middle_2H_1:REAL:=0.0; //中班第一段(17:00-19:00)
- Product_Middle_2H_2:REAL:=0.0; //中班第二段(19:00-21:00)
- Product_Middle_2H_3:REAL:=0.0; //中班第三段(21:00-23:00)
- Product_Middle_2H_4:REAL:=0.0; //中班第四段(23:00-1:00)
+ Product_Middle_2H_1:REAL:=0.0;     //中班第一段(17:00-19:00)
+ Product_Middle_2H_2:REAL:=0.0;     //中班第二段(19:00-21:00)  
+ Product_Middle_2H_3:REAL:=0.0;     //中班第三段(21:00-23:00)
+ Product_Middle_2H_4:REAL:=0.0;     //中班第四段(23:00-1:00)
  //晚班每两小时产量
- Product_Late_2H_1:REAL:=0.0; //晚班第一段(1:00-3:00)
- Product_Late_2H_2:REAL:=0.0; //晚班班第二段(3:00-5:00)
- Product_Late_2H_3:REAL:=0.0; //晚班第三段(5:00-7:00)
- Product_Late_2H_4:REAL:=0.0; //晚班第四段(7:00-9:00)
+ Product_Late_2H_1:REAL:=0.0;      //晚班第一段(1:00-3:00)
+ Product_Late_2H_2:REAL:=0.0;      //晚班班第二段(3:00-5:00)
+ Product_Late_2H_3:REAL:=0.0;      //晚班第三段(5:00-7:00)
+ Product_Late_2H_4:REAL:=0.0;      //晚班第四段(7:00-9:00)
  //初始化完成标志
  Init_Done:BOOL:=FALSE; 
  END_VAR 
