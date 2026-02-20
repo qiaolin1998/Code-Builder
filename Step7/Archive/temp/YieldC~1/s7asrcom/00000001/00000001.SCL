@@ -2,8 +2,8 @@ FUNCTION_BLOCK FB2800
  
  TITLE = 'YieldCalculation' 
  // 
- // ä¸»è¦ç”¨äºè®¡ç®—ç­ã€å¹´ã€æœˆã€æ—¥äº§é‡ï¼Œ 
- // å¢åŠ æ—©ç­ã€ä¸­ç­ã€æ™šç­æ¯ä¸¤å°æ—¶çš„äº§é‡è®¡ç®—
+ // Ö÷ÒªÓÃÓÚ¼ÆËã°à¡¢Äê¡¢ÔÂ¡¢ÈÕ²úÁ¿£¬ 
+ // Ôö¼ÓÔç°à¡¢ÖĞ°à¡¢Íí°àÃ¿Á½Ğ¡Ê±µÄ²úÁ¿¼ÆËã
  // 
  VERSION: '1.3' 
  AUTHOR: QIAO 
@@ -12,42 +12,42 @@ FUNCTION_BLOCK FB2800
  
  
  
- //è¾“å…¥ 
+ //ÊäÈë 
  VAR_INPUT 
- //å®æ—¶å®æ—¶çš®å¸¦ç§¤æ€»ç´¯è®¡é‡ 
+ //ÊµÊ±ÊµÊ±Æ¤´ø³Ó×ÜÀÛ¼ÆÁ¿ 
  Product_Total:REAL; 
- //åˆå§‹åŒ–ä¿¡å·ï¼ˆä¸Šå‡æ²¿æœ‰æ•ˆï¼‰
+ //³õÊ¼»¯ĞÅºÅ£¨ÉÏÉıÑØÓĞĞ§£©
  Initialize:BOOL;
  END_VAR 
   
   
-  //è¾“å‡º 
+  //Êä³ö 
  VAR_OUTPUT 
  
-Product_Early_Class:REAL:=0.0;      //æ—©ç­äº§é‡ï¼ˆ9:00-17:00ï¼‰
-Product_Middle_Class:REAL:=0.0;    //ä¸­ç­äº§é‡ï¼ˆ17:00-1:00ï¼‰
-Product_Late_Class:REAL:=0.0;     //æ™šç­äº§é‡ï¼ˆ1:00-9:00ï¼‰
-Product_Day:REAL:=0.0;           //æ—¥äº§é‡ 
-Product_Month:REAL:=0.0;        //æœˆäº§é‡ 
-Product_Year:REAL:=0.0;        //å¹´äº§é‡ 
-Product_LastMonth:REAL:=0.0;  //ä¸Šæœˆäº§é‡
-Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
-//æ—©ç­æ¯ä¸¤å°æ—¶äº§é‡
- Product_Early_2H_1:REAL:=0.0;      //æ—©ç­ç¬¬ä¸€æ®µ(9:00-11:00)
- Product_Early_2H_2:REAL:=0.0;      //æ—©ç­ç¬¬äºŒæ®µ(11:00-13:00)
- Product_Early_2H_3:REAL:=0.0;      //æ—©ç­ç¬¬ä¸‰æ®µ(13:00-15:00)
- Product_Early_2H_4:REAL:=0.0;      //æ—©ç­ç¬¬å››æ®µ(15:00-17:00)
- //ä¸­ç­æ¯ä¸¤å°æ—¶äº§é‡
- Product_Middle_2H_1:REAL:=0.0;     //ä¸­ç­ç¬¬ä¸€æ®µ(17:00-19:00)
- Product_Middle_2H_2:REAL:=0.0;     //ä¸­ç­ç¬¬äºŒæ®µ(19:00-21:00)  
- Product_Middle_2H_3:REAL:=0.0;     //ä¸­ç­ç¬¬ä¸‰æ®µ(21:00-23:00)
- Product_Middle_2H_4:REAL:=0.0;     //ä¸­ç­ç¬¬å››æ®µ(23:00-1:00)
- //æ™šç­æ¯ä¸¤å°æ—¶äº§é‡
- Product_Late_2H_1:REAL:=0.0;      //æ™šç­ç¬¬ä¸€æ®µ(1:00-3:00)
- Product_Late_2H_2:REAL:=0.0;      //æ™šç­ç­ç¬¬äºŒæ®µ(3:00-5:00)
- Product_Late_2H_3:REAL:=0.0;      //æ™šç­ç¬¬ä¸‰æ®µ(5:00-7:00)
- Product_Late_2H_4:REAL:=0.0;      //æ™šç­ç¬¬å››æ®µ(7:00-9:00)
- //åˆå§‹åŒ–å®Œæˆæ ‡å¿—
+Product_Early_Class:REAL:=0.0;      //Ôç°à²úÁ¿£¨9:00-17:00£©
+Product_Middle_Class:REAL:=0.0;    //ÖĞ°à²úÁ¿£¨17:00-1:00£©
+Product_Late_Class:REAL:=0.0;     //Íí°à²úÁ¿£¨1:00-9:00£©
+Product_Day:REAL:=0.0;           //ÈÕ²úÁ¿ 
+Product_Month:REAL:=0.0;        //ÔÂ²úÁ¿ 
+Product_Year:REAL:=0.0;        //Äê²úÁ¿ 
+Product_LastMonth:REAL:=0.0;  //ÉÏÔÂ²úÁ¿
+Product_Yesterday:REAL:=0.0; //×òÌì²úÁ¿
+//Ôç°àÃ¿Á½Ğ¡Ê±²úÁ¿
+ Product_Early_2H_1:REAL:=0.0;      //Ôç°àµÚÒ»¶Î(9:00-11:00)
+ Product_Early_2H_2:REAL:=0.0;      //Ôç°àµÚ¶ş¶Î(11:00-13:00)
+ Product_Early_2H_3:REAL:=0.0;      //Ôç°àµÚÈı¶Î(13:00-15:00)
+ Product_Early_2H_4:REAL:=0.0;      //Ôç°àµÚËÄ¶Î(15:00-17:00)
+ //ÖĞ°àÃ¿Á½Ğ¡Ê±²úÁ¿
+ Product_Middle_2H_1:REAL:=0.0;     //ÖĞ°àµÚÒ»¶Î(17:00-19:00)
+ Product_Middle_2H_2:REAL:=0.0;     //ÖĞ°àµÚ¶ş¶Î(19:00-21:00)  
+ Product_Middle_2H_3:REAL:=0.0;     //ÖĞ°àµÚÈı¶Î(21:00-23:00)
+ Product_Middle_2H_4:REAL:=0.0;     //ÖĞ°àµÚËÄ¶Î(23:00-1:00)
+ //Íí°àÃ¿Á½Ğ¡Ê±²úÁ¿
+ Product_Late_2H_1:REAL:=0.0;      //Íí°àµÚÒ»¶Î(1:00-3:00)
+ Product_Late_2H_2:REAL:=0.0;      //Íí°à°àµÚ¶ş¶Î(3:00-5:00)
+ Product_Late_2H_3:REAL:=0.0;      //Íí°àµÚÈı¶Î(5:00-7:00)
+ Product_Late_2H_4:REAL:=0.0;      //Íí°àµÚËÄ¶Î(7:00-9:00)
+ //³õÊ¼»¯Íê³É±êÖ¾
  Init_Done:BOOL:=FALSE; 
  END_VAR 
  
@@ -58,9 +58,9 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
  
  // Static Variables 
  VAR 
-       //å½“å‰æ—¶é—´ 
+       //µ±Ç°Ê±¼ä 
       DateAndTimeNow:DATE_AND_TIME; 
-      //æ—¶é—´ç»“æ„ä½“ 
+      //Ê±¼ä½á¹¹Ìå 
       DateAndTimeNowCoporate AT DateAndTimeNow:STRUCT 
       Year:BYTE; 
       Month:BYTE; 
@@ -70,82 +70,82 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
       Second:BYTE; 
       milliSecond:WORD; 
  END_STRUCT; 
-     //å­˜å‚¨å½“å‰æ—¶é—´å˜é‡ 
+     //´æ´¢µ±Ç°Ê±¼ä±äÁ¿ 
       YearNow:INT; 
       MonthNow:INT; 
       DayNow:INT; 
       HourNow:INT; 
       MinuteNow:INT; 
       SecondNow:INT; 
-      //å­˜å‚¨ä¸Šä¸€æ¬¡æ‰«æçš„æ—¶é—´å˜é‡
+      //´æ´¢ÉÏÒ»´ÎÉ¨ÃèµÄÊ±¼ä±äÁ¿
       HourLast:INT; 
       MinuteLast:INT; 
       SecondLast:INT; 
       DayLast:INT; 
       MonthLast:INT; 
       YearLast:INT; 
-      //æœˆã€å¹´æ—¶é—´ä¸€æ¬¡å­˜å‚¨å˜é‡ 
+      //ÔÂ¡¢ÄêÊ±¼äÒ»´Î´æ´¢±äÁ¿ 
       MonthNowFormer:INT; 
       YearNowFormer:INT; 
       DayNowFormer:INT; 
  
-      //å¼€ç­ã€æ—¥ã€æœˆã€å¹´æ—¶é—´çš„äº§é‡ 
+      //¿ª°à¡¢ÈÕ¡¢ÔÂ¡¢ÄêÊ±¼äµÄ²úÁ¿ 
       StartEarlyClassPro:REAL:=0.0; 
       StartMiddleClassPro:REAL:=0.0; 
       StartLateClassPro:REAL:=0.0; 
       StartDayClassPro:REAL:=0.0; 
       StartMonthClassPro:REAL:=0.0; 
       StartYearClassPro:REAL:=0.0; 
-      //æ—©ç­æ¯ä¸¤å°æ—¶äº§é‡èµ·å§‹å€¼
-      StartEarly_2H_1:REAL:=0.0; //æ—©ç­ç¬¬ä¸€æ®µ(9:00-11:00)
-      StartEarly_2H_2:REAL:=0.0; //æ—©ç­ç¬¬äºŒæ®µ(11:00-13:00)
-      StartEarly_2H_3:REAL:=0.0; //æ—©ç­ç¬¬ä¸‰æ®µ(13:00-15:00)
-      StartEarly_2H_4:REAL:=0.0; //æ—©ç­ç¬¬å››æ®µ(15:00-17:00)
-      //ä¸­ç­æ¯ä¸¤å°æ—¶äº§é‡èµ·å§‹å€¼
-      StartMiddle_2H_1:REAL:=0.0; //ä¸­ç­ç¬¬ä¸€æ®µ(17:00-19:00)
-      StartMiddle_2H_2:REAL:=0.0; //ä¸­ç­ç¬¬äºŒæ®µ(19:00-21:00)
-      StartMiddle_2H_3:REAL:=0.0; //ä¸­ç­ç¬¬ä¸‰æ®µ(21:00-23:00)
-      StartMiddle_2H_4:REAL:=0.0; //ä¸­ç­ç¬¬å››æ®µ(23:00-1:00)
-      //æ™šç­æ¯ä¸¤å°æ—¶äº§é‡èµ·å§‹å€¼
-      StartLate_2H_1:REAL:=0.0; //æ™šç­ç¬¬ä¸€æ®µ(1:00-3:00)
-      StartLate_2H_2:REAL:=0.0; //æ™šç­ç¬¬äºŒæ®µ(3:00-5:00)
-      StartLate_2H_3:REAL:=0.0; //æ™šç­ç¬¬ä¸‰æ®µ(5:00-7:00)
-      StartLate_2H_4:REAL:=0.0; //æ™šç­ç¬¬å››æ®µ(7:00-9:00)
-      //æ—©ç­æ¯ä¸¤å°æ—¶äº§é‡æ ‡å¿—ä½
+      //Ôç°àÃ¿Á½Ğ¡Ê±²úÁ¿ÆğÊ¼Öµ
+      StartEarly_2H_1:REAL:=0.0; //Ôç°àµÚÒ»¶Î(9:00-11:00)
+      StartEarly_2H_2:REAL:=0.0; //Ôç°àµÚ¶ş¶Î(11:00-13:00)
+      StartEarly_2H_3:REAL:=0.0; //Ôç°àµÚÈı¶Î(13:00-15:00)
+      StartEarly_2H_4:REAL:=0.0; //Ôç°àµÚËÄ¶Î(15:00-17:00)
+      //ÖĞ°àÃ¿Á½Ğ¡Ê±²úÁ¿ÆğÊ¼Öµ
+      StartMiddle_2H_1:REAL:=0.0; //ÖĞ°àµÚÒ»¶Î(17:00-19:00)
+      StartMiddle_2H_2:REAL:=0.0; //ÖĞ°àµÚ¶ş¶Î(19:00-21:00)
+      StartMiddle_2H_3:REAL:=0.0; //ÖĞ°àµÚÈı¶Î(21:00-23:00)
+      StartMiddle_2H_4:REAL:=0.0; //ÖĞ°àµÚËÄ¶Î(23:00-1:00)
+      //Íí°àÃ¿Á½Ğ¡Ê±²úÁ¿ÆğÊ¼Öµ
+      StartLate_2H_1:REAL:=0.0; //Íí°àµÚÒ»¶Î(1:00-3:00)
+      StartLate_2H_2:REAL:=0.0; //Íí°àµÚ¶ş¶Î(3:00-5:00)
+      StartLate_2H_3:REAL:=0.0; //Íí°àµÚÈı¶Î(5:00-7:00)
+      StartLate_2H_4:REAL:=0.0; //Íí°àµÚËÄ¶Î(7:00-9:00)
+      //Ôç°àÃ¿Á½Ğ¡Ê±²úÁ¿±êÖ¾Î»
       Early_2H_1_Flag:BOOL:=FALSE;
       Early_2H_2_Flag:BOOL:=FALSE;
       Early_2H_3_Flag:BOOL:=FALSE;
       Early_2H_4_Flag:BOOL:=FALSE;
-      //ä¸­ç­æ¯ä¸¤å°æ—¶äº§é‡æ ‡å¿—ä½
+      //ÖĞ°àÃ¿Á½Ğ¡Ê±²úÁ¿±êÖ¾Î»
       Middle_2H_1_Flag:BOOL:=FALSE;
       Middle_2H_2_Flag:BOOL:=FALSE;
       Middle_2H_3_Flag:BOOL:=FALSE;
       Middle_2H_4_Flag:BOOL:=FALSE;
-      //æ™šç­æ¯ä¸¤å°æ—¶äº§é‡æ ‡å¿—ä½
+      //Íí°àÃ¿Á½Ğ¡Ê±²úÁ¿±êÖ¾Î»
       Late_2H_1_Flag:BOOL:=FALSE;
       Late_2H_2_Flag:BOOL:=FALSE;
       Late_2H_3_Flag:BOOL:=FALSE;
       Late_2H_4_Flag:BOOL:=FALSE;
       
-      //é¦–æ¬¡æ‰«ææ ‡å¿—
+      //Ê×´ÎÉ¨Ãè±êÖ¾
       IsFirstScan:BOOL:=TRUE;
-      //ç­åˆ«æ ‡å¿—
+      //°à±ğ±êÖ¾
       EarlyClassFlag:BOOL:=FALSE;
       MiddleClassFlag:BOOL:=FALSE;
       LateClassFlag:BOOL:=FALSE;
-      //äº§é‡è®¡ç®—æ ‡å¿—
+      //²úÁ¿¼ÆËã±êÖ¾
       DayFlag:BOOL:=FALSE;
       MonthFlag:BOOL:=FALSE;
       YearFlag:BOOL:=FALSE;
-      //ä¸Šæœˆäº§é‡è®°å½•
+      //ÉÏÔÂ²úÁ¿¼ÇÂ¼
       LastMonth_Total:REAL:=0.0;
-      //æ˜¨å¤©äº§é‡è®°å½•
+      //×òÌì²úÁ¿¼ÇÂ¼
       Yesterday_Total:REAL:=0.0;
 
  END_VAR 
  
- //ç¨‹åºé€»è¾‘ä»è¿™é‡Œå¼€å§‹ 
- //è·å–ç³»ç»Ÿæ—¶é—´ 
+ //³ÌĞòÂß¼­´ÓÕâÀï¿ªÊ¼ 
+ //»ñÈ¡ÏµÍ³Ê±¼ä 
  Read_Return:=READ_CLK(CDT :=DateAndTimeNow ); 
  YearNow:=BCD_TO_INT(DateAndTimeNowCoporate.Year); 
  MonthNow:=BCD_TO_INT(DateAndTimeNowCoporate.Month); 
@@ -154,113 +154,113 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
  MinuteNow:=BCD_TO_INT(DateAndTimeNowCoporate.Minute); 
  SecondNow:=BCD_TO_INT(DateAndTimeNowCoporate.Second); 
  
- // é¦–æ¬¡æ‰«æåˆå§‹åŒ–
+ // Ê×´ÎÉ¨Ãè³õÊ¼»¯
  IF IsFirstScan THEN
-     // åˆå§‹åŒ–æ‰€æœ‰å¼€å§‹äº§é‡ä¸ºå½“å‰æ€»ç´¯è®¡é‡
+     // ³õÊ¼»¯ËùÓĞ¿ªÊ¼²úÁ¿Îªµ±Ç°×ÜÀÛ¼ÆÁ¿
      StartEarlyClassPro:=Product_Total;
      StartMiddleClassPro:=Product_Total;
      StartLateClassPro:=Product_Total;
      StartDayClassPro:=Product_Total;
      StartMonthClassPro:=Product_Total;
      StartYearClassPro:=Product_Total;
-     // åˆå§‹åŒ–æ—©ç­æ¯ä¸¤å°æ—¶äº§é‡å¼€å§‹å€¼
+     // ³õÊ¼»¯Ôç°àÃ¿Á½Ğ¡Ê±²úÁ¿¿ªÊ¼Öµ
      StartEarly_2H_1:=Product_Total;
      StartEarly_2H_2:=Product_Total;
      StartEarly_2H_3:=Product_Total;
      StartEarly_2H_4:=Product_Total;
-     // åˆå§‹åŒ–ä¸­ç­æ¯ä¸¤å°æ—¶äº§é‡å¼€å§‹å€¼
+     // ³õÊ¼»¯ÖĞ°àÃ¿Á½Ğ¡Ê±²úÁ¿¿ªÊ¼Öµ
      StartMiddle_2H_1:=Product_Total;
      StartMiddle_2H_2:=Product_Total;
      StartMiddle_2H_3:=Product_Total;
      StartMiddle_2H_4:=Product_Total;
-     // åˆå§‹åŒ–æ™šç­æ¯ä¸¤å°æ—¶äº§é‡å¼€å§‹å€¼
+     // ³õÊ¼»¯Íí°àÃ¿Á½Ğ¡Ê±²úÁ¿¿ªÊ¼Öµ
      StartLate_2H_1:=Product_Total;
      StartLate_2H_2:=Product_Total;
      StartLate_2H_3:=Product_Total;
      StartLate_2H_4:=Product_Total;
-     // ä¿å­˜å½“å‰æ—¶é—´ä½œä¸ºä¸Šä¸€æ¬¡æ‰«ææ—¶é—´
+     // ±£´æµ±Ç°Ê±¼ä×÷ÎªÉÏÒ»´ÎÉ¨ÃèÊ±¼ä
      YearLast:=YearNow;
      MonthLast:=MonthNow;
      DayLast:=DayNow;
      HourLast:=HourNow;
      MinuteLast:=MinuteNow;
      SecondLast:=SecondNow;
-     // æ›´æ–°æ ‡å¿—ä½
+     // ¸üĞÂ±êÖ¾Î»
      IsFirstScan:=FALSE;
      Init_Done:=TRUE;
  END_IF;
  
- // åˆå§‹åŒ–ä¿¡å·å¤„ç†
+ // ³õÊ¼»¯ĞÅºÅ´¦Àí
  IF Initialize THEN
-     // é‡ç½®æ‰€æœ‰å¼€å§‹äº§é‡ä¸ºå½“å‰æ€»ç´¯è®¡é‡
+     // ÖØÖÃËùÓĞ¿ªÊ¼²úÁ¿Îªµ±Ç°×ÜÀÛ¼ÆÁ¿
      StartEarlyClassPro:=Product_Total;
      StartMiddleClassPro:=Product_Total;
      StartLateClassPro:=Product_Total;
      StartDayClassPro:=Product_Total;
      StartMonthClassPro:=Product_Total;
      StartYearClassPro:=Product_Total;
-     // é‡ç½®æ—©ç­æ¯ä¸¤å°æ—¶äº§é‡å¼€å§‹å€¼
+     // ÖØÖÃÔç°àÃ¿Á½Ğ¡Ê±²úÁ¿¿ªÊ¼Öµ
      StartEarly_2H_1:=Product_Total;
      StartEarly_2H_2:=Product_Total;
      StartEarly_2H_3:=Product_Total;
      StartEarly_2H_4:=Product_Total;
-     // é‡ç½®ä¸­ç­æ¯ä¸¤å°æ—¶äº§é‡å¼€å§‹å€¼
+     // ÖØÖÃÖĞ°àÃ¿Á½Ğ¡Ê±²úÁ¿¿ªÊ¼Öµ
      StartMiddle_2H_1:=Product_Total;
      StartMiddle_2H_2:=Product_Total;
      StartMiddle_2H_3:=Product_Total;
      StartMiddle_2H_4:=Product_Total;
-     // é‡ç½®æ™šç­æ¯ä¸¤å°æ—¶äº§é‡å¼€å§‹å€¼
+     // ÖØÖÃÍí°àÃ¿Á½Ğ¡Ê±²úÁ¿¿ªÊ¼Öµ
      StartLate_2H_1:=Product_Total;
      StartLate_2H_2:=Product_Total;
      StartLate_2H_3:=Product_Total;
      StartLate_2H_4:=Product_Total;
-     // é‡ç½®æ‰€æœ‰äº§é‡ä¸º0
+     // ÖØÖÃËùÓĞ²úÁ¿Îª0
      Product_Early_Class:=0.0;
      Product_Middle_Class:=0.0;
      Product_Late_Class:=0.0;
      Product_Day:=0.0;
      Product_Month:=0.0;
      Product_Year:=0.0;
-     // é‡ç½®æ—©ç­æ¯ä¸¤å°æ—¶äº§é‡ä¸º0
+     // ÖØÖÃÔç°àÃ¿Á½Ğ¡Ê±²úÁ¿Îª0
      Product_Early_2H_1:=0.0;
      Product_Early_2H_2:=0.0;
      Product_Early_2H_3:=0.0;
      Product_Early_2H_4:=0.0;
-     // é‡ç½®ä¸­ç­æ¯ä¸¤å°æ—¶äº§é‡ä¸º0
+     // ÖØÖÃÖĞ°àÃ¿Á½Ğ¡Ê±²úÁ¿Îª0
      Product_Middle_2H_1:=0.0;
      Product_Middle_2H_2:=0.0;
      Product_Middle_2H_3:=0.0;
      Product_Middle_2H_4:=0.0;
-     // é‡ç½®æ™šç­æ¯ä¸¤å°æ—¶äº§é‡ä¸º0
+     // ÖØÖÃÍí°àÃ¿Á½Ğ¡Ê±²úÁ¿Îª0
      Product_Late_2H_1:=0.0;
      Product_Late_2H_2:=0.0;
      Product_Late_2H_3:=0.0;
      Product_Late_2H_4:=0.0;
-     // æ›´æ–°æ ‡å¿—ä½
+     // ¸üĞÂ±êÖ¾Î»
      Init_Done:=TRUE;
  END_IF;
  
- // æ—©ç­äº§é‡è®¡ç®—ï¼ˆ9:00-17:00ï¼‰ 
- // åˆ¤æ–­æ˜¯å¦è¿›å…¥æ—©ç­æ—¶é—´ï¼ˆ9:00:00ï¼‰
+ // Ôç°à²úÁ¿¼ÆËã£¨9:00-17:00£© 
+ // ÅĞ¶ÏÊÇ·ñ½øÈëÔç°àÊ±¼ä£¨9:00:00£©
  IF (HourNow =9 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <9 AND HourNow>=9) THEN // å¤„ç†è·¨å°æ—¶çš„æƒ…å†µ
+    (HourLast <9 AND HourNow>=9) THEN // ´¦Àí¿çĞ¡Ê±µÄÇé¿ö
      StartEarlyClassPro:=Product_Total;
      EarlyClassFlag:=TRUE;
  END_IF;
  
- // åˆ¤æ–­æ˜¯å¦é€€å‡ºæ—©ç­æ—¶é—´ï¼ˆ17:00:00ï¼‰
+ // ÅĞ¶ÏÊÇ·ñÍË³öÔç°àÊ±¼ä£¨17:00:00£©
  IF (HourNow =17 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <17 AND HourNow>=17) THEN // å¤„ç†è·¨å°æ—¶çš„æƒ…å†µ
+    (HourLast <17 AND HourNow>=17) THEN // ´¦Àí¿çĞ¡Ê±µÄÇé¿ö
      EarlyClassFlag:=FALSE;
  END_IF;
  
- // è®¡ç®—æ—©ç­äº§é‡
+ // ¼ÆËãÔç°à²úÁ¿
  IF HourNow>=9 AND HourNow<17 THEN
     Product_Early_Class:=Product_Total - StartEarlyClassPro;
  END_IF;
  
- // æ—©ç­æ¯ä¸¤å°æ—¶äº§é‡è®¡ç®—
- // æ—©ç­ç¬¬ä¸€æ®µ(9:00-11:00)
+ // Ôç°àÃ¿Á½Ğ¡Ê±²úÁ¿¼ÆËã
+ // Ôç°àµÚÒ»¶Î(9:00-11:00)
  IF (HourNow =9 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <9 AND HourNow>=9) THEN
      StartEarly_2H_1:=Product_Total;
@@ -276,7 +276,7 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Early_2H_1:=Product_Total - StartEarly_2H_1;
  END_IF;
  
- // æ—©ç­ç¬¬äºŒæ®µ(11:00-13:00)
+ // Ôç°àµÚ¶ş¶Î(11:00-13:00)
  IF (HourNow =11 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <11 AND HourNow>=11) THEN
      StartEarly_2H_2:=Product_Total;
@@ -292,7 +292,7 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Early_2H_2:=Product_Total - StartEarly_2H_2;
  END_IF;
  
- // æ—©ç­ç¬¬ä¸‰æ®µ(13:00-15:00)
+ // Ôç°àµÚÈı¶Î(13:00-15:00)
  IF (HourNow =13 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <13 AND HourNow>=13) THEN
      StartEarly_2H_3:=Product_Total;
@@ -308,7 +308,7 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Early_2H_3:=Product_Total - StartEarly_2H_3;
  END_IF;
  
- // æ—©ç­ç¬¬å››æ®µ(15:00-17:00)
+ // Ôç°àµÚËÄ¶Î(15:00-17:00)
  IF (HourNow =15 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <15 AND HourNow>=15) THEN
      StartEarly_2H_4:=Product_Total;
@@ -324,27 +324,27 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Early_2H_4:=Product_Total - StartEarly_2H_4;
  END_IF;
  
- // ä¸­ç­äº§é‡è®¡ç®—ï¼ˆ17:00-1:00ï¼‰ 
- // åˆ¤æ–­æ˜¯å¦è¿›å…¥ä¸­ç­æ—¶é—´ï¼ˆ17:00:00ï¼‰
+ // ÖĞ°à²úÁ¿¼ÆËã£¨17:00-1:00£© 
+ // ÅĞ¶ÏÊÇ·ñ½øÈëÖĞ°àÊ±¼ä£¨17:00:00£©
  IF (HourNow =17 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <17 AND HourNow>=17) THEN // å¤„ç†è·¨å°æ—¶çš„æƒ…å†µ
+    (HourLast <17 AND HourNow>=17) THEN // ´¦Àí¿çĞ¡Ê±µÄÇé¿ö
      StartMiddleClassPro:=Product_Total;
      MiddleClassFlag:=TRUE;
  END_IF;
  
- // åˆ¤æ–­æ˜¯å¦é€€å‡ºä¸­ç­æ—¶é—´ï¼ˆ1:00:00ï¼‰
+ // ÅĞ¶ÏÊÇ·ñÍË³öÖĞ°àÊ±¼ä£¨1:00:00£©
  IF (HourNow =1 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast >=17) THEN // å¤„ç†è·¨å¤©çš„æƒ…å†µ
+    (HourLast >=17) THEN // ´¦Àí¿çÌìµÄÇé¿ö
      MiddleClassFlag:=FALSE;
  END_IF;
  
- // è®¡ç®—ä¸­ç­äº§é‡
+ // ¼ÆËãÖĞ°à²úÁ¿
  IF (HourNow>=17 AND HourNow<=23) OR (HourNow>=0 AND HourNow<1) THEN
      Product_Middle_Class:=Product_Total - StartMiddleClassPro;
  END_IF;
  
- // ä¸­ç­æ¯ä¸¤å°æ—¶äº§é‡è®¡ç®—
- // ä¸­ç­ç¬¬ä¸€æ®µ(17:00-19:00)
+ // ÖĞ°àÃ¿Á½Ğ¡Ê±²úÁ¿¼ÆËã
+ // ÖĞ°àµÚÒ»¶Î(17:00-19:00)
  IF (HourNow =17 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <17 AND HourNow>=17) THEN
      StartMiddle_2H_1:=Product_Total;
@@ -360,7 +360,7 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Middle_2H_1:=Product_Total - StartMiddle_2H_1;
  END_IF;
  
- // ä¸­ç­ç¬¬äºŒæ®µ(19:00-21:00)
+ // ÖĞ°àµÚ¶ş¶Î(19:00-21:00)
  IF (HourNow =19 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <19 AND HourNow>=19) THEN
      StartMiddle_2H_2:=Product_Total;
@@ -376,7 +376,7 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Middle_2H_2:=Product_Total - StartMiddle_2H_2;
  END_IF;
  
- // ä¸­ç­ç¬¬ä¸‰æ®µ(21:00-23:00)
+ // ÖĞ°àµÚÈı¶Î(21:00-23:00)
  IF (HourNow =21 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <21 AND HourNow>=21) THEN
      StartMiddle_2H_3:=Product_Total;
@@ -392,7 +392,7 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Middle_2H_3:=Product_Total - StartMiddle_2H_3;
  END_IF;
  
- // ä¸­ç­ç¬¬å››æ®µ(23:00-1:00)
+ // ÖĞ°àµÚËÄ¶Î(23:00-1:00)
  IF (HourNow =23 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <23 AND HourNow>=23) THEN
      StartMiddle_2H_4:=Product_Total;
@@ -408,27 +408,27 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Middle_2H_4:=Product_Total - StartMiddle_2H_4;
  END_IF;
  
- // æ™šç­äº§é‡è®¡ç®—ï¼ˆ1:00-9:00ï¼‰ 
- // åˆ¤æ–­æ˜¯å¦è¿›å…¥æ™šç­æ—¶é—´ï¼ˆ1:00:00ï¼‰
+ // Íí°à²úÁ¿¼ÆËã£¨1:00-9:00£© 
+ // ÅĞ¶ÏÊÇ·ñ½øÈëÍí°àÊ±¼ä£¨1:00:00£©
  IF (HourNow =1 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast >=17) THEN // å¤„ç†è·¨å¤©çš„æƒ…å†µ
+    (HourLast >=17) THEN // ´¦Àí¿çÌìµÄÇé¿ö
      StartLateClassPro:=Product_Total;
      LateClassFlag:=TRUE;
  END_IF;
  
- // åˆ¤æ–­æ˜¯å¦é€€å‡ºæ™šç­æ—¶é—´ï¼ˆ9:00:00ï¼‰
+ // ÅĞ¶ÏÊÇ·ñÍË³öÍí°àÊ±¼ä£¨9:00:00£©
  IF (HourNow =9 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <9 AND HourNow>=9) THEN // å¤„ç†è·¨å°æ—¶çš„æƒ…å†µ
+    (HourLast <9 AND HourNow>=9) THEN // ´¦Àí¿çĞ¡Ê±µÄÇé¿ö
      LateClassFlag:=FALSE;
  END_IF;
  
- // è®¡ç®—æ™šç­äº§é‡
+ // ¼ÆËãÍí°à²úÁ¿
  IF HourNow>=1 AND HourNow<9 THEN
      Product_Late_Class:=Product_Total - StartLateClassPro;
  END_IF;
  
- // æ™šç­æ¯ä¸¤å°æ—¶äº§é‡è®¡ç®—
- // æ™šç­ç¬¬ä¸€æ®µ(1:00-3:00)
+ // Íí°àÃ¿Á½Ğ¡Ê±²úÁ¿¼ÆËã
+ // Íí°àµÚÒ»¶Î(1:00-3:00)
  IF (HourNow =1 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast >=17) THEN
      StartLate_2H_1:=Product_Total;
@@ -444,7 +444,7 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Late_2H_1:=Product_Total - StartLate_2H_1;
  END_IF;
  
- // æ™šç­ç¬¬äºŒæ®µ(3:00-5:00)
+ // Íí°àµÚ¶ş¶Î(3:00-5:00)
  IF (HourNow =3 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <3 AND HourNow>=3) THEN
      StartLate_2H_2:=Product_Total;
@@ -460,7 +460,7 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Late_2H_2:=Product_Total - StartLate_2H_2;
  END_IF;
  
- // æ™šç­ç¬¬ä¸‰æ®µ(5:00-7:00)
+ // Íí°àµÚÈı¶Î(5:00-7:00)
  IF (HourNow =5 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <5 AND HourNow>=5) THEN
      StartLate_2H_3:=Product_Total;
@@ -476,7 +476,7 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Late_2H_3:=Product_Total - StartLate_2H_3;
  END_IF;
  
- // æ™šç­ç¬¬å››æ®µ(7:00-9:00)
+ // Íí°àµÚËÄ¶Î(7:00-9:00)
  IF (HourNow =7 AND MinuteNow=0 AND SecondNow=0) OR 
     (HourLast <7 AND HourNow>=7) THEN
      StartLate_2H_4:=Product_Total;
@@ -492,60 +492,60 @@ Product_Yesterday:REAL:=0.0; //æ˜¨å¤©äº§é‡
     Product_Late_2H_4:=Product_Total - StartLate_2H_4;
  END_IF;
  
- // æ—¥äº§é‡è®¡ç®—ï¼ˆ9:00-æ¬¡æ—¥9:00ï¼‰ 
- // åˆ¤æ–­æ˜¯å¦è¿›å…¥æ–°çš„ä¸€å¤©ï¼ˆ9:00:00ï¼‰
+ // ÈÕ²úÁ¿¼ÆËã£¨9:00-´ÎÈÕ9:00£© 
+ // ÅĞ¶ÏÊÇ·ñ½øÈëĞÂµÄÒ»Ìì£¨9:00:00£©
  IF (HourNow =9 AND MinuteNow=0 AND SecondNow=0) OR 
-    (HourLast <9 AND HourNow>=9) THEN // å¤„ç†è·¨å°æ—¶çš„æƒ…å†µ
+    (HourLast <9 AND HourNow>=9) THEN // ´¦Àí¿çĞ¡Ê±µÄÇé¿ö
      StartDayClassPro:=Product_Total;
      DayFlag:=TRUE;
  END_IF;
  
- // è®¡ç®—æ—¥äº§é‡
+ // ¼ÆËãÈÕ²úÁ¿
 Product_Day:=Product_Total - StartDayClassPro;
 
-// è®°å½•æ˜¨å¤©äº§é‡ï¼ˆåœ¨æ–°çš„ä¸€å¤©å¼€å§‹æ—¶ï¼‰
+// ¼ÇÂ¼×òÌì²úÁ¿£¨ÔÚĞÂµÄÒ»Ìì¿ªÊ¼Ê±£©
 IF DayFlag THEN
-    // ä¿å­˜æ˜¨å¤©çš„äº§é‡
+    // ±£´æ×òÌìµÄ²úÁ¿
     Yesterday_Total := Product_Day;
-    // è¾“å‡ºæ˜¨å¤©çš„äº§é‡
+    // Êä³ö×òÌìµÄ²úÁ¿
     Product_Yesterday := Yesterday_Total;
-    // é‡ç½®æ—¥æ ‡å¿—
+    // ÖØÖÃÈÕ±êÖ¾
     DayFlag := FALSE;
 END_IF;
  
- // æœˆäº§é‡è®¡ç®—ï¼ˆæ¯æœˆ1æ—¥9:00å¼€å§‹ï¼‰ 
- // åˆ¤æ–­æ˜¯å¦è¿›å…¥æ–°çš„ä¸€æœˆï¼ˆ1æ—¥9:00:00ï¼‰
+ // ÔÂ²úÁ¿¼ÆËã£¨Ã¿ÔÂ1ÈÕ9:00¿ªÊ¼£© 
+ // ÅĞ¶ÏÊÇ·ñ½øÈëĞÂµÄÒ»ÔÂ£¨1ÈÕ9:00:00£©
  IF (DayNow=1 AND HourNow>=9) AND 
-    (DayLast>1 OR (DayLast=1 AND HourLast<9)) THEN // å¤„ç†è·¨æ—¥æˆ–è·¨å°æ—¶çš„æƒ…å†µ
+    (DayLast>1 OR (DayLast=1 AND HourLast<9)) THEN // ´¦Àí¿çÈÕ»ò¿çĞ¡Ê±µÄÇé¿ö
      StartMonthClassPro:=Product_Total;
      MonthFlag:=TRUE;
  END_IF;
  
- // è®¡ç®—æœˆäº§é‡
+ // ¼ÆËãÔÂ²úÁ¿
 Product_Month:=Product_Total - StartMonthClassPro;
 
-// è®°å½•ä¸Šæœˆäº§é‡ï¼ˆåœ¨æ–°çš„ä¸€æœˆå¼€å§‹æ—¶ï¼‰
+// ¼ÇÂ¼ÉÏÔÂ²úÁ¿£¨ÔÚĞÂµÄÒ»ÔÂ¿ªÊ¼Ê±£©
 IF MonthFlag THEN
-    // ä¿å­˜ä¸Šæœˆçš„äº§é‡
+    // ±£´æÉÏÔÂµÄ²úÁ¿
     LastMonth_Total := Product_Month;
-    // è¾“å‡ºä¸Šæœˆçš„äº§é‡
+    // Êä³öÉÏÔÂµÄ²úÁ¿
     Product_LastMonth := LastMonth_Total;
-    // é‡ç½®æœˆæ ‡å¿—
+    // ÖØÖÃÔÂ±êÖ¾
     MonthFlag := FALSE;
 END_IF;
     
- // å¹´äº§é‡è®¡ç®—ï¼ˆæ¯å¹´1æœˆ1æ—¥9:00å¼€å§‹ï¼‰ 
- // åˆ¤æ–­æ˜¯å¦è¿›å…¥æ–°çš„ä¸€å¹´ï¼ˆ1æœˆ1æ—¥9:00:00ï¼‰
+ // Äê²úÁ¿¼ÆËã£¨Ã¿Äê1ÔÂ1ÈÕ9:00¿ªÊ¼£© 
+ // ÅĞ¶ÏÊÇ·ñ½øÈëĞÂµÄÒ»Äê£¨1ÔÂ1ÈÕ9:00:00£©
  IF (MonthNow=1 AND DayNow=1 AND HourNow>=9) AND 
-    ((MonthLast>1) OR (MonthLast=1 AND DayLast>1) OR (MonthLast=1 AND DayLast=1 AND HourLast<9)) THEN // å¤„ç†è·¨å¹´ã€è·¨æœˆæˆ–è·¨å°æ—¶çš„æƒ…å†µ
+    ((MonthLast>1) OR (MonthLast=1 AND DayLast>1) OR (MonthLast=1 AND DayLast=1 AND HourLast<9)) THEN // ´¦Àí¿çÄê¡¢¿çÔÂ»ò¿çĞ¡Ê±µÄÇé¿ö
      StartYearClassPro:=Product_Total;
      YearFlag:=TRUE;
  END_IF;
  
- // è®¡ç®—å¹´äº§é‡
+ // ¼ÆËãÄê²úÁ¿
  Product_Year:=Product_Total - StartYearClassPro;
  
- // ä¿å­˜å½“å‰æ—¶é—´ä½œä¸ºä¸‹ä¸€æ¬¡æ‰«æçš„ä¸Šä¸€æ¬¡æ—¶é—´
+ // ±£´æµ±Ç°Ê±¼ä×÷ÎªÏÂÒ»´ÎÉ¨ÃèµÄÉÏÒ»´ÎÊ±¼ä
  YearLast:=YearNow;
  MonthLast:=MonthNow;
  DayLast:=DayNow;
@@ -554,7 +554,8 @@ END_IF;
  SecondLast:=SecondNow;
  
  END_FUNCTION_BLOCK
-
-DATA_BLOCK DB2800 FB2800
+ 
+ DATA_BLOCK DB2800 FB2800
  BEGIN
  END_DATA_BLOCK
+ 
