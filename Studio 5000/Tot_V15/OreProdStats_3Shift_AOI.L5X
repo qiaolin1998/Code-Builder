@@ -1,797 +1,2315 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!-- =============================================================== -->
-<!-- AOI 名称: OreProdStats_3Shift                                     -->
-<!-- 功能描述: 多维度累计计数器(三班倒 + 每班2小时段产量统计)          -->
-<!-- 版本信息: 1.0                                                    -->
-<!-- 软件版本: Studio 5000 v36.00 (导出格式)                           -->
-<!-- 适用控制器: ControlLogix/CompactLogix                             -->
-<!-- =============================================================== -->
-<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="36.00" TargetName="OreProdStats_3Shift" TargetType="AddOnInstructionDefinition" TargetRevision="1.0" TargetLastEdited="2026-02-23T00:00:00.000Z" ContainsContext="true" ExportDate="Mon Feb 23 00:00:00 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
-  <Controller Use="Context" Name="Tot">
-    <DataTypes Use="Context">
-      <!-- =========================================================== -->
-      <!-- HMI 命令/数据结构(UDT)                                      -->
-      <!-- 说明: 作为 AOI 的 InOut 参数 HMI_CMD,供 HMI 读写清除命令与读取累计值 -->
-      <!-- =========================================================== -->
-      <DataType Name="OreProdStats_3Shift_Type" Family="NoFamily" Class="User">
-        <Members>
-          <Member Name="ZZZZZZZZZZOreProdStats_3Shift0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
-          <Member Name="Clear" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZOreProdStats_3Shift0" BitNumber="0" ExternalAccess="Read/Write">
-            <Description>
-              <![CDATA[清除]]>
-              <LocalizedDescription Lang="zh-CN"><![CDATA[清除]]></LocalizedDescription>
-            </Description>
-          </Member>
-
-          <Member Name="Out_Tot" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[总累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[总累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Min" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[分钟累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[分钟累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_D_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[天实时累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[天实时累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_M_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[月实时累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[月实时累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_D" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[昨天累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[昨天累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_M" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[上个月累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[上个月累计]]></LocalizedDescription></Description>
-          </Member>
-
-          <!-- 当前班实时累计(便于 HMI 单点显示) -->
-          <Member Name="Out_Tot_Shift_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[当前班实时累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[当前班实时累计]]></LocalizedDescription></Description>
-          </Member>
-
-          <!-- 三班历史/实时累计 -->
-          <Member Name="Out_Tot_Shift1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[早班累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[早班累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[中班累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[中班累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[晚班累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[晚班累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift1_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[早班实时累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[早班实时累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift2_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[中班实时累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[中班实时累计]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift3_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[晚班实时累计]]><LocalizedDescription Lang="zh-CN"><![CDATA[晚班实时累计]]></LocalizedDescription></Description>
-          </Member>
-
-          <!-- 早班 2 小时段累计 -->
-          <Member Name="Out_Tot_Shift1_2H_1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[早班 09-11 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[早班 09-11 产量]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift1_2H_2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[早班 11-13 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[早班 11-13 产量]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift1_2H_3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[早班 13-15 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[早班 13-15 产量]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift1_2H_4" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[早班 15-17 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[早班 15-17 产量]]></LocalizedDescription></Description>
-          </Member>
-
-          <!-- 中班 2 小时段累计 -->
-          <Member Name="Out_Tot_Shift2_2H_1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[中班 17-19 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[中班 17-19 产量]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift2_2H_2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[中班 19-21 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[中班 19-21 产量]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift2_2H_3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[中班 21-23 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[中班 21-23 产量]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift2_2H_4" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[中班 23-01 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[中班 23-01 产量]]></LocalizedDescription></Description>
-          </Member>
-
-          <!-- 晚班 2 小时段累计 -->
-          <Member Name="Out_Tot_Shift3_2H_1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[晚班 01-03 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[晚班 01-03 产量]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift3_2H_2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[晚班 03-05 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[晚班 03-05 产量]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift3_2H_3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[晚班 05-07 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[晚班 05-07 产量]]></LocalizedDescription></Description>
-          </Member>
-          <Member Name="Out_Tot_Shift3_2H_4" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-            <Description><![CDATA[晚班 07-09 产量]]><LocalizedDescription Lang="zh-CN"><![CDATA[晚班 07-09 产量]]></LocalizedDescription></Description>
-          </Member>
-        </Members>
-      </DataType>
-    </DataTypes>
-
-    <AddOnInstructionDefinitions Use="Context">
-      <AddOnInstructionDefinition Use="Target" Name="OreProdStats_3Shift" Revision="1.0" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2026-02-23T00:00:00.000Z" CreatedBy="Cursor" EditedDate="2026-02-23T00:00:00.000Z" EditedBy="Cursor" SoftwareRevision="v36.00">
-        <Parameters>
-          <Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only"/>
-          <Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only"/>
-
-          <Parameter Name="In_Pulse" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
-            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="In_Run" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
-            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="In_Scale" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
-            <DefaultData Format="L5K"><![CDATA[0]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData>
-          </Parameter>
-
-          <!-- 原有输出 -->
-          <Parameter Name="Out_Tot" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read/Write">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_Min" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_D_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_M_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_D" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_M" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-
-          <!-- 三班输出 -->
-          <Parameter Name="Out_Tot_Shift1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_Shift2" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_Shift3" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-
-          <Parameter Name="Out_Tot_Shift1_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_Shift2_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_Shift3_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-          <Parameter Name="Out_Tot_Shift_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
-            <DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData>
-            <DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData>
-          </Parameter>
-
-          <!-- 每班 2 小时段输出 -->
-          <Parameter Name="Out_Tot_Shift1_2H_1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-          <Parameter Name="Out_Tot_Shift1_2H_2" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-          <Parameter Name="Out_Tot_Shift1_2H_3" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-          <Parameter Name="Out_Tot_Shift1_2H_4" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-
-          <Parameter Name="Out_Tot_Shift2_2H_1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-          <Parameter Name="Out_Tot_Shift2_2H_2" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-          <Parameter Name="Out_Tot_Shift2_2H_3" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-          <Parameter Name="Out_Tot_Shift2_2H_4" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-
-          <Parameter Name="Out_Tot_Shift3_2H_1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-          <Parameter Name="Out_Tot_Shift3_2H_2" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-          <Parameter Name="Out_Tot_Shift3_2H_3" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-          <Parameter Name="Out_Tot_Shift3_2H_4" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></Parameter>
-
-          <!-- HMI 结构 InOut -->
-          <Parameter Name="HMI_CMD" TagType="Base" DataType="OreProdStats_3Shift_Type" Usage="InOut" Required="true" Visible="true" Constant="false"/>
-
-          <!-- 时间与配置输入(沿用原 OreProdStats 的接口) -->
-          <Parameter Name="Year" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="Month" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="Day" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="Second" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-
-          <Parameter Name="In_Class1_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="In_Class2_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="In_Tot_Min" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="In_Class1_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="In_Class2_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="In_Day_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-          <Parameter Name="In_Day_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
-        </Parameters>
-
-        <LocalTags>
-          <LocalTag Name="Temp" DataType="REAL" Dimensions="32" Radix="Float" ExternalAccess="None">
-            <DefaultData Format="L5K"><![CDATA[[0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000]]]></DefaultData>
-            <DefaultData Format="Decorated">
-              <Array DataType="REAL" Dimensions="32" Radix="Float">
-                <Element Index="[0]" Value="0.0"/><Element Index="[1]" Value="0.0"/><Element Index="[2]" Value="0.0"/><Element Index="[3]" Value="0.0"/>
-                <Element Index="[4]" Value="0.0"/><Element Index="[5]" Value="0.0"/><Element Index="[6]" Value="0.0"/><Element Index="[7]" Value="0.0"/>
-                <Element Index="[8]" Value="0.0"/><Element Index="[9]" Value="0.0"/><Element Index="[10]" Value="0.0"/><Element Index="[11]" Value="0.0"/>
-                <Element Index="[12]" Value="0.0"/><Element Index="[13]" Value="0.0"/><Element Index="[14]" Value="0.0"/><Element Index="[15]" Value="0.0"/>
-                <Element Index="[16]" Value="0.0"/><Element Index="[17]" Value="0.0"/><Element Index="[18]" Value="0.0"/><Element Index="[19]" Value="0.0"/>
-                <Element Index="[20]" Value="0.0"/><Element Index="[21]" Value="0.0"/><Element Index="[22]" Value="0.0"/><Element Index="[23]" Value="0.0"/>
-                <Element Index="[24]" Value="0.0"/><Element Index="[25]" Value="0.0"/><Element Index="[26]" Value="0.0"/><Element Index="[27]" Value="0.0"/>
-                <Element Index="[28]" Value="0.0"/><Element Index="[29]" Value="0.0"/><Element Index="[30]" Value="0.0"/><Element Index="[31]" Value="0.0"/>
-              </Array>
-            </DefaultData>
-          </LocalTag>
-
-          <LocalTag Name="TONR_01" DataType="FBD_TIMER" ExternalAccess="None">
-            <DefaultData Format="L5K"><![CDATA[[1,0,0,0,0,0,0,0,0,4,0,0]]]></DefaultData>
-            <DefaultData Format="Decorated">
-              <Structure DataType="FBD_TIMER">
-                <DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
-                <DataValueMember Name="TimerEnable" DataType="BOOL" Value="0"/>
-                <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
-                <DataValueMember Name="Reset" DataType="BOOL" Value="0"/>
-                <DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
-                <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
-                <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
-                <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
-                <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
-                <DataValueMember Name="Status" DataType="DINT" Radix="Hex" Value="16#0000_0000"/>
-                <DataValueMember Name="InstructFault" DataType="BOOL" Value="0"/>
-                <DataValueMember Name="PresetInv" DataType="BOOL" Value="0"/>
-              </Structure>
-            </DefaultData>
-          </LocalTag>
-
-          <LocalTag Name="OSRI_Pulse" DataType="FBD_ONESHOT" ExternalAccess="None">
-            <DefaultData Format="L5K"><![CDATA[[1,0,5.60519386e-045]]]></DefaultData>
-            <DefaultData Format="Decorated">
-              <Structure DataType="FBD_ONESHOT">
-                <DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
-                <DataValueMember Name="InputBit" DataType="BOOL" Value="0"/>
-                <DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
-                <DataValueMember Name="OutputBit" DataType="BOOL" Value="0"/>
-              </Structure>
-            </DefaultData>
-          </LocalTag>
-
-          <LocalTag Name="Time" DataType="DINT" Dimensions="8" Radix="Decimal" ExternalAccess="None">
-            <DefaultData Format="L5K"><![CDATA[[0,0,0,0,0,0,0,0]]]></DefaultData>
-            <DefaultData Format="Decorated">
-              <Array DataType="DINT" Dimensions="8" Radix="Decimal">
-                <Element Index="[0]" Value="0"/><Element Index="[1]" Value="0"/><Element Index="[2]" Value="0"/><Element Index="[3]" Value="0"/>
-                <Element Index="[4]" Value="0"/><Element Index="[5]" Value="0"/><Element Index="[6]" Value="0"/><Element Index="[7]" Value="0"/>
-              </Array>
-            </DefaultData>
-          </LocalTag>
-
-          <LocalTag Name="Time_Set1" DataType="DINT" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-          <LocalTag Name="Time_Set2" DataType="DINT" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-          <LocalTag Name="Time_Set3_Day" DataType="DINT" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-          <LocalTag Name="Time_Real" DataType="DINT" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-
-          <LocalTag Name="Is_Leap_Year" DataType="BOOL" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-          <LocalTag Name="Days_In_Month" DataType="DINT" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-
-          <!-- 三班/段辅助变量 -->
-          <LocalTag Name="Shift_ID" DataType="DINT" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-          <LocalTag Name="Shift_Section_ID" DataType="DINT" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-          <LocalTag Name="Prev_Section_ID" DataType="DINT" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-          <LocalTag Name="Minutes_From_Shift_Start" DataType="DINT" Radix="Decimal" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></LocalTag>
-
-          <!-- 班与 2 小时段临时累计 -->
-          <LocalTag Name="TempShift1" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift2" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift3" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-
-          <LocalTag Name="TempShift1_2H_1" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift1_2H_2" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift1_2H_3" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift1_2H_4" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-
-          <LocalTag Name="TempShift2_2H_1" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift2_2H_2" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift2_2H_3" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift2_2H_4" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-
-          <LocalTag Name="TempShift3_2H_1" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift3_2H_2" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift3_2H_3" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-          <LocalTag Name="TempShift3_2H_4" DataType="REAL" Radix="Float" ExternalAccess="None"><DefaultData Format="L5K"><![CDATA[0.00000000e+000]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="REAL" Radix="Float" Value="0.0"/></DefaultData></LocalTag>
-        </LocalTags>
-
-        <Routines>
-          <Routine Name="Logic" Type="ST">
-            <STContent>
-              <!-- 由 OreProdStats_3Shift.st 逐行写入 -->
-              <Line Number="0"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="1"><![CDATA[// AOI 名称: OreProdStats_3Shift (三班制产量统计系统)]]></Line>
-              <Line Number="2"><![CDATA[// 版本: 1.0]]></Line>
-              <Line Number="3"><![CDATA[// 编程语言: Structured Text (ST)]]></Line>
-              <Line Number="4"><![CDATA[// 适用平台: Studio 5000 (ControlLogix/CompactLogix)]]></Line>
-              <Line Number="5"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="6"><![CDATA[// 功能概述:]]></Line>
-              <Line Number="7"><![CDATA[// 1. 在保留原 OreProdStats AOI 功能(总/分钟/天/月统计)的基础上,实现固定时间的三班制产量统计;]]></Line>
-              <Line Number="8"><![CDATA[// 2. 三个班次的时间范围固定如下:]]></Line>
-              <Line Number="9"><![CDATA[//    - 早班: 09:00 – 17:00]]></Line>
-              <Line Number="10"><![CDATA[//    - 中班: 17:00 – 次日 01:00 (跨越午夜)]]></Line>
-              <Line Number="11"><![CDATA[//    - 晚班: 01:00 – 09:00]]></Line>
-              <Line Number="12"><![CDATA[// 3. 在每个班内部,再划分为连续的 4 个 2 小时段,对每段单独累计产量:]]></Line>
-              <Line Number="13"><![CDATA[//    - 早班:  9–11, 11–13, 13–15, 15–17]]></Line>
-              <Line Number="14"><![CDATA[//    - 中班: 17–19, 19–21, 21–23, 23–1]]></Line>
-              <Line Number="15"><![CDATA[//    - 晚班:  1–3,  3–5,  5–7,  7–9]]></Line>
-              <Line Number="16"><![CDATA[// 4. 每个班次提供:]]></Line>
-              <Line Number="17"><![CDATA[//    - 班实时累计: 当前正在运行班次在本班周期内的实时总产量;]]></Line>
-              <Line Number="18"><![CDATA[//    - 班历史累计: 上一次完成的该班的总产量(在班切换时冻结);]]></Line>
-              <Line Number="19"><![CDATA[// 5. 每个 2 小时段提供:]]></Line>
-              <Line Number="20"><![CDATA[//    - 段历史累计: 上一个完成的 2 小时段的总产量(在段切换时冻结)。]]></Line>
-              <Line Number="21"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="22"><![CDATA[// 设计说明:]]></Line>
-              <Line Number="23"><![CDATA[// 1. 时间基准:]]></Line>
-              <Line Number="24"><![CDATA[//    - 使用系统时间 Year/Month/Day/Hour/Minute/Second;]]></Line>
-              <Line Number="25"><![CDATA[//    - 计算 Time_Real = Hour * 60 + Minute (范围 0..1439),作为一天内统一的“分钟计数”时间轴;]]></Line>
-              <Line Number="26"><![CDATA[//    - 结合当前班次,计算 Minutes_From_Shift_Start 表示“当前时间距离本班起点经过的分钟数”。]]></Line>
-              <Line Number="27"><![CDATA[// 2. 班次与 2 小时段划分:]]></Line>
-              <Line Number="28"><![CDATA[//    - 班次通过比较 Time_Real 与三个固定时间点(9:00、17:00、1:00)自动判定,跨午夜的情况单独处理;]]></Line>
-              <Line Number="29"><![CDATA[//    - 班内 2 小时段通过 Shift_Section_ID = Minutes_From_Shift_Start / 120 计算得到(0..3 共 4 段)。]]></Line>
-              <Line Number="30"><![CDATA[// 3. 累计策略:]]></Line>
-              <Line Number="31"><![CDATA[//    - 以 OSRI 检测到的脉冲上升沿为触发,在对应班次和对应 2 小时段的临时变量上累加产量;]]></Line>
-              <Line Number="32"><![CDATA[//    - 在班切换时,将本班临时累计拷贝到历史班累计输出,随后清零临时值;]]></Line>
-              <Line Number="33"><![CDATA[//    - 在 2 小时段切换时,将上一段临时累计拷贝到历史 2 小时段累计输出,随后清零该段临时值。]]></Line>
-              <Line Number="34"><![CDATA[// 4. 与原 AOI 的兼容:]]></Line>
-              <Line Number="35"><![CDATA[//    - 总累计/分钟累计/天累计/月累计逻辑完全沿用原 OreProdStats 程序,保证统计口径一致;]]></Line>
-              <Line Number="36"><![CDATA[//    - 原 AOI 中与班次相关的时间输入(In_Class1/2_Time_*)仍被保留,用于天/月切换等场景。]]></Line>
-              <Line Number="37"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="38"><![CDATA[// 变量约定(相对原 OreProdStats 的扩展部分):]]></Line>
-              <Line Number="39"><![CDATA[// 1. 输出(历史班累计):]]></Line>
-              <Line Number="40"><![CDATA[//    - Out_Tot_Shift1, Out_Tot_Shift2, Out_Tot_Shift3 : DINT;   // 分别表示早/中/晚班上一个完成班次的总产量]]></Line>
-              <Line Number="41"><![CDATA[// 2. 输出(实时班累计):]]></Line>
-              <Line Number="42"><![CDATA[//    - Out_Tot_Shift1_RT, Out_Tot_Shift2_RT, Out_Tot_Shift3_RT : DINT; // 各自班当前周期内的实时累计]]></Line>
-              <Line Number="43"><![CDATA[//    - Out_Tot_Shift_RT : DINT;                                        // 当前班的实时累计(根据 Shift_ID 选取)]]></Line>
-              <Line Number="44"><![CDATA[// 3. 输出(每班内每 2 小时段累计,历史值):]]></Line>
-              <Line Number="45"><![CDATA[//    - Out_Tot_Shift1_2H_1..4, Out_Tot_Shift2_2H_1..4, Out_Tot_Shift3_2H_1..4 : DINT;]]></Line>
-              <Line Number="46"><![CDATA[//      表示对应班次中 4 个 2 小时段“上一个完成周期”的固定产量。]]></Line>
-              <Line Number="47"><![CDATA[// 4. 本地变量(班与 2 小时段临时累计):]]></Line>
-              <Line Number="48"><![CDATA[//    - TempShift1, TempShift2, TempShift3 : DINT;]]></Line>
-              <Line Number="49"><![CDATA[//      用于在当前班周期内累加产量,在班结束时拷贝到 Out_Tot_ShiftX 并清零。]]></Line>
-              <Line Number="50"><![CDATA[//    - TempShift1_2H_1..4, TempShift2_2H_1..4, TempShift3_2H_1..4 : DINT;]]></Line>
-              <Line Number="51"><![CDATA[//      用于在当前班当前 2 小时段内累加产量,在段结束时拷贝到 Out_Tot_ShiftX_2H_Y 并清零。]]></Line>
-              <Line Number="52"><![CDATA[// 5. 本地变量(时间辅助):]]></Line>
-              <Line Number="53"><![CDATA[//    - Shift_ID, Shift_Section_ID, Prev_Section_ID : DINT;  // 当前班号/当前段号/上一段号]]></Line>
-              <Line Number="54"><![CDATA[//    - Minutes_From_Shift_Start : DINT;                    // 当前时间距离本班起始时间的分钟数]]></Line>
-              <Line Number="55"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="56"><![CDATA[]]></Line>
-              <Line Number="57"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="58"><![CDATA[// 功能段 1: 脉冲检测与总累计]]></Line>
-              <Line Number="59"><![CDATA[// 与原 OreProdStats 相同]]></Line>
-              <Line Number="60"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="61"><![CDATA[]]></Line>
-              <Line Number="62"><![CDATA[// 脉冲上升沿检测]]></Line>
-              <Line Number="63"><![CDATA[OSRI_Pulse.InputBit := In_Pulse;]]></Line>
-              <Line Number="64"><![CDATA[OSRI(OSRI_Pulse);]]></Line>
-              <Line Number="65"><![CDATA[]]></Line>
-              <Line Number="66"><![CDATA[// 总累计计数]]></Line>
-              <Line Number="67"><![CDATA[IF OSRI_Pulse.OutputBit AND In_Run THEN]]></Line>
-              <Line Number="68"><![CDATA[    Out_Tot := Out_Tot + In_Scale;]]></Line>
-              <Line Number="69"><![CDATA[    Temp[0] := Temp[0] + In_Scale;   // 分钟累计临时量]]></Line>
-              <Line Number="70"><![CDATA[END_IF;]]></Line>
-              <Line Number="71"><![CDATA[]]></Line>
-              <Line Number="72"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="73"><![CDATA[// 功能段 2: 分钟累计]]></Line>
-              <Line Number="74"><![CDATA[// 与原 OreProdStats 相同]]></Line>
-              <Line Number="75"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="76"><![CDATA[]]></Line>
-              <Line Number="77"><![CDATA[TONR_01.PRE := In_Tot_Min * 60000;]]></Line>
-              <Line Number="78"><![CDATA[TONR_01.Reset := TONR_01.DN;]]></Line>
-              <Line Number="79"><![CDATA[TONR_01.TimerEnable := In_Run;]]></Line>
-              <Line Number="80"><![CDATA[TONR(TONR_01);]]></Line>
-              <Line Number="81"><![CDATA[]]></Line>
-              <Line Number="82"><![CDATA[IF TONR_01.DN THEN]]></Line>
-              <Line Number="83"><![CDATA[    Out_Tot_Min := Temp[0];]]></Line>
-              <Line Number="84"><![CDATA[    Temp[0] := 0;]]></Line>
-              <Line Number="85"><![CDATA[END_IF;]]></Line>
-              <Line Number="86"><![CDATA[]]></Line>
-              <Line Number="87"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="88"><![CDATA[// 功能段 3: 时间数据准备]]></Line>
-              <Line Number="89"><![CDATA[// 与原 OreProdStats 相同,并在此基础上增加三班制辅助变量]]></Line>
-              <Line Number="90"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="91"><![CDATA[]]></Line>
-              <Line Number="92"><![CDATA[// 系统时间 -> 数组]]></Line>
-              <Line Number="93"><![CDATA[Time[0] := Year;]]></Line>
-              <Line Number="94"><![CDATA[Time[1] := Month;]]></Line>
-              <Line Number="95"><![CDATA[Time[2] := Day;]]></Line>
-              <Line Number="96"><![CDATA[Time[3] := Hour;]]></Line>
-              <Line Number="97"><![CDATA[Time[4] := Minute;]]></Line>
-              <Line Number="98"><![CDATA[Time[5] := Second;]]></Line>
-              <Line Number="99"><![CDATA[]]></Line>
-              <Line Number="100"><![CDATA[// 当前时间的分钟偏移量 (0..1439)]]></Line>
-              <Line Number="101"><![CDATA[Time_Real := Hour * 60 + Minute;]]></Line>
-              <Line Number="102"><![CDATA[]]></Line>
-              <Line Number="103"><![CDATA[// 原班次/天切换时间计算(保留天/月逻辑需要)]]></Line>
-              <Line Number="104"><![CDATA[Time_Set1 := In_Class1_Time_Hour * 60 + In_Class1_Time_Minute;]]></Line>
-              <Line Number="105"><![CDATA[Time_Set2 := In_Class2_Time_Hour * 60 + In_Class2_Time_Minute;]]></Line>
-              <Line Number="106"><![CDATA[Time_Set3_Day := In_Day_Time_Hour * 60 + In_Day_Time_Minute;]]></Line>
-              <Line Number="107"><![CDATA[]]></Line>
-              <Line Number="108"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="109"><![CDATA[// 功能段 4: 三班制班次判定与 2 小时段计算]]></Line>
-              <Line Number="110"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="111"><![CDATA[]]></Line>
-              <Line Number="112"><![CDATA[// 班次判定:]]></Line>
-              <Line Number="113"><![CDATA[// Shift_ID = 1: 早班  09:00–17:00]]></Line>
-              <Line Number="114"><![CDATA[// Shift_ID = 2: 中班  17:00–次日 01:00 (跨午夜)]]></Line>
-              <Line Number="115"><![CDATA[// Shift_ID = 3: 晚班  01:00–09:00]]></Line>
-              <Line Number="116"><![CDATA[IF (Time_Real >= 9 * 60) AND (Time_Real < 17 * 60) THEN]]></Line>
-              <Line Number="117"><![CDATA[    Shift_ID := 1;  // 早班]]></Line>
-              <Line Number="118"><![CDATA[ELSIF (Time_Real >= 17 * 60) OR (Time_Real < 1 * 60) THEN]]></Line>
-              <Line Number="119"><![CDATA[    Shift_ID := 2;  // 中班(跨午夜)]]></Line>
-              <Line Number="120"><![CDATA[ELSE]]></Line>
-              <Line Number="121"><![CDATA[    Shift_ID := 3;  // 晚班]]></Line>
-              <Line Number="122"><![CDATA[END_IF;]]></Line>
-              <Line Number="123"><![CDATA[]]></Line>
-              <Line Number="124"><![CDATA[// 计算“当前时间距离本班开始的分钟数”(0..479)]]></Line>
-              <Line Number="125"><![CDATA[CASE Shift_ID OF]]></Line>
-              <Line Number="126"><![CDATA[    1: // 早班 09:00–17:00, 起点不跨午夜]]></Line>
-              <Line Number="127"><![CDATA[        Minutes_From_Shift_Start := Time_Real - 9 * 60;]]></Line>
-              <Line Number="128"><![CDATA[    2: // 中班 17:00–次日 01:00, 起点跨午夜]]></Line>
-              <Line Number="129"><![CDATA[        IF Time_Real >= 17 * 60 THEN]]></Line>
-              <Line Number="130"><![CDATA[            Minutes_From_Shift_Start := Time_Real - 17 * 60;]]></Line>
-              <Line Number="131"><![CDATA[        ELSE]]></Line>
-              <Line Number="132"><![CDATA[            Minutes_From_Shift_Start := Time_Real + 1440 - 17 * 60;]]></Line>
-              <Line Number="133"><![CDATA[        END_IF;]]></Line>
-              <Line Number="134"><![CDATA[    3: // 晚班 01:00–09:00, 起点在凌晨]]></Line>
-              <Line Number="135"><![CDATA[        IF Time_Real >= 1 * 60 THEN]]></Line>
-              <Line Number="136"><![CDATA[            Minutes_From_Shift_Start := Time_Real - 1 * 60;]]></Line>
-              <Line Number="137"><![CDATA[        ELSE]]></Line>
-              <Line Number="138"><![CDATA[            Minutes_From_Shift_Start := Time_Real + 1440 - 1 * 60;]]></Line>
-              <Line Number="139"><![CDATA[        END_IF;]]></Line>
-              <Line Number="140"><![CDATA[END_CASE;]]></Line>
-              <Line Number="141"><![CDATA[]]></Line>
-              <Line Number="142"><![CDATA[// 每班 8 小时 = 480 分钟,按 2 小时 = 120 分钟划分为 4 段:]]></Line>
-              <Line Number="143"><![CDATA[// Shift_Section_ID = 0..3]]></Line>
-              <Line Number="144"><![CDATA[Shift_Section_ID := Minutes_From_Shift_Start / 120;]]></Line>
-              <Line Number="145"><![CDATA[]]></Line>
-              <Line Number="146"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="147"><![CDATA[// 功能段 5: 三班制班累计与 2 小时段累计]]></Line>
-              <Line Number="148"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="149"><![CDATA[]]></Line>
-              <Line Number="150"><![CDATA[// 在脉冲处进行三班累计和班内 2 小时段累计]]></Line>
-              <Line Number="151"><![CDATA[IF OSRI_Pulse.OutputBit AND In_Run THEN]]></Line>
-              <Line Number="152"><![CDATA[    // 班累计临时值]]></Line>
-              <Line Number="153"><![CDATA[    CASE Shift_ID OF]]></Line>
-              <Line Number="154"><![CDATA[        1:  TempShift1 := TempShift1 + In_Scale;]]></Line>
-              <Line Number="155"><![CDATA[        2:  TempShift2 := TempShift2 + In_Scale;]]></Line>
-              <Line Number="156"><![CDATA[        3:  TempShift3 := TempShift3 + In_Scale;]]></Line>
-              <Line Number="157"><![CDATA[    END_CASE;]]></Line>
-              <Line Number="158"><![CDATA[]]></Line>
-              <Line Number="159"><![CDATA[    // 班内 2 小时段临时累计]]></Line>
-              <Line Number="160"><![CDATA[    CASE Shift_ID OF]]></Line>
-              <Line Number="161"><![CDATA[        1:]]></Line>
-              <Line Number="162"><![CDATA[            CASE Shift_Section_ID OF]]></Line>
-              <Line Number="163"><![CDATA[                0: TempShift1_2H_1 := TempShift1_2H_1 + In_Scale;]]></Line>
-              <Line Number="164"><![CDATA[                1: TempShift1_2H_2 := TempShift1_2H_2 + In_Scale;]]></Line>
-              <Line Number="165"><![CDATA[                2: TempShift1_2H_3 := TempShift1_2H_3 + In_Scale;]]></Line>
-              <Line Number="166"><![CDATA[                3: TempShift1_2H_4 := TempShift1_2H_4 + In_Scale;]]></Line>
-              <Line Number="167"><![CDATA[            END_CASE;]]></Line>
-              <Line Number="168"><![CDATA[        2:]]></Line>
-              <Line Number="169"><![CDATA[            CASE Shift_Section_ID OF]]></Line>
-              <Line Number="170"><![CDATA[                0: TempShift2_2H_1 := TempShift2_2H_1 + In_Scale;]]></Line>
-              <Line Number="171"><![CDATA[                1: TempShift2_2H_2 := TempShift2_2H_2 + In_Scale;]]></Line>
-              <Line Number="172"><![CDATA[                2: TempShift2_2H_3 := TempShift2_2H_3 + In_Scale;]]></Line>
-              <Line Number="173"><![CDATA[                3: TempShift2_2H_4 := TempShift2_2H_4 + In_Scale;]]></Line>
-              <Line Number="174"><![CDATA[            END_CASE;]]></Line>
-              <Line Number="175"><![CDATA[        3:]]></Line>
-              <Line Number="176"><![CDATA[            CASE Shift_Section_ID OF]]></Line>
-              <Line Number="177"><![CDATA[                0: TempShift3_2H_1 := TempShift3_2H_1 + In_Scale;]]></Line>
-              <Line Number="178"><![CDATA[                1: TempShift3_2H_2 := TempShift3_2H_2 + In_Scale;]]></Line>
-              <Line Number="179"><![CDATA[                2: TempShift3_2H_3 := TempShift3_2H_3 + In_Scale;]]></Line>
-              <Line Number="180"><![CDATA[                3: TempShift3_2H_4 := TempShift3_2H_4 + In_Scale;]]></Line>
-              <Line Number="181"><![CDATA[            END_CASE;]]></Line>
-              <Line Number="182"><![CDATA[    END_CASE;]]></Line>
-              <Line Number="183"><![CDATA[END_IF;]]></Line>
-              <Line Number="184"><![CDATA[]]></Line>
-              <Line Number="185"><![CDATA[// 班实时累计输出]]></Line>
-              <Line Number="186"><![CDATA[Out_Tot_Shift1_RT := TempShift1;]]></Line>
-              <Line Number="187"><![CDATA[Out_Tot_Shift2_RT := TempShift2;]]></Line>
-              <Line Number="188"><![CDATA[Out_Tot_Shift3_RT := TempShift3;]]></Line>
-              <Line Number="189"><![CDATA[]]></Line>
-              <Line Number="190"><![CDATA[// 当前班实时累计(用于 HMI 显示“当前班产量”)]]></Line>
-              <Line Number="191"><![CDATA[CASE Shift_ID OF]]></Line>
-              <Line Number="192"><![CDATA[    1: Out_Tot_Shift_RT := Out_Tot_Shift1_RT;]]></Line>
-              <Line Number="193"><![CDATA[    2: Out_Tot_Shift_RT := Out_Tot_Shift2_RT;]]></Line>
-              <Line Number="194"><![CDATA[    3: Out_Tot_Shift_RT := Out_Tot_Shift3_RT;]]></Line>
-              <Line Number="195"><![CDATA[END_CASE;]]></Line>
-              <Line Number="196"><![CDATA[]]></Line>
-              <Line Number="197"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="198"><![CDATA[// 功能段 6: 班结束时保存班累计并清零]]></Line>
-              <Line Number="199"><![CDATA[// 班切换时间固定:]]></Line>
-              <Line Number="200"><![CDATA[//   早班结束=中班开始: 17:00]]></Line>
-              <Line Number="201"><![CDATA[//   中班结束=晚班开始: 01:00]]></Line>
-              <Line Number="202"><![CDATA[//   晚班结束=早班开始: 09:00]]></Line>
-              <Line Number="203"><![CDATA[// 逻辑与原白/夜班逻辑类似,先冻结历史值,再延迟 2 秒清零临时量]]></Line>
-              <Line Number="204"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="205"><![CDATA[]]></Line>
-              <Line Number="206"><![CDATA[// 早班结束 / 中班开始: 17:00]]></Line>
-              <Line Number="207"><![CDATA[IF (Hour = 17) AND (Minute = 0) AND (Second <= 1) THEN]]></Line>
-              <Line Number="208"><![CDATA[    Out_Tot_Shift1 := TempShift1;]]></Line>
-              <Line Number="209"><![CDATA[    Out_Tot_Shift1_RT := 0;]]></Line>
-              <Line Number="210"><![CDATA[END_IF;]]></Line>
-              <Line Number="211"><![CDATA[]]></Line>
-              <Line Number="212"><![CDATA[IF (Hour = 17) AND (Minute = 0) AND (Second >= 2) AND (Second <= 3) THEN]]></Line>
-              <Line Number="213"><![CDATA[    TempShift1 := 0;]]></Line>
-              <Line Number="214"><![CDATA[END_IF;]]></Line>
-              <Line Number="215"><![CDATA[]]></Line>
-              <Line Number="216"><![CDATA[// 中班结束 / 晚班开始: 01:00]]></Line>
-              <Line Number="217"><![CDATA[IF (Hour = 1) AND (Minute = 0) AND (Second <= 1) THEN]]></Line>
-              <Line Number="218"><![CDATA[    Out_Tot_Shift2 := TempShift2;]]></Line>
-              <Line Number="219"><![CDATA[    Out_Tot_Shift2_RT := 0;]]></Line>
-              <Line Number="220"><![CDATA[END_IF;]]></Line>
-              <Line Number="221"><![CDATA[]]></Line>
-              <Line Number="222"><![CDATA[IF (Hour = 1) AND (Minute = 0) AND (Second >= 2) AND (Second <= 3) THEN]]></Line>
-              <Line Number="223"><![CDATA[    TempShift2 := 0;]]></Line>
-              <Line Number="224"><![CDATA[END_IF;]]></Line>
-              <Line Number="225"><![CDATA[]]></Line>
-              <Line Number="226"><![CDATA[// 晚班结束 / 早班开始: 09:00]]></Line>
-              <Line Number="227"><![CDATA[IF (Hour = 9) AND (Minute = 0) AND (Second <= 1) THEN]]></Line>
-              <Line Number="228"><![CDATA[    Out_Tot_Shift3 := TempShift3;]]></Line>
-              <Line Number="229"><![CDATA[    Out_Tot_Shift3_RT := 0;]]></Line>
-              <Line Number="230"><![CDATA[END_IF;]]></Line>
-              <Line Number="231"><![CDATA[]]></Line>
-              <Line Number="232"><![CDATA[IF (Hour = 9) AND (Minute = 0) AND (Second >= 2) AND (Second <= 3) THEN]]></Line>
-              <Line Number="233"><![CDATA[    TempShift3 := 0;]]></Line>
-              <Line Number="234"><![CDATA[END_IF;]]></Line>
-              <Line Number="235"><![CDATA[]]></Line>
-              <Line Number="236"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="237"><![CDATA[// 功能段 7: 每 2 小时段结束时保存该段产量]]></Line>
-              <Line Number="238"><![CDATA[// 利用 Minutes_From_Shift_Start MOD 120 = 0 识别 2 小时边界,]]></Line>
-              <Line Number="239"><![CDATA[// 在边界时冻结“上一段”的产量并清零上一段临时累计。]]></Line>
-              <Line Number="240"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="241"><![CDATA[]]></Line>
-              <Line Number="242"><![CDATA[IF (Minutes_From_Shift_Start MOD 120 = 0) AND (Second <= 1) THEN]]></Line>
-              <Line Number="243"><![CDATA[]]></Line>
-              <Line Number="244"><![CDATA[    // 上一段编号 = (当前段编号 + 3) MOD 4, 范围 0..3]]></Line>
-              <Line Number="245"><![CDATA[    Prev_Section_ID := (Shift_Section_ID + 3) MOD 4;]]></Line>
-              <Line Number="246"><![CDATA[]]></Line>
-              <Line Number="247"><![CDATA[    CASE Shift_ID OF]]></Line>
-              <Line Number="248"><![CDATA[        1:]]></Line>
-              <Line Number="249"><![CDATA[            CASE Prev_Section_ID OF]]></Line>
-              <Line Number="250"><![CDATA[                0:]]></Line>
-              <Line Number="251"><![CDATA[                    Out_Tot_Shift1_2H_1 := TempShift1_2H_1;]]></Line>
-              <Line Number="252"><![CDATA[                    TempShift1_2H_1 := 0;]]></Line>
-              <Line Number="253"><![CDATA[                1:]]></Line>
-              <Line Number="254"><![CDATA[                    Out_Tot_Shift1_2H_2 := TempShift1_2H_2;]]></Line>
-              <Line Number="255"><![CDATA[                    TempShift1_2H_2 := 0;]]></Line>
-              <Line Number="256"><![CDATA[                2:]]></Line>
-              <Line Number="257"><![CDATA[                    Out_Tot_Shift1_2H_3 := TempShift1_2H_3;]]></Line>
-              <Line Number="258"><![CDATA[                    TempShift1_2H_3 := 0;]]></Line>
-              <Line Number="259"><![CDATA[                3:]]></Line>
-              <Line Number="260"><![CDATA[                    Out_Tot_Shift1_2H_4 := TempShift1_2H_4;]]></Line>
-              <Line Number="261"><![CDATA[                    TempShift1_2H_4 := 0;]]></Line>
-              <Line Number="262"><![CDATA[            END_CASE;]]></Line>
-              <Line Number="263"><![CDATA[]]></Line>
-              <Line Number="264"><![CDATA[        2:]]></Line>
-              <Line Number="265"><![CDATA[            CASE Prev_Section_ID OF]]></Line>
-              <Line Number="266"><![CDATA[                0:]]></Line>
-              <Line Number="267"><![CDATA[                    Out_Tot_Shift2_2H_1 := TempShift2_2H_1;]]></Line>
-              <Line Number="268"><![CDATA[                    TempShift2_2H_1 := 0;]]></Line>
-              <Line Number="269"><![CDATA[                1:]]></Line>
-              <Line Number="270"><![CDATA[                    Out_Tot_Shift2_2H_2 := TempShift2_2H_2;]]></Line>
-              <Line Number="271"><![CDATA[                    TempShift2_2H_2 := 0;]]></Line>
-              <Line Number="272"><![CDATA[                2:]]></Line>
-              <Line Number="273"><![CDATA[                    Out_Tot_Shift2_2H_3 := TempShift2_2H_3;]]></Line>
-              <Line Number="274"><![CDATA[                    TempShift2_2H_3 := 0;]]></Line>
-              <Line Number="275"><![CDATA[                3:]]></Line>
-              <Line Number="276"><![CDATA[                    Out_Tot_Shift2_2H_4 := TempShift2_2H_4;]]></Line>
-              <Line Number="277"><![CDATA[                    TempShift2_2H_4 := 0;]]></Line>
-              <Line Number="278"><![CDATA[            END_CASE;]]></Line>
-              <Line Number="279"><![CDATA[]]></Line>
-              <Line Number="280"><![CDATA[        3:]]></Line>
-              <Line Number="281"><![CDATA[            CASE Prev_Section_ID OF]]></Line>
-              <Line Number="282"><![CDATA[                0:]]></Line>
-              <Line Number="283"><![CDATA[                    Out_Tot_Shift3_2H_1 := TempShift3_2H_1;]]></Line>
-              <Line Number="284"><![CDATA[                    TempShift3_2H_1 := 0;]]></Line>
-              <Line Number="285"><![CDATA[                1:]]></Line>
-              <Line Number="286"><![CDATA[                    Out_Tot_Shift3_2H_2 := TempShift3_2H_2;]]></Line>
-              <Line Number="287"><![CDATA[                    TempShift3_2H_2 := 0;]]></Line>
-              <Line Number="288"><![CDATA[                2:]]></Line>
-              <Line Number="289"><![CDATA[                    Out_Tot_Shift3_2H_3 := TempShift3_2H_3;]]></Line>
-              <Line Number="290"><![CDATA[                    TempShift3_2H_3 := 0;]]></Line>
-              <Line Number="291"><![CDATA[                3:]]></Line>
-              <Line Number="292"><![CDATA[                    Out_Tot_Shift3_2H_4 := TempShift3_2H_4;]]></Line>
-              <Line Number="293"><![CDATA[                    TempShift3_2H_4 := 0;]]></Line>
-              <Line Number="294"><![CDATA[            END_CASE;]]></Line>
-              <Line Number="295"><![CDATA[    END_CASE;]]></Line>
-              <Line Number="296"><![CDATA[END_IF;]]></Line>
-              <Line Number="297"><![CDATA[]]></Line>
-              <Line Number="298"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="299"><![CDATA[// 功能段 8: 天累计逻辑]]></Line>
-              <Line Number="300"><![CDATA[// 直接复用原 OreProdStats 的实现]]></Line>
-              <Line Number="301"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="302"><![CDATA[]]></Line>
-              <Line Number="303"><![CDATA[IF OSRI_Pulse.OutputBit AND In_Run THEN]]></Line>
-              <Line Number="304"><![CDATA[    Temp[8] := Temp[8] + In_Scale;]]></Line>
-              <Line Number="305"><![CDATA[END_IF;]]></Line>
-              <Line Number="306"><![CDATA[]]></Line>
-              <Line Number="307"><![CDATA[Out_Tot_D_RT := Temp[8];]]></Line>
-              <Line Number="308"><![CDATA[]]></Line>
-              <Line Number="309"><![CDATA[IF (Hour = In_Day_Time_Hour) AND (Minute = In_Day_Time_Minute) AND (Second <= 1) THEN]]></Line>
-              <Line Number="310"><![CDATA[    Out_Tot_D := Temp[8];]]></Line>
-              <Line Number="311"><![CDATA[    Out_Tot_D_RT := 0;]]></Line>
-              <Line Number="312"><![CDATA[END_IF;]]></Line>
-              <Line Number="313"><![CDATA[]]></Line>
-              <Line Number="314"><![CDATA[IF (Hour = In_Day_Time_Hour) AND (Minute = In_Day_Time_Minute) AND (Second >= 2) AND (Second <= 3) THEN]]></Line>
-              <Line Number="315"><![CDATA[    Temp[8] := 0;]]></Line>
-              <Line Number="316"><![CDATA[END_IF;]]></Line>
-              <Line Number="317"><![CDATA[]]></Line>
-              <Line Number="318"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="319"><![CDATA[// 功能段 9: 月累计逻辑(与原 OreProdStats 相同)]]></Line>
-              <Line Number="320"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="321"><![CDATA[]]></Line>
-              <Line Number="322"><![CDATA[Is_Leap_Year := (Year MOD 4 = 0) AND (Year MOD 100 <> 0) OR (Year MOD 400 = 0);]]></Line>
-              <Line Number="323"><![CDATA[]]></Line>
-              <Line Number="324"><![CDATA[CASE Month OF]]></Line>
-              <Line Number="325"><![CDATA[    1, 3, 5, 7, 8, 10, 12: Days_In_Month := 31;]]></Line>
-              <Line Number="326"><![CDATA[    4, 6, 9, 11: Days_In_Month := 30;]]></Line>
-              <Line Number="327"><![CDATA[    2:]]></Line>
-              <Line Number="328"><![CDATA[        IF Is_Leap_Year THEN]]></Line>
-              <Line Number="329"><![CDATA[            Days_In_Month := 29;]]></Line>
-              <Line Number="330"><![CDATA[        ELSE]]></Line>
-              <Line Number="331"><![CDATA[            Days_In_Month := 28;]]></Line>
-              <Line Number="332"><![CDATA[        END_IF;]]></Line>
-              <Line Number="333"><![CDATA[END_CASE;]]></Line>
-              <Line Number="334"><![CDATA[]]></Line>
-              <Line Number="335"><![CDATA[IF (Day >= 1) AND (Day <= Days_In_Month) AND OSRI_Pulse.OutputBit AND In_Run THEN]]></Line>
-              <Line Number="336"><![CDATA[    Temp[4] := Temp[4] + In_Scale;]]></Line>
-              <Line Number="337"><![CDATA[END_IF;]]></Line>
-              <Line Number="338"><![CDATA[]]></Line>
-              <Line Number="339"><![CDATA[IF (Day >= 1) AND (Day <= Days_In_Month) THEN]]></Line>
-              <Line Number="340"><![CDATA[    Out_Tot_M_RT := Temp[4];]]></Line>
-              <Line Number="341"><![CDATA[END_IF;]]></Line>
-              <Line Number="342"><![CDATA[]]></Line>
-              <Line Number="343"><![CDATA[IF (Day = 1) AND (Hour = 0) AND (Minute = 0) AND (Second <= 1) THEN]]></Line>
-              <Line Number="344"><![CDATA[    Out_Tot_M := Temp[4];]]></Line>
-              <Line Number="345"><![CDATA[    Out_Tot_M_RT := 0;]]></Line>
-              <Line Number="346"><![CDATA[END_IF;]]></Line>
-              <Line Number="347"><![CDATA[]]></Line>
-              <Line Number="348"><![CDATA[IF (Day = 1) AND (Hour = 0) AND (Minute = 0) AND (Second >= 2) AND (Second <= 3) THEN]]></Line>
-              <Line Number="349"><![CDATA[    Temp[4] := 0;]]></Line>
-              <Line Number="350"><![CDATA[END_IF;]]></Line>
-              <Line Number="351"><![CDATA[]]></Line>
-              <Line Number="352"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="353"><![CDATA[// 功能段 10: HMI 命令处理(扩展以支持三班与 2 小时段)]]></Line>
-              <Line Number="354"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="355"><![CDATA[]]></Line>
-              <Line Number="356"><![CDATA[IF HMI_CMD.Clear THEN]]></Line>
-              <Line Number="357"><![CDATA[    // 清零原有输出累计值]]></Line>
-              <Line Number="358"><![CDATA[    Out_Tot := 0;]]></Line>
-              <Line Number="359"><![CDATA[    Out_Tot_Min := 0;]]></Line>
-              <Line Number="360"><![CDATA[    Out_Tot_D_RT := 0;]]></Line>
-              <Line Number="361"><![CDATA[    Out_Tot_M_RT := 0;]]></Line>
-              <Line Number="362"><![CDATA[    Out_Tot_D := 0;]]></Line>
-              <Line Number="363"><![CDATA[    Out_Tot_M := 0;]]></Line>
-              <Line Number="364"><![CDATA[]]></Line>
-              <Line Number="365"><![CDATA[    // 清零三班累计(历史与实时)]]></Line>
-              <Line Number="366"><![CDATA[    Out_Tot_Shift1 := 0;]]></Line>
-              <Line Number="367"><![CDATA[    Out_Tot_Shift2 := 0;]]></Line>
-              <Line Number="368"><![CDATA[    Out_Tot_Shift3 := 0;]]></Line>
-              <Line Number="369"><![CDATA[]]></Line>
-              <Line Number="370"><![CDATA[    Out_Tot_Shift1_RT := 0;]]></Line>
-              <Line Number="371"><![CDATA[    Out_Tot_Shift2_RT := 0;]]></Line>
-              <Line Number="372"><![CDATA[    Out_Tot_Shift3_RT := 0;]]></Line>
-              <Line Number="373"><![CDATA[    Out_Tot_Shift_RT := 0;]]></Line>
-              <Line Number="374"><![CDATA[]]></Line>
-              <Line Number="375"><![CDATA[    // 清零 2 小时段累计(历史)]]></Line>
-              <Line Number="376"><![CDATA[    Out_Tot_Shift1_2H_1 := 0;]]></Line>
-              <Line Number="377"><![CDATA[    Out_Tot_Shift1_2H_2 := 0;]]></Line>
-              <Line Number="378"><![CDATA[    Out_Tot_Shift1_2H_3 := 0;]]></Line>
-              <Line Number="379"><![CDATA[    Out_Tot_Shift1_2H_4 := 0;]]></Line>
-              <Line Number="380"><![CDATA[]]></Line>
-              <Line Number="381"><![CDATA[    Out_Tot_Shift2_2H_1 := 0;]]></Line>
-              <Line Number="382"><![CDATA[    Out_Tot_Shift2_2H_2 := 0;]]></Line>
-              <Line Number="383"><![CDATA[    Out_Tot_Shift2_2H_3 := 0;]]></Line>
-              <Line Number="384"><![CDATA[    Out_Tot_Shift2_2H_4 := 0;]]></Line>
-              <Line Number="385"><![CDATA[]]></Line>
-              <Line Number="386"><![CDATA[    Out_Tot_Shift3_2H_1 := 0;]]></Line>
-              <Line Number="387"><![CDATA[    Out_Tot_Shift3_2H_2 := 0;]]></Line>
-              <Line Number="388"><![CDATA[    Out_Tot_Shift3_2H_3 := 0;]]></Line>
-              <Line Number="389"><![CDATA[    Out_Tot_Shift3_2H_4 := 0;]]></Line>
-              <Line Number="390"><![CDATA[]]></Line>
-              <Line Number="391"><![CDATA[    // 清零临时累计变量]]></Line>
-              <Line Number="392"><![CDATA[    Temp[0] := 0;   // 分钟累计]]></Line>
-              <Line Number="393"><![CDATA[    Temp[4] := 0;   // 月累计]]></Line>
-              <Line Number="394"><![CDATA[    Temp[8] := 0;   // 天累计]]></Line>
-              <Line Number="395"><![CDATA[]]></Line>
-              <Line Number="396"><![CDATA[    TempShift1 := 0;]]></Line>
-              <Line Number="397"><![CDATA[    TempShift2 := 0;]]></Line>
-              <Line Number="398"><![CDATA[    TempShift3 := 0;]]></Line>
-              <Line Number="399"><![CDATA[]]></Line>
-              <Line Number="400"><![CDATA[    TempShift1_2H_1 := 0;]]></Line>
-              <Line Number="401"><![CDATA[    TempShift1_2H_2 := 0;]]></Line>
-              <Line Number="402"><![CDATA[    TempShift1_2H_3 := 0;]]></Line>
-              <Line Number="403"><![CDATA[    TempShift1_2H_4 := 0;]]></Line>
-              <Line Number="404"><![CDATA[]]></Line>
-              <Line Number="405"><![CDATA[    TempShift2_2H_1 := 0;]]></Line>
-              <Line Number="406"><![CDATA[    TempShift2_2H_2 := 0;]]></Line>
-              <Line Number="407"><![CDATA[    TempShift2_2H_3 := 0;]]></Line>
-              <Line Number="408"><![CDATA[    TempShift2_2H_4 := 0;]]></Line>
-              <Line Number="409"><![CDATA[]]></Line>
-              <Line Number="410"><![CDATA[    TempShift3_2H_1 := 0;]]></Line>
-              <Line Number="411"><![CDATA[    TempShift3_2H_2 := 0;]]></Line>
-              <Line Number="412"><![CDATA[    TempShift3_2H_3 := 0;]]></Line>
-              <Line Number="413"><![CDATA[    TempShift3_2H_4 := 0;]]></Line>
-              <Line Number="414"><![CDATA[]]></Line>
-              <Line Number="415"><![CDATA[    // 复位清除命令]]></Line>
-              <Line Number="416"><![CDATA[    HMI_CMD.Clear := 0;]]></Line>
-              <Line Number="417"><![CDATA[END_IF;]]></Line>
-              <Line Number="418"><![CDATA[]]></Line>
-              <Line Number="419"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="420"><![CDATA[// 功能段 11: HMI 数据同步(示例)]]></Line>
-              <Line Number="421"><![CDATA[// 实际需要根据你的 HMI_CMD 结构扩展字段]]></Line>
-              <Line Number="422"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="423"><![CDATA[]]></Line>
-              <Line Number="424"><![CDATA[HMI_CMD.Out_Tot := Out_Tot;]]></Line>
-              <Line Number="425"><![CDATA[HMI_CMD.Out_Tot_Min := Out_Tot_Min;]]></Line>
-              <Line Number="426"><![CDATA[HMI_CMD.Out_Tot_D_RT := Out_Tot_D_RT;]]></Line>
-              <Line Number="427"><![CDATA[HMI_CMD.Out_Tot_M_RT := Out_Tot_M_RT;]]></Line>
-              <Line Number="428"><![CDATA[HMI_CMD.Out_Tot_D := Out_Tot_D;]]></Line>
-              <Line Number="429"><![CDATA[HMI_CMD.Out_Tot_M := Out_Tot_M;]]></Line>
-              <Line Number="430"><![CDATA[]]></Line>
-              <Line Number="431"><![CDATA[// 三班累计]]></Line>
-              <Line Number="432"><![CDATA[HMI_CMD.Out_Tot_Shift1 := Out_Tot_Shift1;]]></Line>
-              <Line Number="433"><![CDATA[HMI_CMD.Out_Tot_Shift2 := Out_Tot_Shift2;]]></Line>
-              <Line Number="434"><![CDATA[HMI_CMD.Out_Tot_Shift3 := Out_Tot_Shift3;]]></Line>
-              <Line Number="435"><![CDATA[HMI_CMD.Out_Tot_Shift1_RT := Out_Tot_Shift1_RT;]]></Line>
-              <Line Number="436"><![CDATA[HMI_CMD.Out_Tot_Shift2_RT := Out_Tot_Shift2_RT;]]></Line>
-              <Line Number="437"><![CDATA[HMI_CMD.Out_Tot_Shift3_RT := Out_Tot_Shift3_RT;]]></Line>
-              <Line Number="438"><![CDATA[HMI_CMD.Out_Tot_Shift_RT := Out_Tot_Shift_RT;]]></Line>
-              <Line Number="439"><![CDATA[]]></Line>
-              <Line Number="440"><![CDATA[// 每班内 2 小时段(如需在 HMI 上显示,可在 UDT 中增加对应字段)]]></Line>
-              <Line Number="441"><![CDATA[HMI_CMD.Out_Tot_Shift1_2H_1 := Out_Tot_Shift1_2H_1;]]></Line>
-              <Line Number="442"><![CDATA[HMI_CMD.Out_Tot_Shift1_2H_2 := Out_Tot_Shift1_2H_2;]]></Line>
-              <Line Number="443"><![CDATA[HMI_CMD.Out_Tot_Shift1_2H_3 := Out_Tot_Shift1_2H_3;]]></Line>
-              <Line Number="444"><![CDATA[HMI_CMD.Out_Tot_Shift1_2H_4 := Out_Tot_Shift1_2H_4;]]></Line>
-              <Line Number="445"><![CDATA[]]></Line>
-              <Line Number="446"><![CDATA[HMI_CMD.Out_Tot_Shift2_2H_1 := Out_Tot_Shift2_2H_1;]]></Line>
-              <Line Number="447"><![CDATA[HMI_CMD.Out_Tot_Shift2_2H_2 := Out_Tot_Shift2_2H_2;]]></Line>
-              <Line Number="448"><![CDATA[HMI_CMD.Out_Tot_Shift2_2H_3 := Out_Tot_Shift2_2H_3;]]></Line>
-              <Line Number="449"><![CDATA[HMI_CMD.Out_Tot_Shift2_2H_4 := Out_Tot_Shift2_2H_4;]]></Line>
-              <Line Number="450"><![CDATA[]]></Line>
-              <Line Number="451"><![CDATA[HMI_CMD.Out_Tot_Shift3_2H_1 := Out_Tot_Shift3_2H_1;]]></Line>
-              <Line Number="452"><![CDATA[HMI_CMD.Out_Tot_Shift3_2H_2 := Out_Tot_Shift3_2H_2;]]></Line>
-              <Line Number="453"><![CDATA[HMI_CMD.Out_Tot_Shift3_2H_3 := Out_Tot_Shift3_2H_3;]]></Line>
-              <Line Number="454"><![CDATA[HMI_CMD.Out_Tot_Shift3_2H_4 := Out_Tot_Shift3_2H_4;]]></Line>
-              <Line Number="455"><![CDATA[]]></Line>
-              <Line Number="456"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="457"><![CDATA[// 功能段 12: 启用状态输出]]></Line>
-              <Line Number="458"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="459"><![CDATA[]]></Line>
-              <Line Number="460"><![CDATA[EnableOut := EnableIn;]]></Line>
-              <Line Number="461"><![CDATA[]]></Line>
-              <Line Number="462"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="463"><![CDATA[// 程序结束]]></Line>
-              <Line Number="464"><![CDATA[// ===============================================================]]></Line>
-              <Line Number="465"><![CDATA[]]></Line>
-            </STContent>
-          </Routine>
-        </Routines>
-      </AddOnInstructionDefinition>
-    </AddOnInstructionDefinitions>
-  </Controller>
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="36.00" TargetName="OreProdStats_3Shift" TargetType="AddOnInstructionDefinition" TargetRevision="1.0 " TargetLastEdited="2026-02-23T14:58:08.646Z" ContainsContext="true" ExportDate="Mon Feb 23 22:58:59 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
+<Controller Use="Context" Name="OreProdStats_3Shift">
+<DataTypes Use="Context">
+<DataType Name="OreProdStats_3Shift_Type" Family="NoFamily" Class="User">
+<Members>
+<Member Name="ZZZZZZZZZZOreProdStats_3Shift0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="Clear" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZOreProdStats_3Shift0" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[清除]]>
+</Description>
+</Member>
+<Member Name="Out_Tot" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[总累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Min" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[分钟累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_D_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[天实时累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_M_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[月实时累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_D" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[昨天累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_M" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[上个月累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[当前班实时累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[早班累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[中班累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[晚班累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[早班实时累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[中班实时累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[晚班实时累计]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_2H_1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[早班 09-11 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_2H_2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[早班 11-13 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_2H_3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[早班 13-15 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_2H_4" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[早班 15-17 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_2H_1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[中班 17-19 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_2H_2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[中班 19-21 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_2H_3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[中班 21-23 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_2H_4" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[中班 23-01 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_2H_1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[晚班 01-03 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_2H_2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[晚班 03-05 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_2H_3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[晚班 05-07 产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_2H_4" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[晚班 07-09 产量]]>
+</Description>
+</Member>
+</Members>
+</DataType>
+</DataTypes>
+<AddOnInstructionDefinitions Use="Context">
+<AddOnInstructionDefinition Use="Target" Name="OreProdStats_3Shift" Revision="1.0" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2026-02-23T00:00:00.000Z" CreatedBy="Cursor" EditedDate="2026-02-23T14:58:08.646Z" EditedBy="ZBOOKFURY\meqia" SoftwareRevision="v36.00">
+<Parameters>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[使能输入]]>
+</Description>
+</Parameter>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[使能输出]]>
+</Description>
+</Parameter>
+<Parameter Name="In_Pulse" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[脉冲信号]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Run" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[运行信号]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Scale" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[缩放系数]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[总累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Min" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[分钟累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_D_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[天实时累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_M_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[月实时累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_D" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[昨天累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_M" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[上个月累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[早班累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift2" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[中班累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift3" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[晚班累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift1_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[早班实时累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift2_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[中班实时累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift3_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[晚班实时累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[当前班实时累计]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift1_2H_1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[早班 09-11 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift1_2H_2" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[早班 11-13 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift1_2H_3" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[早班 13-15 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift1_2H_4" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[早班 15-17 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift2_2H_1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[中班 17-19 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift2_2H_2" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[中班 19-21 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift2_2H_3" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[中班 21-23 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift2_2H_4" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[中班 23-01 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift3_2H_1" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[晚班 01-03 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift3_2H_2" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[晚班 03-05 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift3_2H_3" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[晚班 05-07 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_Shift3_2H_4" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[晚班 07-09 产量]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="HMI_CMD" TagType="Base" DataType="OreProdStats_3Shift_Type" Usage="InOut" Required="true" Visible="true" Constant="false">
+<Description>
+<![CDATA[HMI命令与数据]]>
+</Description>
+</Parameter>
+<Parameter Name="Year" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[年]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Month" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[月]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Day" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[日]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[时]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="None">
+<Description>
+<![CDATA[分]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Second" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="None">
+<Description>
+<![CDATA[秒]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Class1_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[班1开始小时]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Class2_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[班2开始小时]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Tot_Min" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[分钟累计周期]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Class1_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[班1开始分钟]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Class2_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[班2开始分钟]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Day_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[天切换小时]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Day_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[天切换分钟]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+</Parameters>
+<LocalTags>
+<LocalTag Name="Temp" DataType="REAL" Dimensions="32" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000,0.00000000e+000]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Array DataType="REAL" Dimensions="32" Radix="Float">
+<Element Index="[0]" Value="0.0"/>
+<Element Index="[1]" Value="0.0"/>
+<Element Index="[2]" Value="0.0"/>
+<Element Index="[3]" Value="0.0"/>
+<Element Index="[4]" Value="0.0"/>
+<Element Index="[5]" Value="0.0"/>
+<Element Index="[6]" Value="0.0"/>
+<Element Index="[7]" Value="0.0"/>
+<Element Index="[8]" Value="0.0"/>
+<Element Index="[9]" Value="0.0"/>
+<Element Index="[10]" Value="0.0"/>
+<Element Index="[11]" Value="0.0"/>
+<Element Index="[12]" Value="0.0"/>
+<Element Index="[13]" Value="0.0"/>
+<Element Index="[14]" Value="0.0"/>
+<Element Index="[15]" Value="0.0"/>
+<Element Index="[16]" Value="0.0"/>
+<Element Index="[17]" Value="0.0"/>
+<Element Index="[18]" Value="0.0"/>
+<Element Index="[19]" Value="0.0"/>
+<Element Index="[20]" Value="0.0"/>
+<Element Index="[21]" Value="0.0"/>
+<Element Index="[22]" Value="0.0"/>
+<Element Index="[23]" Value="0.0"/>
+<Element Index="[24]" Value="0.0"/>
+<Element Index="[25]" Value="0.0"/>
+<Element Index="[26]" Value="0.0"/>
+<Element Index="[27]" Value="0.0"/>
+<Element Index="[28]" Value="0.0"/>
+<Element Index="[29]" Value="0.0"/>
+<Element Index="[30]" Value="0.0"/>
+<Element Index="[31]" Value="0.0"/>
+</Array>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TONR_01" DataType="FBD_TIMER" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[1,0,0,0,0,0,0,0,0,4,0,0]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="FBD_TIMER">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="TimerEnable" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="Reset" DataType="BOOL" Value="0"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Status" DataType="DINT" Radix="Hex" Value="16#0000_0000"/>
+<DataValueMember Name="InstructFault" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PresetInv" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="OSRI_Pulse" DataType="FBD_ONESHOT" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[1,0,5.60519386e-045]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="FBD_ONESHOT">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="InputBit" DataType="BOOL" Value="0"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="OutputBit" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time" DataType="DINT" Dimensions="8" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[0,0,0,0,0,0,0,0]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Array DataType="DINT" Dimensions="8" Radix="Decimal">
+<Element Index="[0]" Value="0"/>
+<Element Index="[1]" Value="0"/>
+<Element Index="[2]" Value="0"/>
+<Element Index="[3]" Value="0"/>
+<Element Index="[4]" Value="0"/>
+<Element Index="[5]" Value="0"/>
+<Element Index="[6]" Value="0"/>
+<Element Index="[7]" Value="0"/>
+</Array>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time_Set1" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time_Set2" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time_Set3_Day" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Time_Real" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Is_Leap_Year" DataType="BOOL" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Days_In_Month" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Shift_ID" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Shift_Section_ID" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Prev_Section_ID" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Minutes_From_Shift_Start" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift1" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift2" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift3" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift1_2H_1" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift1_2H_2" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift1_2H_3" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift1_2H_4" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift2_2H_1" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift2_2H_2" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift2_2H_3" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift2_2H_4" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift3_2H_1" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift3_2H_2" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift3_2H_3" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="TempShift3_2H_4" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+</LocalTags>
+<Routines>
+<Routine Name="Logic" Type="ST">
+<STContent>
+<Line Number="0">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="1">
+<![CDATA[// AOI 名称: OreProdStats_3Shift (三班制产量统计系统)]]>
+</Line>
+<Line Number="2">
+<![CDATA[// 版本: 1.0]]>
+</Line>
+<Line Number="3">
+<![CDATA[// 编程语言: Structured Text (ST)]]>
+</Line>
+<Line Number="4">
+<![CDATA[// 适用平台: Studio 5000 (ControlLogix/CompactLogix)]]>
+</Line>
+<Line Number="5">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="6">
+<![CDATA[// 功能概述:]]>
+</Line>
+<Line Number="7">
+<![CDATA[// 1. 在保留原 OreProdStats AOI 功能(总/分钟/天/月统计)的基础上,实现固定时间的三班制产量统计;]]>
+</Line>
+<Line Number="8">
+<![CDATA[// 2. 三个班次的时间范围固定如下:]]>
+</Line>
+<Line Number="9">
+<![CDATA[//    - 早班: 09:00 – 17:00]]>
+</Line>
+<Line Number="10">
+<![CDATA[//    - 中班: 17:00 – 次日 01:00 (跨越午夜)]]>
+</Line>
+<Line Number="11">
+<![CDATA[//    - 晚班: 01:00 – 09:00]]>
+</Line>
+<Line Number="12">
+<![CDATA[// 3. 在每个班内部,再划分为连续的 4 个 2 小时段,对每段单独累计产量:]]>
+</Line>
+<Line Number="13">
+<![CDATA[//    - 早班:  9–11, 11–13, 13–15, 15–17]]>
+</Line>
+<Line Number="14">
+<![CDATA[//    - 中班: 17–19, 19–21, 21–23, 23–1]]>
+</Line>
+<Line Number="15">
+<![CDATA[//    - 晚班:  1–3,  3–5,  5–7,  7–9]]>
+</Line>
+<Line Number="16">
+<![CDATA[// 4. 每个班次提供:]]>
+</Line>
+<Line Number="17">
+<![CDATA[//    - 班实时累计: 当前正在运行班次在本班周期内的实时总产量;]]>
+</Line>
+<Line Number="18">
+<![CDATA[//    - 班历史累计: 上一次完成的该班的总产量(在班切换时冻结);]]>
+</Line>
+<Line Number="19">
+<![CDATA[// 5. 每个 2 小时段提供:]]>
+</Line>
+<Line Number="20">
+<![CDATA[//    - 段历史累计: 上一个完成的 2 小时段的总产量(在段切换时冻结)。]]>
+</Line>
+<Line Number="21">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="22">
+<![CDATA[// 设计说明:]]>
+</Line>
+<Line Number="23">
+<![CDATA[// 1. 时间基准:]]>
+</Line>
+<Line Number="24">
+<![CDATA[//    - 使用系统时间 Year/Month/Day/Hour/Minute/Second;]]>
+</Line>
+<Line Number="25">
+<![CDATA[//    - 计算 Time_Real = Hour * 60 + Minute (范围 0..1439),作为一天内统一的“分钟计数”时间轴;]]>
+</Line>
+<Line Number="26">
+<![CDATA[//    - 结合当前班次,计算 Minutes_From_Shift_Start 表示“当前时间距离本班起点经过的分钟数”。]]>
+</Line>
+<Line Number="27">
+<![CDATA[// 2. 班次与 2 小时段划分:]]>
+</Line>
+<Line Number="28">
+<![CDATA[//    - 班次通过比较 Time_Real 与三个固定时间点(9:00、17:00、1:00)自动判定,跨午夜的情况单独处理;]]>
+</Line>
+<Line Number="29">
+<![CDATA[//    - 班内 2 小时段通过 Shift_Section_ID = Minutes_From_Shift_Start / 120 计算得到(0..3 共 4 段)。]]>
+</Line>
+<Line Number="30">
+<![CDATA[// 3. 累计策略:]]>
+</Line>
+<Line Number="31">
+<![CDATA[//    - 以 OSRI 检测到的脉冲上升沿为触发,在对应班次和对应 2 小时段的临时变量上累加产量;]]>
+</Line>
+<Line Number="32">
+<![CDATA[//    - 在班切换时,将本班临时累计拷贝到历史班累计输出,随后清零临时值;]]>
+</Line>
+<Line Number="33">
+<![CDATA[//    - 在 2 小时段切换时,将上一段临时累计拷贝到历史 2 小时段累计输出,随后清零该段临时值。]]>
+</Line>
+<Line Number="34">
+<![CDATA[// 4. 与原 AOI 的兼容:]]>
+</Line>
+<Line Number="35">
+<![CDATA[//    - 总累计/分钟累计/天累计/月累计逻辑完全沿用原 OreProdStats 程序,保证统计口径一致;]]>
+</Line>
+<Line Number="36">
+<![CDATA[//    - 原 AOI 中与班次相关的时间输入(In_Class1/2_Time_*)仍被保留,用于天/月切换等场景。]]>
+</Line>
+<Line Number="37">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="38">
+<![CDATA[// 变量约定(相对原 OreProdStats 的扩展部分):]]>
+</Line>
+<Line Number="39">
+<![CDATA[// 1. 输出(历史班累计):]]>
+</Line>
+<Line Number="40">
+<![CDATA[//    - Out_Tot_Shift1, Out_Tot_Shift2, Out_Tot_Shift3 : DINT;   // 分别表示早/中/晚班上一个完成班次的总产量]]>
+</Line>
+<Line Number="41">
+<![CDATA[// 2. 输出(实时班累计):]]>
+</Line>
+<Line Number="42">
+<![CDATA[//    - Out_Tot_Shift1_RT, Out_Tot_Shift2_RT, Out_Tot_Shift3_RT : DINT; // 各自班当前周期内的实时累计]]>
+</Line>
+<Line Number="43">
+<![CDATA[//    - Out_Tot_Shift_RT : DINT;                                        // 当前班的实时累计(根据 Shift_ID 选取)]]>
+</Line>
+<Line Number="44">
+<![CDATA[// 3. 输出(每班内每 2 小时段累计,历史值):]]>
+</Line>
+<Line Number="45">
+<![CDATA[//    - Out_Tot_Shift1_2H_1..4, Out_Tot_Shift2_2H_1..4, Out_Tot_Shift3_2H_1..4 : DINT;]]>
+</Line>
+<Line Number="46">
+<![CDATA[//      表示对应班次中 4 个 2 小时段“上一个完成周期”的固定产量。]]>
+</Line>
+<Line Number="47">
+<![CDATA[// 4. 本地变量(班与 2 小时段临时累计):]]>
+</Line>
+<Line Number="48">
+<![CDATA[//    - TempShift1, TempShift2, TempShift3 : DINT;]]>
+</Line>
+<Line Number="49">
+<![CDATA[//      用于在当前班周期内累加产量,在班结束时拷贝到 Out_Tot_ShiftX 并清零。]]>
+</Line>
+<Line Number="50">
+<![CDATA[//    - TempShift1_2H_1..4, TempShift2_2H_1..4, TempShift3_2H_1..4 : DINT;]]>
+</Line>
+<Line Number="51">
+<![CDATA[//      用于在当前班当前 2 小时段内累加产量,在段结束时拷贝到 Out_Tot_ShiftX_2H_Y 并清零。]]>
+</Line>
+<Line Number="52">
+<![CDATA[// 5. 本地变量(时间辅助):]]>
+</Line>
+<Line Number="53">
+<![CDATA[//    - Shift_ID, Shift_Section_ID, Prev_Section_ID : DINT;  // 当前班号/当前段号/上一段号]]>
+</Line>
+<Line Number="54">
+<![CDATA[//    - Minutes_From_Shift_Start : DINT;                    // 当前时间距离本班起始时间的分钟数]]>
+</Line>
+<Line Number="55">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="56">
+<![CDATA[]]>
+</Line>
+<Line Number="57">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="58">
+<![CDATA[// 功能段 1: 脉冲检测与总累计]]>
+</Line>
+<Line Number="59">
+<![CDATA[// 与原 OreProdStats 相同]]>
+</Line>
+<Line Number="60">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="61">
+<![CDATA[]]>
+</Line>
+<Line Number="62">
+<![CDATA[// 脉冲上升沿检测]]>
+</Line>
+<Line Number="63">
+<![CDATA[OSRI_Pulse.InputBit := In_Pulse;]]>
+</Line>
+<Line Number="64">
+<![CDATA[OSRI(OSRI_Pulse);]]>
+</Line>
+<Line Number="65">
+<![CDATA[]]>
+</Line>
+<Line Number="66">
+<![CDATA[// 总累计计数]]>
+</Line>
+<Line Number="67">
+<![CDATA[IF OSRI_Pulse.OutputBit AND In_Run THEN]]>
+</Line>
+<Line Number="68">
+<![CDATA[    Out_Tot := Out_Tot + In_Scale;]]>
+</Line>
+<Line Number="69">
+<![CDATA[    Temp[0] := Temp[0] + In_Scale;   // 分钟累计临时量]]>
+</Line>
+<Line Number="70">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="71">
+<![CDATA[]]>
+</Line>
+<Line Number="72">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="73">
+<![CDATA[// 功能段 2: 分钟累计]]>
+</Line>
+<Line Number="74">
+<![CDATA[// 与原 OreProdStats 相同]]>
+</Line>
+<Line Number="75">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="76">
+<![CDATA[]]>
+</Line>
+<Line Number="77">
+<![CDATA[TONR_01.PRE := In_Tot_Min * 60000;]]>
+</Line>
+<Line Number="78">
+<![CDATA[TONR_01.Reset := TONR_01.DN;]]>
+</Line>
+<Line Number="79">
+<![CDATA[TONR_01.TimerEnable := In_Run;]]>
+</Line>
+<Line Number="80">
+<![CDATA[TONR(TONR_01);]]>
+</Line>
+<Line Number="81">
+<![CDATA[]]>
+</Line>
+<Line Number="82">
+<![CDATA[IF TONR_01.DN THEN]]>
+</Line>
+<Line Number="83">
+<![CDATA[    Out_Tot_Min := Temp[0];]]>
+</Line>
+<Line Number="84">
+<![CDATA[    Temp[0] := 0;]]>
+</Line>
+<Line Number="85">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="86">
+<![CDATA[]]>
+</Line>
+<Line Number="87">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="88">
+<![CDATA[// 功能段 3: 时间数据准备]]>
+</Line>
+<Line Number="89">
+<![CDATA[// 与原 OreProdStats 相同,并在此基础上增加三班制辅助变量]]>
+</Line>
+<Line Number="90">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="91">
+<![CDATA[]]>
+</Line>
+<Line Number="92">
+<![CDATA[// 系统时间 -> 数组]]>
+</Line>
+<Line Number="93">
+<![CDATA[Time[0] := Year;]]>
+</Line>
+<Line Number="94">
+<![CDATA[Time[1] := Month;]]>
+</Line>
+<Line Number="95">
+<![CDATA[Time[2] := Day;]]>
+</Line>
+<Line Number="96">
+<![CDATA[Time[3] := Hour;]]>
+</Line>
+<Line Number="97">
+<![CDATA[Time[4] := Minute;]]>
+</Line>
+<Line Number="98">
+<![CDATA[Time[5] := Second;]]>
+</Line>
+<Line Number="99">
+<![CDATA[]]>
+</Line>
+<Line Number="100">
+<![CDATA[// 当前时间的分钟偏移量 (0..1439)]]>
+</Line>
+<Line Number="101">
+<![CDATA[Time_Real := Hour * 60 + Minute;]]>
+</Line>
+<Line Number="102">
+<![CDATA[]]>
+</Line>
+<Line Number="103">
+<![CDATA[// 原班次/天切换时间计算(保留天/月逻辑需要)]]>
+</Line>
+<Line Number="104">
+<![CDATA[Time_Set1 := In_Class1_Time_Hour * 60 + In_Class1_Time_Minute;]]>
+</Line>
+<Line Number="105">
+<![CDATA[Time_Set2 := In_Class2_Time_Hour * 60 + In_Class2_Time_Minute;]]>
+</Line>
+<Line Number="106">
+<![CDATA[Time_Set3_Day := In_Day_Time_Hour * 60 + In_Day_Time_Minute;]]>
+</Line>
+<Line Number="107">
+<![CDATA[]]>
+</Line>
+<Line Number="108">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="109">
+<![CDATA[// 功能段 4: 三班制班次判定与 2 小时段计算]]>
+</Line>
+<Line Number="110">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="111">
+<![CDATA[]]>
+</Line>
+<Line Number="112">
+<![CDATA[// 班次判定:]]>
+</Line>
+<Line Number="113">
+<![CDATA[// Shift_ID = 1: 早班  09:00–17:00]]>
+</Line>
+<Line Number="114">
+<![CDATA[// Shift_ID = 2: 中班  17:00–次日 01:00 (跨午夜)]]>
+</Line>
+<Line Number="115">
+<![CDATA[// Shift_ID = 3: 晚班  01:00–09:00]]>
+</Line>
+<Line Number="116">
+<![CDATA[IF (Time_Real >= 9 * 60) AND (Time_Real < 17 * 60) THEN]]>
+</Line>
+<Line Number="117">
+<![CDATA[    Shift_ID := 1;  // 早班]]>
+</Line>
+<Line Number="118">
+<![CDATA[ELSIF (Time_Real >= 17 * 60) OR (Time_Real < 1 * 60) THEN]]>
+</Line>
+<Line Number="119">
+<![CDATA[    Shift_ID := 2;  // 中班(跨午夜)]]>
+</Line>
+<Line Number="120">
+<![CDATA[ELSE]]>
+</Line>
+<Line Number="121">
+<![CDATA[    Shift_ID := 3;  // 晚班]]>
+</Line>
+<Line Number="122">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="123">
+<![CDATA[]]>
+</Line>
+<Line Number="124">
+<![CDATA[// 计算“当前时间距离本班开始的分钟数”(0..479)]]>
+</Line>
+<Line Number="125">
+<![CDATA[CASE Shift_ID OF]]>
+</Line>
+<Line Number="126">
+<![CDATA[    1: // 早班 09:00–17:00, 起点不跨午夜]]>
+</Line>
+<Line Number="127">
+<![CDATA[        Minutes_From_Shift_Start := Time_Real - 9 * 60;]]>
+</Line>
+<Line Number="128">
+<![CDATA[    2: // 中班 17:00–次日 01:00, 起点跨午夜]]>
+</Line>
+<Line Number="129">
+<![CDATA[        IF Time_Real >= 17 * 60 THEN]]>
+</Line>
+<Line Number="130">
+<![CDATA[            Minutes_From_Shift_Start := Time_Real - 17 * 60;]]>
+</Line>
+<Line Number="131">
+<![CDATA[        ELSE]]>
+</Line>
+<Line Number="132">
+<![CDATA[            Minutes_From_Shift_Start := Time_Real + 1440 - 17 * 60;]]>
+</Line>
+<Line Number="133">
+<![CDATA[        END_IF;]]>
+</Line>
+<Line Number="134">
+<![CDATA[    3: // 晚班 01:00–09:00, 起点在凌晨]]>
+</Line>
+<Line Number="135">
+<![CDATA[        IF Time_Real >= 1 * 60 THEN]]>
+</Line>
+<Line Number="136">
+<![CDATA[            Minutes_From_Shift_Start := Time_Real - 1 * 60;]]>
+</Line>
+<Line Number="137">
+<![CDATA[        ELSE]]>
+</Line>
+<Line Number="138">
+<![CDATA[            Minutes_From_Shift_Start := Time_Real + 1440 - 1 * 60;]]>
+</Line>
+<Line Number="139">
+<![CDATA[        END_IF;]]>
+</Line>
+<Line Number="140">
+<![CDATA[END_CASE;]]>
+</Line>
+<Line Number="141">
+<![CDATA[]]>
+</Line>
+<Line Number="142">
+<![CDATA[// 每班 8 小时 = 480 分钟,按 2 小时 = 120 分钟划分为 4 段:]]>
+</Line>
+<Line Number="143">
+<![CDATA[// Shift_Section_ID = 0..3]]>
+</Line>
+<Line Number="144">
+<![CDATA[Shift_Section_ID := Minutes_From_Shift_Start / 120;]]>
+</Line>
+<Line Number="145">
+<![CDATA[]]>
+</Line>
+<Line Number="146">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="147">
+<![CDATA[// 功能段 5: 三班制班累计与 2 小时段累计]]>
+</Line>
+<Line Number="148">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="149">
+<![CDATA[]]>
+</Line>
+<Line Number="150">
+<![CDATA[// 在脉冲处进行三班累计和班内 2 小时段累计]]>
+</Line>
+<Line Number="151">
+<![CDATA[IF OSRI_Pulse.OutputBit AND In_Run THEN]]>
+</Line>
+<Line Number="152">
+<![CDATA[    // 班累计临时值]]>
+</Line>
+<Line Number="153">
+<![CDATA[    CASE Shift_ID OF]]>
+</Line>
+<Line Number="154">
+<![CDATA[        1:  TempShift1 := TempShift1 + In_Scale;]]>
+</Line>
+<Line Number="155">
+<![CDATA[        2:  TempShift2 := TempShift2 + In_Scale;]]>
+</Line>
+<Line Number="156">
+<![CDATA[        3:  TempShift3 := TempShift3 + In_Scale;]]>
+</Line>
+<Line Number="157">
+<![CDATA[    END_CASE;]]>
+</Line>
+<Line Number="158">
+<![CDATA[]]>
+</Line>
+<Line Number="159">
+<![CDATA[    // 班内 2 小时段临时累计]]>
+</Line>
+<Line Number="160">
+<![CDATA[    CASE Shift_ID OF]]>
+</Line>
+<Line Number="161">
+<![CDATA[        1:]]>
+</Line>
+<Line Number="162">
+<![CDATA[            CASE Shift_Section_ID OF]]>
+</Line>
+<Line Number="163">
+<![CDATA[                0: TempShift1_2H_1 := TempShift1_2H_1 + In_Scale;]]>
+</Line>
+<Line Number="164">
+<![CDATA[                1: TempShift1_2H_2 := TempShift1_2H_2 + In_Scale;]]>
+</Line>
+<Line Number="165">
+<![CDATA[                2: TempShift1_2H_3 := TempShift1_2H_3 + In_Scale;]]>
+</Line>
+<Line Number="166">
+<![CDATA[                3: TempShift1_2H_4 := TempShift1_2H_4 + In_Scale;]]>
+</Line>
+<Line Number="167">
+<![CDATA[            END_CASE;]]>
+</Line>
+<Line Number="168">
+<![CDATA[        2:]]>
+</Line>
+<Line Number="169">
+<![CDATA[            CASE Shift_Section_ID OF]]>
+</Line>
+<Line Number="170">
+<![CDATA[                0: TempShift2_2H_1 := TempShift2_2H_1 + In_Scale;]]>
+</Line>
+<Line Number="171">
+<![CDATA[                1: TempShift2_2H_2 := TempShift2_2H_2 + In_Scale;]]>
+</Line>
+<Line Number="172">
+<![CDATA[                2: TempShift2_2H_3 := TempShift2_2H_3 + In_Scale;]]>
+</Line>
+<Line Number="173">
+<![CDATA[                3: TempShift2_2H_4 := TempShift2_2H_4 + In_Scale;]]>
+</Line>
+<Line Number="174">
+<![CDATA[            END_CASE;]]>
+</Line>
+<Line Number="175">
+<![CDATA[        3:]]>
+</Line>
+<Line Number="176">
+<![CDATA[            CASE Shift_Section_ID OF]]>
+</Line>
+<Line Number="177">
+<![CDATA[                0: TempShift3_2H_1 := TempShift3_2H_1 + In_Scale;]]>
+</Line>
+<Line Number="178">
+<![CDATA[                1: TempShift3_2H_2 := TempShift3_2H_2 + In_Scale;]]>
+</Line>
+<Line Number="179">
+<![CDATA[                2: TempShift3_2H_3 := TempShift3_2H_3 + In_Scale;]]>
+</Line>
+<Line Number="180">
+<![CDATA[                3: TempShift3_2H_4 := TempShift3_2H_4 + In_Scale;]]>
+</Line>
+<Line Number="181">
+<![CDATA[            END_CASE;]]>
+</Line>
+<Line Number="182">
+<![CDATA[    END_CASE;]]>
+</Line>
+<Line Number="183">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="184">
+<![CDATA[]]>
+</Line>
+<Line Number="185">
+<![CDATA[// 班实时累计输出]]>
+</Line>
+<Line Number="186">
+<![CDATA[Out_Tot_Shift1_RT := TempShift1;]]>
+</Line>
+<Line Number="187">
+<![CDATA[Out_Tot_Shift2_RT := TempShift2;]]>
+</Line>
+<Line Number="188">
+<![CDATA[Out_Tot_Shift3_RT := TempShift3;]]>
+</Line>
+<Line Number="189">
+<![CDATA[]]>
+</Line>
+<Line Number="190">
+<![CDATA[// 当前班实时累计(用于 HMI 显示“当前班产量”)]]>
+</Line>
+<Line Number="191">
+<![CDATA[CASE Shift_ID OF]]>
+</Line>
+<Line Number="192">
+<![CDATA[    1: Out_Tot_Shift_RT := Out_Tot_Shift1_RT;]]>
+</Line>
+<Line Number="193">
+<![CDATA[    2: Out_Tot_Shift_RT := Out_Tot_Shift2_RT;]]>
+</Line>
+<Line Number="194">
+<![CDATA[    3: Out_Tot_Shift_RT := Out_Tot_Shift3_RT;]]>
+</Line>
+<Line Number="195">
+<![CDATA[END_CASE;]]>
+</Line>
+<Line Number="196">
+<![CDATA[]]>
+</Line>
+<Line Number="197">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="198">
+<![CDATA[// 功能段 6: 班结束时保存班累计并清零]]>
+</Line>
+<Line Number="199">
+<![CDATA[// 班切换时间固定:]]>
+</Line>
+<Line Number="200">
+<![CDATA[//   早班结束=中班开始: 17:00]]>
+</Line>
+<Line Number="201">
+<![CDATA[//   中班结束=晚班开始: 01:00]]>
+</Line>
+<Line Number="202">
+<![CDATA[//   晚班结束=早班开始: 09:00]]>
+</Line>
+<Line Number="203">
+<![CDATA[// 逻辑与原白/夜班逻辑类似,先冻结历史值,再延迟 2 秒清零临时量]]>
+</Line>
+<Line Number="204">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="205">
+<![CDATA[]]>
+</Line>
+<Line Number="206">
+<![CDATA[// 早班结束 / 中班开始: 17:00]]>
+</Line>
+<Line Number="207">
+<![CDATA[IF (Hour = 17) AND (Minute = 0) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="208">
+<![CDATA[    Out_Tot_Shift1 := TempShift1;]]>
+</Line>
+<Line Number="209">
+<![CDATA[    Out_Tot_Shift1_RT := 0;]]>
+</Line>
+<Line Number="210">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="211">
+<![CDATA[]]>
+</Line>
+<Line Number="212">
+<![CDATA[IF (Hour = 17) AND (Minute = 0) AND (Second >= 2) AND (Second <= 3) THEN]]>
+</Line>
+<Line Number="213">
+<![CDATA[    TempShift1 := 0;]]>
+</Line>
+<Line Number="214">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="215">
+<![CDATA[]]>
+</Line>
+<Line Number="216">
+<![CDATA[// 中班结束 / 晚班开始: 01:00]]>
+</Line>
+<Line Number="217">
+<![CDATA[IF (Hour = 1) AND (Minute = 0) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="218">
+<![CDATA[    Out_Tot_Shift2 := TempShift2;]]>
+</Line>
+<Line Number="219">
+<![CDATA[    Out_Tot_Shift2_RT := 0;]]>
+</Line>
+<Line Number="220">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="221">
+<![CDATA[]]>
+</Line>
+<Line Number="222">
+<![CDATA[IF (Hour = 1) AND (Minute = 0) AND (Second >= 2) AND (Second <= 3) THEN]]>
+</Line>
+<Line Number="223">
+<![CDATA[    TempShift2 := 0;]]>
+</Line>
+<Line Number="224">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="225">
+<![CDATA[]]>
+</Line>
+<Line Number="226">
+<![CDATA[// 晚班结束 / 早班开始: 09:00]]>
+</Line>
+<Line Number="227">
+<![CDATA[IF (Hour = 9) AND (Minute = 0) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="228">
+<![CDATA[    Out_Tot_Shift3 := TempShift3;]]>
+</Line>
+<Line Number="229">
+<![CDATA[    Out_Tot_Shift3_RT := 0;]]>
+</Line>
+<Line Number="230">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="231">
+<![CDATA[]]>
+</Line>
+<Line Number="232">
+<![CDATA[IF (Hour = 9) AND (Minute = 0) AND (Second >= 2) AND (Second <= 3) THEN]]>
+</Line>
+<Line Number="233">
+<![CDATA[    TempShift3 := 0;]]>
+</Line>
+<Line Number="234">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="235">
+<![CDATA[]]>
+</Line>
+<Line Number="236">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="237">
+<![CDATA[// 功能段 7: 每 2 小时段结束时保存该段产量]]>
+</Line>
+<Line Number="238">
+<![CDATA[// 利用 Minutes_From_Shift_Start MOD 120 = 0 识别 2 小时边界,]]>
+</Line>
+<Line Number="239">
+<![CDATA[// 在边界时冻结“上一段”的产量并清零上一段临时累计。]]>
+</Line>
+<Line Number="240">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="241">
+<![CDATA[]]>
+</Line>
+<Line Number="242">
+<![CDATA[IF (Minutes_From_Shift_Start MOD 120 = 0) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="243">
+<![CDATA[]]>
+</Line>
+<Line Number="244">
+<![CDATA[    // 上一段编号 = (当前段编号 + 3) MOD 4, 范围 0..3]]>
+</Line>
+<Line Number="245">
+<![CDATA[    Prev_Section_ID := (Shift_Section_ID + 3) MOD 4;]]>
+</Line>
+<Line Number="246">
+<![CDATA[]]>
+</Line>
+<Line Number="247">
+<![CDATA[    CASE Shift_ID OF]]>
+</Line>
+<Line Number="248">
+<![CDATA[        1:]]>
+</Line>
+<Line Number="249">
+<![CDATA[            CASE Prev_Section_ID OF]]>
+</Line>
+<Line Number="250">
+<![CDATA[                0:]]>
+</Line>
+<Line Number="251">
+<![CDATA[                    Out_Tot_Shift1_2H_1 := TempShift1_2H_1;]]>
+</Line>
+<Line Number="252">
+<![CDATA[                    TempShift1_2H_1 := 0;]]>
+</Line>
+<Line Number="253">
+<![CDATA[                1:]]>
+</Line>
+<Line Number="254">
+<![CDATA[                    Out_Tot_Shift1_2H_2 := TempShift1_2H_2;]]>
+</Line>
+<Line Number="255">
+<![CDATA[                    TempShift1_2H_2 := 0;]]>
+</Line>
+<Line Number="256">
+<![CDATA[                2:]]>
+</Line>
+<Line Number="257">
+<![CDATA[                    Out_Tot_Shift1_2H_3 := TempShift1_2H_3;]]>
+</Line>
+<Line Number="258">
+<![CDATA[                    TempShift1_2H_3 := 0;]]>
+</Line>
+<Line Number="259">
+<![CDATA[                3:]]>
+</Line>
+<Line Number="260">
+<![CDATA[                    Out_Tot_Shift1_2H_4 := TempShift1_2H_4;]]>
+</Line>
+<Line Number="261">
+<![CDATA[                    TempShift1_2H_4 := 0;]]>
+</Line>
+<Line Number="262">
+<![CDATA[            END_CASE;]]>
+</Line>
+<Line Number="263">
+<![CDATA[]]>
+</Line>
+<Line Number="264">
+<![CDATA[        2:]]>
+</Line>
+<Line Number="265">
+<![CDATA[            CASE Prev_Section_ID OF]]>
+</Line>
+<Line Number="266">
+<![CDATA[                0:]]>
+</Line>
+<Line Number="267">
+<![CDATA[                    Out_Tot_Shift2_2H_1 := TempShift2_2H_1;]]>
+</Line>
+<Line Number="268">
+<![CDATA[                    TempShift2_2H_1 := 0;]]>
+</Line>
+<Line Number="269">
+<![CDATA[                1:]]>
+</Line>
+<Line Number="270">
+<![CDATA[                    Out_Tot_Shift2_2H_2 := TempShift2_2H_2;]]>
+</Line>
+<Line Number="271">
+<![CDATA[                    TempShift2_2H_2 := 0;]]>
+</Line>
+<Line Number="272">
+<![CDATA[                2:]]>
+</Line>
+<Line Number="273">
+<![CDATA[                    Out_Tot_Shift2_2H_3 := TempShift2_2H_3;]]>
+</Line>
+<Line Number="274">
+<![CDATA[                    TempShift2_2H_3 := 0;]]>
+</Line>
+<Line Number="275">
+<![CDATA[                3:]]>
+</Line>
+<Line Number="276">
+<![CDATA[                    Out_Tot_Shift2_2H_4 := TempShift2_2H_4;]]>
+</Line>
+<Line Number="277">
+<![CDATA[                    TempShift2_2H_4 := 0;]]>
+</Line>
+<Line Number="278">
+<![CDATA[            END_CASE;]]>
+</Line>
+<Line Number="279">
+<![CDATA[]]>
+</Line>
+<Line Number="280">
+<![CDATA[        3:]]>
+</Line>
+<Line Number="281">
+<![CDATA[            CASE Prev_Section_ID OF]]>
+</Line>
+<Line Number="282">
+<![CDATA[                0:]]>
+</Line>
+<Line Number="283">
+<![CDATA[                    Out_Tot_Shift3_2H_1 := TempShift3_2H_1;]]>
+</Line>
+<Line Number="284">
+<![CDATA[                    TempShift3_2H_1 := 0;]]>
+</Line>
+<Line Number="285">
+<![CDATA[                1:]]>
+</Line>
+<Line Number="286">
+<![CDATA[                    Out_Tot_Shift3_2H_2 := TempShift3_2H_2;]]>
+</Line>
+<Line Number="287">
+<![CDATA[                    TempShift3_2H_2 := 0;]]>
+</Line>
+<Line Number="288">
+<![CDATA[                2:]]>
+</Line>
+<Line Number="289">
+<![CDATA[                    Out_Tot_Shift3_2H_3 := TempShift3_2H_3;]]>
+</Line>
+<Line Number="290">
+<![CDATA[                    TempShift3_2H_3 := 0;]]>
+</Line>
+<Line Number="291">
+<![CDATA[                3:]]>
+</Line>
+<Line Number="292">
+<![CDATA[                    Out_Tot_Shift3_2H_4 := TempShift3_2H_4;]]>
+</Line>
+<Line Number="293">
+<![CDATA[                    TempShift3_2H_4 := 0;]]>
+</Line>
+<Line Number="294">
+<![CDATA[            END_CASE;]]>
+</Line>
+<Line Number="295">
+<![CDATA[    END_CASE;]]>
+</Line>
+<Line Number="296">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="297">
+<![CDATA[]]>
+</Line>
+<Line Number="298">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="299">
+<![CDATA[// 功能段 8: 天累计逻辑]]>
+</Line>
+<Line Number="300">
+<![CDATA[// 直接复用原 OreProdStats 的实现]]>
+</Line>
+<Line Number="301">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="302">
+<![CDATA[]]>
+</Line>
+<Line Number="303">
+<![CDATA[IF OSRI_Pulse.OutputBit AND In_Run THEN]]>
+</Line>
+<Line Number="304">
+<![CDATA[    Temp[8] := Temp[8] + In_Scale;]]>
+</Line>
+<Line Number="305">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="306">
+<![CDATA[]]>
+</Line>
+<Line Number="307">
+<![CDATA[Out_Tot_D_RT := Temp[8];]]>
+</Line>
+<Line Number="308">
+<![CDATA[]]>
+</Line>
+<Line Number="309">
+<![CDATA[IF (Hour = In_Day_Time_Hour) AND (Minute = In_Day_Time_Minute) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="310">
+<![CDATA[    Out_Tot_D := Temp[8];]]>
+</Line>
+<Line Number="311">
+<![CDATA[    Out_Tot_D_RT := 0;]]>
+</Line>
+<Line Number="312">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="313">
+<![CDATA[]]>
+</Line>
+<Line Number="314">
+<![CDATA[IF (Hour = In_Day_Time_Hour) AND (Minute = In_Day_Time_Minute) AND (Second >= 2) AND (Second <= 3) THEN]]>
+</Line>
+<Line Number="315">
+<![CDATA[    Temp[8] := 0;]]>
+</Line>
+<Line Number="316">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="317">
+<![CDATA[]]>
+</Line>
+<Line Number="318">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="319">
+<![CDATA[// 功能段 9: 月累计逻辑(与原 OreProdStats 相同)]]>
+</Line>
+<Line Number="320">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="321">
+<![CDATA[]]>
+</Line>
+<Line Number="322">
+<![CDATA[Is_Leap_Year := (Year MOD 4 = 0) AND (Year MOD 100 <> 0) OR (Year MOD 400 = 0);]]>
+</Line>
+<Line Number="323">
+<![CDATA[]]>
+</Line>
+<Line Number="324">
+<![CDATA[CASE Month OF]]>
+</Line>
+<Line Number="325">
+<![CDATA[    1, 3, 5, 7, 8, 10, 12: Days_In_Month := 31;]]>
+</Line>
+<Line Number="326">
+<![CDATA[    4, 6, 9, 11: Days_In_Month := 30;]]>
+</Line>
+<Line Number="327">
+<![CDATA[    2:]]>
+</Line>
+<Line Number="328">
+<![CDATA[        IF Is_Leap_Year THEN]]>
+</Line>
+<Line Number="329">
+<![CDATA[            Days_In_Month := 29;]]>
+</Line>
+<Line Number="330">
+<![CDATA[        ELSE]]>
+</Line>
+<Line Number="331">
+<![CDATA[            Days_In_Month := 28;]]>
+</Line>
+<Line Number="332">
+<![CDATA[        END_IF;]]>
+</Line>
+<Line Number="333">
+<![CDATA[END_CASE;]]>
+</Line>
+<Line Number="334">
+<![CDATA[]]>
+</Line>
+<Line Number="335">
+<![CDATA[IF (Day >= 1) AND (Day <= Days_In_Month) AND OSRI_Pulse.OutputBit AND In_Run THEN]]>
+</Line>
+<Line Number="336">
+<![CDATA[    Temp[4] := Temp[4] + In_Scale;]]>
+</Line>
+<Line Number="337">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="338">
+<![CDATA[]]>
+</Line>
+<Line Number="339">
+<![CDATA[IF (Day >= 1) AND (Day <= Days_In_Month) THEN]]>
+</Line>
+<Line Number="340">
+<![CDATA[    Out_Tot_M_RT := Temp[4];]]>
+</Line>
+<Line Number="341">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="342">
+<![CDATA[]]>
+</Line>
+<Line Number="343">
+<![CDATA[IF (Day = 1) AND (Hour = 0) AND (Minute = 0) AND (Second <= 1) THEN]]>
+</Line>
+<Line Number="344">
+<![CDATA[    Out_Tot_M := Temp[4];]]>
+</Line>
+<Line Number="345">
+<![CDATA[    Out_Tot_M_RT := 0;]]>
+</Line>
+<Line Number="346">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="347">
+<![CDATA[]]>
+</Line>
+<Line Number="348">
+<![CDATA[IF (Day = 1) AND (Hour = 0) AND (Minute = 0) AND (Second >= 2) AND (Second <= 3) THEN]]>
+</Line>
+<Line Number="349">
+<![CDATA[    Temp[4] := 0;]]>
+</Line>
+<Line Number="350">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="351">
+<![CDATA[]]>
+</Line>
+<Line Number="352">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="353">
+<![CDATA[// 功能段 10: HMI 命令处理(扩展以支持三班与 2 小时段)]]>
+</Line>
+<Line Number="354">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="355">
+<![CDATA[]]>
+</Line>
+<Line Number="356">
+<![CDATA[IF HMI_CMD.Clear THEN]]>
+</Line>
+<Line Number="357">
+<![CDATA[    // 清零原有输出累计值]]>
+</Line>
+<Line Number="358">
+<![CDATA[    Out_Tot := 0;]]>
+</Line>
+<Line Number="359">
+<![CDATA[    Out_Tot_Min := 0;]]>
+</Line>
+<Line Number="360">
+<![CDATA[    Out_Tot_D_RT := 0;]]>
+</Line>
+<Line Number="361">
+<![CDATA[    Out_Tot_M_RT := 0;]]>
+</Line>
+<Line Number="362">
+<![CDATA[    Out_Tot_D := 0;]]>
+</Line>
+<Line Number="363">
+<![CDATA[    Out_Tot_M := 0;]]>
+</Line>
+<Line Number="364">
+<![CDATA[]]>
+</Line>
+<Line Number="365">
+<![CDATA[    // 清零三班累计(历史与实时)]]>
+</Line>
+<Line Number="366">
+<![CDATA[    Out_Tot_Shift1 := 0;]]>
+</Line>
+<Line Number="367">
+<![CDATA[    Out_Tot_Shift2 := 0;]]>
+</Line>
+<Line Number="368">
+<![CDATA[    Out_Tot_Shift3 := 0;]]>
+</Line>
+<Line Number="369">
+<![CDATA[]]>
+</Line>
+<Line Number="370">
+<![CDATA[    Out_Tot_Shift1_RT := 0;]]>
+</Line>
+<Line Number="371">
+<![CDATA[    Out_Tot_Shift2_RT := 0;]]>
+</Line>
+<Line Number="372">
+<![CDATA[    Out_Tot_Shift3_RT := 0;]]>
+</Line>
+<Line Number="373">
+<![CDATA[    Out_Tot_Shift_RT := 0;]]>
+</Line>
+<Line Number="374">
+<![CDATA[]]>
+</Line>
+<Line Number="375">
+<![CDATA[    // 清零 2 小时段累计(历史)]]>
+</Line>
+<Line Number="376">
+<![CDATA[    Out_Tot_Shift1_2H_1 := 0;]]>
+</Line>
+<Line Number="377">
+<![CDATA[    Out_Tot_Shift1_2H_2 := 0;]]>
+</Line>
+<Line Number="378">
+<![CDATA[    Out_Tot_Shift1_2H_3 := 0;]]>
+</Line>
+<Line Number="379">
+<![CDATA[    Out_Tot_Shift1_2H_4 := 0;]]>
+</Line>
+<Line Number="380">
+<![CDATA[]]>
+</Line>
+<Line Number="381">
+<![CDATA[    Out_Tot_Shift2_2H_1 := 0;]]>
+</Line>
+<Line Number="382">
+<![CDATA[    Out_Tot_Shift2_2H_2 := 0;]]>
+</Line>
+<Line Number="383">
+<![CDATA[    Out_Tot_Shift2_2H_3 := 0;]]>
+</Line>
+<Line Number="384">
+<![CDATA[    Out_Tot_Shift2_2H_4 := 0;]]>
+</Line>
+<Line Number="385">
+<![CDATA[]]>
+</Line>
+<Line Number="386">
+<![CDATA[    Out_Tot_Shift3_2H_1 := 0;]]>
+</Line>
+<Line Number="387">
+<![CDATA[    Out_Tot_Shift3_2H_2 := 0;]]>
+</Line>
+<Line Number="388">
+<![CDATA[    Out_Tot_Shift3_2H_3 := 0;]]>
+</Line>
+<Line Number="389">
+<![CDATA[    Out_Tot_Shift3_2H_4 := 0;]]>
+</Line>
+<Line Number="390">
+<![CDATA[]]>
+</Line>
+<Line Number="391">
+<![CDATA[    // 清零临时累计变量]]>
+</Line>
+<Line Number="392">
+<![CDATA[    Temp[0] := 0;   // 分钟累计]]>
+</Line>
+<Line Number="393">
+<![CDATA[    Temp[4] := 0;   // 月累计]]>
+</Line>
+<Line Number="394">
+<![CDATA[    Temp[8] := 0;   // 天累计]]>
+</Line>
+<Line Number="395">
+<![CDATA[]]>
+</Line>
+<Line Number="396">
+<![CDATA[    TempShift1 := 0;]]>
+</Line>
+<Line Number="397">
+<![CDATA[    TempShift2 := 0;]]>
+</Line>
+<Line Number="398">
+<![CDATA[    TempShift3 := 0;]]>
+</Line>
+<Line Number="399">
+<![CDATA[]]>
+</Line>
+<Line Number="400">
+<![CDATA[    TempShift1_2H_1 := 0;]]>
+</Line>
+<Line Number="401">
+<![CDATA[    TempShift1_2H_2 := 0;]]>
+</Line>
+<Line Number="402">
+<![CDATA[    TempShift1_2H_3 := 0;]]>
+</Line>
+<Line Number="403">
+<![CDATA[    TempShift1_2H_4 := 0;]]>
+</Line>
+<Line Number="404">
+<![CDATA[]]>
+</Line>
+<Line Number="405">
+<![CDATA[    TempShift2_2H_1 := 0;]]>
+</Line>
+<Line Number="406">
+<![CDATA[    TempShift2_2H_2 := 0;]]>
+</Line>
+<Line Number="407">
+<![CDATA[    TempShift2_2H_3 := 0;]]>
+</Line>
+<Line Number="408">
+<![CDATA[    TempShift2_2H_4 := 0;]]>
+</Line>
+<Line Number="409">
+<![CDATA[]]>
+</Line>
+<Line Number="410">
+<![CDATA[    TempShift3_2H_1 := 0;]]>
+</Line>
+<Line Number="411">
+<![CDATA[    TempShift3_2H_2 := 0;]]>
+</Line>
+<Line Number="412">
+<![CDATA[    TempShift3_2H_3 := 0;]]>
+</Line>
+<Line Number="413">
+<![CDATA[    TempShift3_2H_4 := 0;]]>
+</Line>
+<Line Number="414">
+<![CDATA[]]>
+</Line>
+<Line Number="415">
+<![CDATA[    // 复位清除命令]]>
+</Line>
+<Line Number="416">
+<![CDATA[    HMI_CMD.Clear := 0;]]>
+</Line>
+<Line Number="417">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="418">
+<![CDATA[]]>
+</Line>
+<Line Number="419">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="420">
+<![CDATA[// 功能段 11: HMI 数据同步(示例)]]>
+</Line>
+<Line Number="421">
+<![CDATA[// 实际需要根据你的 HMI_CMD 结构扩展字段]]>
+</Line>
+<Line Number="422">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="423">
+<![CDATA[]]>
+</Line>
+<Line Number="424">
+<![CDATA[HMI_CMD.Out_Tot := Out_Tot;]]>
+</Line>
+<Line Number="425">
+<![CDATA[HMI_CMD.Out_Tot_Min := Out_Tot_Min;]]>
+</Line>
+<Line Number="426">
+<![CDATA[HMI_CMD.Out_Tot_D_RT := Out_Tot_D_RT;]]>
+</Line>
+<Line Number="427">
+<![CDATA[HMI_CMD.Out_Tot_M_RT := Out_Tot_M_RT;]]>
+</Line>
+<Line Number="428">
+<![CDATA[HMI_CMD.Out_Tot_D := Out_Tot_D;]]>
+</Line>
+<Line Number="429">
+<![CDATA[HMI_CMD.Out_Tot_M := Out_Tot_M;]]>
+</Line>
+<Line Number="430">
+<![CDATA[]]>
+</Line>
+<Line Number="431">
+<![CDATA[// 三班累计]]>
+</Line>
+<Line Number="432">
+<![CDATA[HMI_CMD.Out_Tot_Shift1 := Out_Tot_Shift1;]]>
+</Line>
+<Line Number="433">
+<![CDATA[HMI_CMD.Out_Tot_Shift2 := Out_Tot_Shift2;]]>
+</Line>
+<Line Number="434">
+<![CDATA[HMI_CMD.Out_Tot_Shift3 := Out_Tot_Shift3;]]>
+</Line>
+<Line Number="435">
+<![CDATA[HMI_CMD.Out_Tot_Shift1_RT := Out_Tot_Shift1_RT;]]>
+</Line>
+<Line Number="436">
+<![CDATA[HMI_CMD.Out_Tot_Shift2_RT := Out_Tot_Shift2_RT;]]>
+</Line>
+<Line Number="437">
+<![CDATA[HMI_CMD.Out_Tot_Shift3_RT := Out_Tot_Shift3_RT;]]>
+</Line>
+<Line Number="438">
+<![CDATA[HMI_CMD.Out_Tot_Shift_RT := Out_Tot_Shift_RT;]]>
+</Line>
+<Line Number="439">
+<![CDATA[]]>
+</Line>
+<Line Number="440">
+<![CDATA[// 每班内 2 小时段(如需在 HMI 上显示,可在 UDT 中增加对应字段)]]>
+</Line>
+<Line Number="441">
+<![CDATA[HMI_CMD.Out_Tot_Shift1_2H_1 := Out_Tot_Shift1_2H_1;]]>
+</Line>
+<Line Number="442">
+<![CDATA[HMI_CMD.Out_Tot_Shift1_2H_2 := Out_Tot_Shift1_2H_2;]]>
+</Line>
+<Line Number="443">
+<![CDATA[HMI_CMD.Out_Tot_Shift1_2H_3 := Out_Tot_Shift1_2H_3;]]>
+</Line>
+<Line Number="444">
+<![CDATA[HMI_CMD.Out_Tot_Shift1_2H_4 := Out_Tot_Shift1_2H_4;]]>
+</Line>
+<Line Number="445">
+<![CDATA[]]>
+</Line>
+<Line Number="446">
+<![CDATA[HMI_CMD.Out_Tot_Shift2_2H_1 := Out_Tot_Shift2_2H_1;]]>
+</Line>
+<Line Number="447">
+<![CDATA[HMI_CMD.Out_Tot_Shift2_2H_2 := Out_Tot_Shift2_2H_2;]]>
+</Line>
+<Line Number="448">
+<![CDATA[HMI_CMD.Out_Tot_Shift2_2H_3 := Out_Tot_Shift2_2H_3;]]>
+</Line>
+<Line Number="449">
+<![CDATA[HMI_CMD.Out_Tot_Shift2_2H_4 := Out_Tot_Shift2_2H_4;]]>
+</Line>
+<Line Number="450">
+<![CDATA[]]>
+</Line>
+<Line Number="451">
+<![CDATA[HMI_CMD.Out_Tot_Shift3_2H_1 := Out_Tot_Shift3_2H_1;]]>
+</Line>
+<Line Number="452">
+<![CDATA[HMI_CMD.Out_Tot_Shift3_2H_2 := Out_Tot_Shift3_2H_2;]]>
+</Line>
+<Line Number="453">
+<![CDATA[HMI_CMD.Out_Tot_Shift3_2H_3 := Out_Tot_Shift3_2H_3;]]>
+</Line>
+<Line Number="454">
+<![CDATA[HMI_CMD.Out_Tot_Shift3_2H_4 := Out_Tot_Shift3_2H_4;]]>
+</Line>
+<Line Number="455">
+<![CDATA[]]>
+</Line>
+<Line Number="456">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="457">
+<![CDATA[// 功能段 12: 启用状态输出]]>
+</Line>
+<Line Number="458">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="459">
+<![CDATA[]]>
+</Line>
+<Line Number="460">
+<![CDATA[EnableOut := EnableIn;]]>
+</Line>
+<Line Number="461">
+<![CDATA[]]>
+</Line>
+<Line Number="462">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="463">
+<![CDATA[// 程序结束]]>
+</Line>
+<Line Number="464">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="465">
+<![CDATA[]]>
+</Line>
+</STContent>
+</Routine>
+</Routines>
+<Dependencies>
+<Dependency Type="DataType" Name="OreProdStats_3Shift_Type"/>
+</Dependencies>
+</AddOnInstructionDefinition>
+</AddOnInstructionDefinitions>
+</Controller>
 </RSLogix5000Content>
