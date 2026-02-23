@@ -1,0 +1,745 @@
+
+//=====================================================================
+// FB2802 两班产量计算功能块
+//=====================================================================
+// 功能描述:
+// - 计算两班产量：白班(9:00-21:00)和夜班(21:00-次日9:00)
+// - 统计每个班次中每3小时的产量
+// - 计算日产量、月产量和年产量
+//
+// 优化方法说明:
+// - Method 1 (时间转换法): 将时间转换为总分钟数进行时间段判断
+//   公式: TotalMinutes = Hour * 60 + Minute
+//   优点: 适合判断时间是否在某个时间段内
+//   
+// - Method 2 (精确时间点法): 直接比较时、分、秒进行精确时间点检测
+//   格式: Hour = X AND Minute = 0 AND Second = 0
+//   优点: 适合检测精确的时间边界点，避免重复触发
+//
+// 优化原理:
+// 1. 使用Method 1进行时间段判断（如：当前是否在白班时间段）
+// 2. 使用Method 2进行边界检测（如：9:00:00触发班次切换）
+// 3. 两种方法结合，既能准确判断时间段，又能精确捕获边界时刻
+//=====================================================================
+
+FUNCTION_BLOCK FB2802 
+
+TITLE = 'TwoShiftYieldCalculation'
+// 
+// 主要用于计算两班产量， 
+// 白班从早上9点到21点，夜班从21点到次日9点
+// 同时统计每个班次中每3小时的产量
+// 
+// 优化说明：
+// - Method 1: 使用Time_Real函数将时间转换为总分钟数进行时间段判断
+// - Method 2: 使用直接比较小时、分钟、秒进行精确时间点检测
+// - 混合方法结合两种技术的优势，提高时间判断的准确性和可靠性
+// 
+VERSION: '1.0' 
+AUTHOR: QIAO 
+
+NAME:ProCount
+FAMILY:QFam
+
+
+//=====================================================================
+// 输入变量
+//=====================================================================
+VAR_INPUT 
+
+Product_Total:REAL; // 实时皮带秤总累计量 - 从现场设备采集的实时产量数据
+Initialize:BOOL;    // 初始化信号 - 上升沿触发，初始化所有产量计数器和标志位
+END_VAR 
+
+
+//=====================================================================
+// 输出变量
+//=====================================================================
+VAR_OUTPUT 
+
+Product_Day_Shift:REAL:=0.0;  // 白班产量 (9:00-21:00)    
+Product_Night_Shift:REAL:=0.0;  // 夜班产量 (21:00-次日9:00)   
+Product_Day:REAL:=0.0;     // 日产量 (9:00-次日9:00)
+Product_Month:REAL:=0.0;   // 月产量 - 从每月1日9:00开始统计     
+Product_Year:REAL:=0.0;    // 年产量 - 从每年1月1日9:00开始统计    
+Product_LastMonth:REAL:=0.0;  // 上月产量 - 上个月的总产量
+Product_Yesterday:REAL:=0.0; // 昨天产量 - 昨天的总产量
+
+// 白班每3小时产量统计
+Product_Day_3H_1:REAL:=0.0;     // 白班第一段: 9:00-12:00  
+Product_Day_3H_2:REAL:=0.0;    // 白班第二段: 12:00-15:00   
+Product_Day_3H_3:REAL:=0.0;   // 白班第三段: 15:00-18:00   
+Product_Day_3H_4:REAL:=0.0;  // 白班第四段: 18:00-21:00    
+
+// 夜班每3小时产量统计
+Product_Night_3H_1:REAL:=0.0;   // 夜班第一段: 21:00-24:00(0:00)  
+Product_Night_3H_2:REAL:=0.0;   // 夜班第二段: 0:00-3:00  
+Product_Night_3H_3:REAL:=0.0;   // 夜班第三段: 3:00-6:00  
+Product_Night_3H_4:REAL:=0.0;   // 夜班第四段: 6:00-9:00 
+
+Init_Done:BOOL:=FALSE; // 初始化完成标志 - 首次扫描或初始化后置位
+
+//=====================================================================
+// 调试输出变量 - 用于监控时间判断逻辑
+//=====================================================================
+
+Debug_Hour:INT:=0;    // 当前小时 (0-23)          
+Debug_Minute:INT:=0;   // 当前分钟 (0-59)            
+Debug_Second:INT:=0;   // 当前秒 (0-59)            
+Debug_TotalMinutes:INT:=0;  // 当前总分钟数 (Method 1计算值, 0-1439)    
+Debug_ShiftStatus:INT:=0;        // 班别状态: 0=未知, 1=白班, 2=夜班
+Debug_TimePeriod:INT:=0;        // 时间段状态 - 详细的时间段转换代码
+Debug_ErrorCode:INT:=0;          // 错误代码: 0=正常, 1=READ_CLK错误, 2=小时值超出范围
+END_VAR 
+
+//=====================================================================
+// 临时变量 - 仅在本次扫描周期内使用
+//=====================================================================
+VAR_TEMP 
+// READ_CLK系统函数的返回值
+Read_Return :INT; 
+// Method 1: 当前时间的总分钟数
+CurrentTotalMinutes:INT;
+// Method 1: 上次扫描时间的总分钟数
+LastTotalMinutes:INT;
+// Method 2: 精确时间点标志 - 检测是否恰好在整点时刻
+IsExactTimePoint:BOOL;
+// 错误标志 - 标记是否发生错误
+ErrorFlag:BOOL;
+END_VAR 
+
+//=====================================================================
+// 静态变量 - 在功能块调用之间保持值
+//=====================================================================
+VAR 
+//=====================================================================
+// 系统时间相关变量
+//=====================================================================
+DateAndTimeNow:DATE_AND_TIME; // 当前系统时间 - 从PLC时钟读取
+// 时间结构体 - 将DATE_AND_TIME拆分为单独的时间分量
+DateAndTimeNowCoporate AT DateAndTimeNow:STRUCT 
+Year:BYTE;      // 年 (BCD编码)
+Month:BYTE;     // 月 (BCD编码)
+Day:BYTE;       // 日 (BCD编码)
+Hour:BYTE;      // 时 (BCD编码)
+Minute:BYTE;   // 分 (BCD编码)
+Second:BYTE;   // 秒 (BCD编码)
+milliSecond:WORD; // 毫秒
+END_STRUCT; 
+
+//=====================================================================
+// 当前时间存储 - 从BCD转换为整数的值
+//=====================================================================
+YearNow:INT;      // 当前年份
+MonthNow:INT;     // 当前月份
+DayNow:INT;       // 当前日期
+HourNow:INT;      // 当前小时 (0-23)
+MinuteNow:INT;    // 当前分钟 (0-59)
+SecondNow:INT;    // 当前秒 (0-59)
+
+//=====================================================================
+// 上次扫描时间存储 - 用于检测时间变化和边界跨越
+//=====================================================================
+HourLast:INT;      // 上次小时
+MinuteLast:INT;    // 上次分钟
+SecondLast:INT;   // 上次秒
+DayLast:INT;       // 上次日期
+MonthLast:INT;    // 上次月份
+YearLast:INT;      // 上次年份
+
+//=====================================================================
+// 月份和年份变化检测辅助变量
+//=====================================================================
+MonthNowFormer:INT;   // 上月的月份缓存
+YearNowFormer:INT;     // 上年的年份缓存
+DayNowFormer:INT;      // 上次的日期缓存
+
+//=====================================================================
+// 各周期产量起始值 - 用于计算产量增量
+//=====================================================================
+StartDayShiftPro:REAL:=0.0; // 白班产量起始值
+StartNightShiftPro:REAL:=0.0; // 夜班产量起始值
+StartDayClassPro:REAL:=0.0; // 日产量起始值
+StartMonthClassPro:REAL:=0.0; // 月产量起始值
+StartYearClassPro:REAL:=0.0; // 年产量起始值
+
+//=====================================================================
+// 白班每3小时产量起始值
+//=====================================================================
+StartDay_3H_1:REAL:=0.0;  // 9:00时刻的累计量
+StartDay_3H_2:REAL:=0.0;  // 12:00时刻的累计量
+StartDay_3H_3:REAL:=0.0;  // 15:00时刻的累计量
+StartDay_3H_4:REAL:=0.0;  // 18:00时刻的累计量
+
+//=====================================================================
+// 夜班每3小时产量起始值
+//=====================================================================
+StartNight_3H_1:REAL:=0.0; // 21:00时刻的累计量
+StartNight_3H_2:REAL:=0.0; // 0:00时刻的累计量
+StartNight_3H_3:REAL:=0.0; // 3:00时刻的累计量
+StartNight_3H_4:REAL:=0.0; // 6:00时刻的累计量
+
+//=====================================================================
+// 3小时时段标志位 - 标记当前是否处于某个3小时时段内
+//=====================================================================
+Day_3H_1_Flag:BOOL:=FALSE;  // 白班第一段(9:00-12:00)标志
+Day_3H_2_Flag:BOOL:=FALSE;  // 白班第二段(12:00-15:00)标志
+Day_3H_3_Flag:BOOL:=FALSE;  // 白班第三段(15:00-18:00)标志
+Day_3H_4_Flag:BOOL:=FALSE;  // 白班第四段(18:00-21:00)标志
+
+Night_3H_1_Flag:BOOL:=FALSE; // 夜班第一段(21:00-24:00)标志
+Night_3H_2_Flag:BOOL:=FALSE; // 夜班第二段(0:00-3:00)标志
+Night_3H_3_Flag:BOOL:=FALSE; // 夜班第三段(3:00-6:00)标志
+Night_3H_4_Flag:BOOL:=FALSE; // 夜班第四段(6:00-9:00)标志
+
+//=====================================================================
+// 扫描和班次状态标志
+//=====================================================================
+IsFirstScan:BOOL:=TRUE;     // 首次扫描标志 - 用于初始化
+DayShiftFlag:BOOL:=FALSE;   // 白班进行中标志
+NightShiftFlag:BOOL:=FALSE; // 夜班进行中标志
+
+//=====================================================================
+// 周期切换标志
+//=====================================================================
+DayFlag:BOOL:=FALSE;   // 日切换标志 - 9:00时触发
+MonthFlag:BOOL:=FALSE; // 月切换标志 - 每月1日9:00触发
+YearFlag:BOOL:=FALSE;  // 年切换标志 - 每年1月1日9:00触发
+
+//=====================================================================
+// 历史数据存储
+//=====================================================================
+LastMonth_Total:REAL:=0.0;  // 上月产量缓存
+Yesterday_Total:REAL:=0.0;  // 昨天产量缓存
+
+END_VAR 
+
+//=====================================================================
+// 方法1实现: Time_Real - 将时间转换为总分钟数
+//=====================================================================
+// 功能说明:
+//   将小时和分钟转换为从0点开始的总分钟数
+//   例如: 9:30 -&gt; 9*60+30 = 570分钟
+//
+// 时间段划分 (基于总分钟数):
+//   白班: 9:00-21:00 =&gt; 540-1260分钟
+//   夜班: 21:00-24:00 =&gt; 1260-1440分钟
+//   夜班: 0:00-9:00 =&gt; 0-540分钟
+//
+// 3小时时段划分:
+//   9:00-12:00 =&gt; 540-720分钟
+//   12:00-15:00 =&gt; 720-900分钟
+//   15:00-18:00 =&gt; 900-1080分钟
+//   18:00-21:00 =&gt; 1080-1260分钟
+//=====================================================================
+
+//=====================================================================
+// 程序主体
+//=====================================================================
+
+// 1. 初始化错误处理
+ErrorFlag:=FALSE;
+Debug_ErrorCode:=0;
+
+// 2. 获取系统时间
+Read_Return:=READ_CLK(CDT :=DateAndTimeNow ); 
+// 检查时间读取是否成功
+IF Read_Return &lt;&gt; 0 THEN
+    ErrorFlag:=TRUE;
+    Debug_ErrorCode:=1;  // READ_CLK错误
+END_IF;
+
+// 3. 将BCD编码的时间转换为整数
+YearNow:=BCD_TO_INT(DateAndTimeNowCoporate.Year); 
+MonthNow:=BCD_TO_INT(DateAndTimeNowCoporate.Month); 
+DayNow:=BCD_TO_INT(DateAndTimeNowCoporate.Day); 
+HourNow:=BCD_TO_INT(DateAndTimeNowCoporate.Hour); 
+MinuteNow:=BCD_TO_INT(DateAndTimeNowCoporate.Minute); 
+SecondNow:=BCD_TO_INT(DateAndTimeNowCoporate.Second); 
+
+//=====================================================================
+// Method 1: 将时间转换为总分钟数
+//=====================================================================
+// 原理: 使用公式 TotalMinutes = Hour * 60 + Minute
+// 目的: 将时间比较转化为整数范围比较，更加直观和可靠
+
+// 检查小时值是否在有效范围内(0-23)
+IF (HourNow &lt; 0) OR (HourNow &gt; 23) THEN
+    ErrorFlag:=TRUE;
+    Debug_ErrorCode:=2;  // 小时值超出范围
+    CurrentTotalMinutes:=0;  // 出错时设为0
+ELSE
+    // 转换为总分钟数 (秒数被忽略，因为主要用于时间段判断)
+    CurrentTotalMinutes:=HourNow * 60 + MinuteNow;
+END_IF;
+
+// 同样转换上次扫描时间
+IF (HourLast &lt; 0) OR (HourLast &gt; 23) THEN
+    LastTotalMinutes:=0;
+ELSE
+    LastTotalMinutes:=HourLast * 60 + MinuteLast;
+END_IF;
+
+// 更新调试变量，便于监控
+Debug_Hour:=HourNow;
+Debug_Minute:=MinuteNow;
+Debug_Second:=SecondNow;
+Debug_TotalMinutes:=CurrentTotalMinutes;
+
+//=====================================================================
+// Method 2: 精确时间点检测
+//=====================================================================
+// 原理: 直接比较时、分、秒是否完全匹配目标时间
+// 目的: 精确检测关键时间边界点，确保只在特定时刻触发一次
+// 
+// 使用场景:
+// - 检测9:00:00整点时刻
+// - 检测12:00:00整点时刻
+// - 检测21:00:00整点时刻
+// 等精确边界时刻
+
+// 检测是否恰好在整点时刻(时=任意, 分=0, 秒=0)
+IsExactTimePoint:=(MinuteNow = 0) AND (SecondNow = 0);
+
+//=====================================================================
+// 班别状态判断 - 使用Method 1进行时间段判断
+//=====================================================================
+// 说明:
+//   白班时间: 9:00-21:00
+//   - 9:00 = 9*60+0 = 540分钟
+//   - 21:00 = 21*60+0 = 1260分钟
+//   
+//   夜班时间: 21:00-次日9:00
+//   - 21:00-24:00 = 1260-1440分钟
+//   - 0:00-9:00 = 0-540分钟
+
+// 使用Method 1: 基于总分钟数判断当前时间段
+IF (CurrentTotalMinutes &gt;= 540) AND (CurrentTotalMinutes &lt; 1260) THEN
+    // 540 &lt;= 分钟 &lt; 1260 =&gt; 9:00 &lt;= 时间 &lt; 21:00 =&gt; 白班
+    Debug_ShiftStatus:=1;  // 白班
+ELSIF (CurrentTotalMinutes &gt;= 1260) OR (CurrentTotalMinutes &lt; 540) THEN
+    // 分钟 &gt;= 1260 或 &lt; 540 =&gt; 夜班时段
+    Debug_ShiftStatus:=2;  // 夜班
+ELSE
+    Debug_ShiftStatus:=0;  // 未知状态
+END_IF;
+
+//=====================================================================
+// 白班时间点检测 - Method 1 + Method 2 混合使用
+//=====================================================================
+
+//--------------------------------------------------------------------
+// 白班开始检测 (9:00:00)
+//--------------------------------------------------------------------
+// Method 2检测: 当时间恰好为9:00:00时触发 (精确匹配)
+IF (HourNow = 9) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartDayShiftPro:=Product_Total;           // 记录白班开始时的累计产量
+    StartDay_3H_1:=Product_Total;              // 记录第一时段开始产量
+    DayShiftFlag:=TRUE;                        // 置位白班进行中标志
+    Day_3H_1_Flag:=TRUE;                       // 置位第一时段标志
+    Debug_TimePeriod:=11;  // 白班开始
+// Method 1检测: 当从夜班时段跨越到白班时段时触发 (容错处理)
+// 场景: PLC扫描周期错过9:00:00整点，但在9:00之后扫描到
+ELSIF (HourLast &lt; 9) AND (HourNow &gt;= 9) AND (HourNow &lt; 21) THEN
+    StartDayShiftPro:=Product_Total;
+    StartDay_3H_1:=Product_Total;
+    DayShiftFlag:=TRUE;
+    Day_3H_1_Flag:=TRUE;
+    Debug_TimePeriod:=12;  // 夜班切白班
+END_IF;
+
+//--------------------------------------------------------------------
+// 白班结束检测 (21:00:00)
+//--------------------------------------------------------------------
+// Method 2检测: 精确时间为21:00:00
+IF (HourNow = 21) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    DayShiftFlag:=FALSE;            // 复位白班标志
+    Day_3H_4_Flag:=FALSE;           // 复位第四时段标志
+    Debug_TimePeriod:=13;  // 白班结束
+// Method 1检测: 从白班跨越到夜班
+ELSIF (HourLast &lt; 21) AND (HourNow &gt;= 21) THEN
+    DayShiftFlag:=FALSE;
+    Day_3H_4_Flag:=FALSE;
+    Debug_TimePeriod:=14;  // 白班切夜班
+END_IF;
+
+//=====================================================================
+// 夜班时间点检测 - Method 1 + Method 2 混合使用
+//=====================================================================
+
+//--------------------------------------------------------------------
+// 夜班开始检测 (21:00:00)
+//--------------------------------------------------------------------
+// Method 2检测: 精确时间为21:00:00
+IF (HourNow = 21) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartNightShiftPro:=Product_Total;         // 记录夜班开始时的累计产量
+    StartNight_3H_1:=Product_Total;            // 记录第一时段开始产量
+    NightShiftFlag:=TRUE;                      // 置位夜班进行中标志
+    Night_3H_1_Flag:=TRUE;                     // 置位第一时段标志
+    Debug_TimePeriod:=21;  // 夜班开始
+// Method 1检测: 从白班跨越到夜班
+ELSIF (HourLast &lt; 21) AND (HourNow &gt;= 21) THEN
+    StartNightShiftPro:=Product_Total;
+    StartNight_3H_1:=Product_Total;
+    NightShiftFlag:=TRUE;
+    Night_3H_1_Flag:=TRUE;
+    Debug_TimePeriod:=22;  // 白班切夜班
+// Method 1检测: 午夜跨日情况 (前一天21:00到次日9:00)
+// 例如: HourLast=23, HourNow=1
+ELSIF (HourLast &gt;= 21) AND (HourNow &lt; 9) THEN
+    NightShiftFlag:=TRUE;
+    Debug_TimePeriod:=23;  // 午夜跨日
+END_IF;
+
+//--------------------------------------------------------------------
+// 夜班结束检测 (次日9:00:00)
+//--------------------------------------------------------------------
+// Method 2检测: 精确时间为9:00:00
+IF (HourNow = 9) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    NightShiftFlag:=FALSE;           // 复位夜班标志
+    Night_3H_4_Flag:=FALSE;         // 复位第四时段标志
+    Debug_TimePeriod:=24;  // 夜班结束
+// Method 1检测: 从夜班跨越到白班
+ELSIF (HourLast &lt; 9) AND (HourNow &gt;= 9) AND (HourNow &lt; 21) THEN
+    NightShiftFlag:=FALSE;
+    Night_3H_4_Flag:=FALSE;
+    Debug_TimePeriod:=25;  // 夜班切白班
+END_IF;
+
+//=====================================================================
+// 3小时时段边界检测 - Method 1 + Method 2 混合使用
+//=====================================================================
+
+//--------------------------------------------------------------------
+// 白班第一段结束 / 第二段开始 (12:00:00)
+//--------------------------------------------------------------------
+IF (HourNow = 12) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    Day_3H_1_Flag:=FALSE;  // 第一段结束
+    Debug_TimePeriod:=31;
+ELSIF (HourLast &lt; 12) AND (HourNow &gt;= 12) THEN
+    Day_3H_1_Flag:=FALSE;
+    Debug_TimePeriod:=32;
+END_IF;
+
+IF (HourNow = 12) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartDay_3H_2:=Product_Total;  // 第二段开始
+    Day_3H_2_Flag:=TRUE;
+    Debug_TimePeriod:=33;
+ELSIF (HourLast &lt; 12) AND (HourNow &gt;= 12) THEN
+    StartDay_3H_2:=Product_Total;
+    Day_3H_2_Flag:=TRUE;
+    Debug_TimePeriod:=34;
+END_IF;
+
+//--------------------------------------------------------------------
+// 白班第二段结束 / 第三段开始 (15:00:00)
+//--------------------------------------------------------------------
+IF (HourNow = 15) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    Day_3H_2_Flag:=FALSE;
+    Debug_TimePeriod:=35;
+ELSIF (HourLast &lt; 15) AND (HourNow &gt;= 15) THEN
+    Day_3H_2_Flag:=FALSE;
+    Debug_TimePeriod:=36;
+END_IF;
+
+IF (HourNow = 15) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartDay_3H_3:=Product_Total;
+    Day_3H_3_Flag:=TRUE;
+    Debug_TimePeriod:=37;
+ELSIF (HourLast &lt; 15) AND (HourNow &gt;= 15) THEN
+    StartDay_3H_3:=Product_Total;
+    Day_3H_3_Flag:=TRUE;
+    Debug_TimePeriod:=38;
+END_IF;
+
+//--------------------------------------------------------------------
+// 白班第三段结束 / 第四段开始 (18:00:00)
+//--------------------------------------------------------------------
+IF (HourNow = 18) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    Day_3H_3_Flag:=FALSE;
+    Debug_TimePeriod:=39;
+ELSIF (HourLast &lt; 18) AND (HourNow &gt;= 18) THEN
+    Day_3H_3_Flag:=FALSE;
+    Debug_TimePeriod:=40;
+END_IF;
+
+IF (HourNow = 18) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartDay_3H_4:=Product_Total;
+    Day_3H_4_Flag:=TRUE;
+    Debug_TimePeriod:=41;
+ELSIF (HourLast &lt; 18) AND (HourNow &gt;= 18) THEN
+    StartDay_3H_4:=Product_Total;
+    Day_3H_4_Flag:=TRUE;
+    Debug_TimePeriod:=42;
+END_IF;
+
+//--------------------------------------------------------------------
+// 夜班第一段结束 / 第二段开始 (0:00:00)
+//--------------------------------------------------------------------
+IF (HourNow = 0) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    Night_3H_1_Flag:=FALSE;
+    Debug_TimePeriod:=43;
+ELSIF (HourLast &gt;= 21) AND (HourNow &lt; 3) THEN  // 跨日情况
+    Night_3H_1_Flag:=FALSE;
+    Debug_TimePeriod:=44;
+END_IF;
+
+IF (HourNow = 0) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartNight_3H_2:=Product_Total;
+    Night_3H_2_Flag:=TRUE;
+    Debug_TimePeriod:=45;
+ELSIF (HourLast &gt;= 21) AND (HourNow &lt; 3) THEN
+    StartNight_3H_2:=Product_Total;
+    Night_3H_2_Flag:=TRUE;
+    Debug_TimePeriod:=46;
+END_IF;
+
+//--------------------------------------------------------------------
+// 夜班第二段结束 / 第三段开始 (3:00:00)
+//--------------------------------------------------------------------
+IF (HourNow = 3) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    Night_3H_2_Flag:=FALSE;
+    Debug_TimePeriod:=47;
+ELSIF (HourLast &lt; 3) AND (HourNow &gt;= 3) THEN
+    Night_3H_2_Flag:=FALSE;
+    Debug_TimePeriod:=48;
+END_IF;
+
+IF (HourNow = 3) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartNight_3H_3:=Product_Total;
+    Night_3H_3_Flag:=TRUE;
+    Debug_TimePeriod:=49;
+ELSIF (HourLast &lt; 3) AND (HourNow &gt;= 3) THEN
+    StartNight_3H_3:=Product_Total;
+    Night_3H_3_Flag:=TRUE;
+    Debug_TimePeriod:=50;
+END_IF;
+
+//--------------------------------------------------------------------
+// 夜班第三段结束 / 第四段开始 (6:00:00)
+//--------------------------------------------------------------------
+IF (HourNow = 6) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    Night_3H_3_Flag:=FALSE;
+    Debug_TimePeriod:=51;
+ELSIF (HourLast &lt; 6) AND (HourNow &gt;= 6) THEN
+    Night_3H_3_Flag:=FALSE;
+    Debug_TimePeriod:=52;
+END_IF;
+
+IF (HourNow = 6) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartNight_3H_4:=Product_Total;
+    Night_3H_4_Flag:=TRUE;
+    Debug_TimePeriod:=53;
+ELSIF (HourLast &lt; 6) AND (HourNow &gt;= 6) THEN
+    StartNight_3H_4:=Product_Total;
+    Night_3H_4_Flag:=TRUE;
+    Debug_TimePeriod:=54;
+END_IF;
+
+//=====================================================================
+// 首次扫描初始化
+//=====================================================================
+// 功能: 第一次扫描时记录所有初始值，避免产量从0开始计算
+IF IsFirstScan THEN
+    // 记录各班次和各时段的初始累计量
+    StartDayShiftPro:=Product_Total;
+    StartNightShiftPro:=Product_Total;
+    StartDayClassPro:=Product_Total;
+    StartMonthClassPro:=Product_Total;
+    StartYearClassPro:=Product_Total;
+    StartDay_3H_1:=Product_Total;
+    StartDay_3H_2:=Product_Total;
+    StartDay_3H_3:=Product_Total;
+    StartDay_3H_4:=Product_Total;
+    StartNight_3H_1:=Product_Total;
+    StartNight_3H_2:=Product_Total;
+    StartNight_3H_3:=Product_Total;
+    StartNight_3H_4:=Product_Total;
+    
+    // 保存当前时间作为下次比较的基准
+    YearLast:=YearNow;
+    MonthLast:=MonthNow;
+    DayLast:=DayNow;
+    HourLast:=HourNow;
+    MinuteLast:=MinuteNow;
+    SecondLast:=SecondNow;
+    
+    IsFirstScan:=FALSE;
+    Init_Done:=TRUE;
+END_IF;
+
+//=====================================================================
+// 手动初始化信号处理
+//=====================================================================
+// 功能: 当外部触发Initialize信号时，重置所有计数器和标志位
+IF Initialize THEN
+    // 重置所有产量起始值
+    StartDayShiftPro:=Product_Total;
+    StartNightShiftPro:=Product_Total;
+    StartDayClassPro:=Product_Total;
+    StartMonthClassPro:=Product_Total;
+    StartYearClassPro:=Product_Total;
+    StartDay_3H_1:=Product_Total;
+    StartDay_3H_2:=Product_Total;
+    StartDay_3H_3:=Product_Total;
+    StartDay_3H_4:=Product_Total;
+    StartNight_3H_1:=Product_Total;
+    StartNight_3H_2:=Product_Total;
+    StartNight_3H_3:=Product_Total;
+    StartNight_3H_4:=Product_Total;
+    
+    // 清零所有产量输出
+    Product_Day_Shift:=0.0;
+    Product_Night_Shift:=0.0;
+    Product_Day:=0.0;
+    Product_Month:=0.0;
+    Product_Year:=0.0;
+    Product_Day_3H_1:=0.0;
+    Product_Day_3H_2:=0.0;
+    Product_Day_3H_3:=0.0;
+    Product_Day_3H_4:=0.0;
+    Product_Night_3H_1:=0.0;
+    Product_Night_3H_2:=0.0;
+    Product_Night_3H_3:=0.0;
+    Product_Night_3H_4:=0.0;
+    
+    Init_Done:=TRUE;
+END_IF;
+
+//=====================================================================
+// 产量计算 - 使用Method 1时间段判断
+//=====================================================================
+
+//--------------------------------------------------------------------
+// 白班产量计算 (9:00-21:00)
+//--------------------------------------------------------------------
+IF (CurrentTotalMinutes &gt;= 540) AND (CurrentTotalMinutes &lt; 1260) THEN
+   Product_Day_Shift:=Product_Total - StartDayShiftPro;
+END_IF;
+
+//--------------------------------------------------------------------
+// 白班每3小时产量计算 - Method 1时间段判断
+//--------------------------------------------------------------------
+IF (CurrentTotalMinutes &gt;= 540) AND (CurrentTotalMinutes &lt; 720) THEN
+   Product_Day_3H_1:=Product_Total - StartDay_3H_1;
+END_IF;
+
+IF (CurrentTotalMinutes &gt;= 720) AND (CurrentTotalMinutes &lt; 900) THEN
+   Product_Day_3H_2:=Product_Total - StartDay_3H_2;
+END_IF;
+
+IF (CurrentTotalMinutes &gt;= 900) AND (CurrentTotalMinutes &lt; 1080) THEN
+   Product_Day_3H_3:=Product_Total - StartDay_3H_3;
+END_IF;
+
+IF (CurrentTotalMinutes &gt;= 1080) AND (CurrentTotalMinutes &lt; 1260) THEN
+   Product_Day_3H_4:=Product_Total - StartDay_3H_4;
+END_IF;
+
+//--------------------------------------------------------------------
+// 夜班产量计算 (21:00-次日9:00)
+//--------------------------------------------------------------------
+IF (CurrentTotalMinutes &gt;= 1260) OR (CurrentTotalMinutes &lt; 540) THEN
+    Product_Night_Shift:=Product_Total - StartNightShiftPro;
+END_IF;
+
+//--------------------------------------------------------------------
+// 夜班每3小时产量计算 - Method 1时间段判断
+//--------------------------------------------------------------------
+IF (CurrentTotalMinutes &gt;= 1260) THEN
+   Product_Night_3H_1:=Product_Total - StartNight_3H_1;
+END_IF;
+
+IF (CurrentTotalMinutes &gt;= 0) AND (CurrentTotalMinutes &lt; 180) THEN
+   Product_Night_3H_2:=Product_Total - StartNight_3H_2;
+END_IF;
+
+IF (CurrentTotalMinutes &gt;= 180) AND (CurrentTotalMinutes &lt; 360) THEN
+   Product_Night_3H_3:=Product_Total - StartNight_3H_3;
+END_IF;
+
+IF (CurrentTotalMinutes &gt;= 360) AND (CurrentTotalMinutes &lt; 540) THEN
+   Product_Night_3H_4:=Product_Total - StartNight_3H_4;
+END_IF;
+
+//=====================================================================
+// 日产量计算 (9:00-次日9:00)
+//=====================================================================
+IF (HourNow = 9) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartDayClassPro:=Product_Total;
+    DayFlag:=TRUE;
+    Debug_TimePeriod:=61;
+ELSIF (HourLast &lt; 9) AND (HourNow &gt;= 9) THEN
+    StartDayClassPro:=Product_Total;
+    DayFlag:=TRUE;
+    Debug_TimePeriod:=62;
+END_IF;
+
+// 日产量 = 当前累计量 - 今日9:00时的累计量
+Product_Day:=Product_Total - StartDayClassPro;
+
+// 记录昨日产量
+IF DayFlag THEN
+    Yesterday_Total := Product_Day;
+    Product_Yesterday := Yesterday_Total;
+    DayFlag := FALSE;
+END_IF;
+
+//=====================================================================
+// 月产量计算 (每月1日9:00开始)
+//=====================================================================
+IF (DayNow = 1) AND (HourNow &gt;= 9) AND ((DayLast &gt; 1) OR (DayLast = 1) AND (HourLast &lt; 9)) THEN 
+    StartMonthClassPro:=Product_Total;
+    MonthFlag:=TRUE;
+    Debug_TimePeriod:=71;
+ELSIF (DayNow = 1) AND (HourNow = 9) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartMonthClassPro:=Product_Total;
+    MonthFlag:=TRUE;
+    Debug_TimePeriod:=72;
+END_IF;
+
+Product_Month:=Product_Total - StartMonthClassPro;
+
+IF MonthFlag THEN
+    LastMonth_Total := Product_Month;
+    Product_LastMonth := LastMonth_Total;
+    MonthFlag := FALSE;
+END_IF;
+    
+//=====================================================================
+// 年产量计算 (每年1月1日9:00开始)
+//=====================================================================
+IF (MonthNow = 1) AND (DayNow = 1) AND (HourNow &gt;= 9) AND ((MonthLast &gt; 1) OR (MonthLast = 1) AND (DayLast &gt; 1) OR (MonthLast = 1) AND (DayLast = 1) AND (HourLast &lt; 9)) THEN 
+    StartYearClassPro:=Product_Total;
+    YearFlag:=TRUE;
+    Debug_TimePeriod:=81;
+ELSIF (MonthNow = 1) AND (DayNow = 1) AND (HourNow = 9) AND (MinuteNow = 0) AND (SecondNow = 0) THEN
+    StartYearClassPro:=Product_Total;
+    YearFlag:=TRUE;
+    Debug_TimePeriod:=82;
+END_IF;
+
+Product_Year:=Product_Total - StartYearClassPro;
+
+//=====================================================================
+// 保存当前时间到静态变量
+//=====================================================================
+// 功能: 将本次扫描的时间保存，作为下次扫描的上次时间
+// 用途: 用于检测时间变化和跨越边界的情况
+YearLast:=YearNow;
+MonthLast:=MonthNow;
+DayLast:=DayNow;
+HourLast:=HourNow;
+MinuteLast:=MinuteNow;
+SecondLast:=SecondNow;
+
+END_FUNCTION_BLOCK
+
+//=====================================================================
+// 数据块定义
+//=====================================================================
+// 将FB2802功能块实例化为DB2802数据块
+DATA_BLOCK DB2802 FB2802
+BEGIN
+END_DATA_BLOCK
+

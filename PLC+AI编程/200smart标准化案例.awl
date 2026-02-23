@@ -1,0 +1,34 @@
+ORGANIZATION_BLOCK MAIN:OB1
+TITLE=³ÌÐò×¢ÊÍ
+BEGIN
+Network 1 
+//  ³ÌÐò¶Î×¢ÊÍ
+LD     SM0.1
+S      M2.0, 1
+Network 2 
+LD     M2.0
+S      Q0.0, 1
+TON    T37, 10
+A      T37
+R      M2.0, 1
+S      M2.1, 1
+Network 3 
+LD     M2.1
+S      Q0.1, 1
+TON    T38, 20
+A      T38
+R      M2.1, 1
+S      M2.0, 1
+END_ORGANIZATION_BLOCK
+SUBROUTINE_BLOCK SBR_0:SBR0
+TITLE=×Ó³ÌÐò×¢ÊÍ
+BEGIN
+Network 1 
+//  ³ÌÐò¶Î×¢ÊÍ
+END_SUBROUTINE_BLOCK
+INTERRUPT_BLOCK INT_0:INT0
+TITLE=ÖÐ¶ÏÀý³Ì×¢ÊÍ
+BEGIN
+Network 1 
+//  ³ÌÐò¶Î×¢ÊÍ
+END_INTERRUPT_BLOCK

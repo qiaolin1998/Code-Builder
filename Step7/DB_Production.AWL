@@ -1,0 +1,45 @@
+DATA_BLOCK "Production"
+TITLE =
+AUTHOR : TangZhen
+VERSION : 0.1
+
+
+  STRUCT 	
+   Product_Total : REAL ;	//总产量
+   Product_White_Class : REAL ;	//白班产量
+   Product_Hight_Class : REAL ;	//夜班产量
+   Product_Day : REAL ;	//日产量
+   Product_Month : REAL ;	//月产量
+   Product_Year : REAL ;	//年产量
+   roduct_White_3H_1 : REAL ;	//白班第一段（9：00-12:00）
+   roduct_White_3H_2 : REAL ;	//白班第二段（12：00-15：00）
+   roduct_White_3H_3 : REAL ;	//白班第三段（15：00-18：00}
+   roduct_White_3H_4 : REAL ;	//白班第四段（18：00-21：00}
+   Product_Night_3H_1 : REAL ;	//夜班第一段（21:00-24：00）
+   Product_Night_3H_2 : REAL ;	//夜班第二段（0：00-3：00）
+   Product_Night_3H_3 : REAL ;	//夜班第三段（3：00-6：00}
+   Product_Night_3H_4 : REAL ;	//夜班第四段（6：00-9：00}
+   Initialize : BOOL ;	//初始化
+   Product_LastMonth : REAL ;	//上月产量
+   Product_Yesterday : REAL ;	//昨天产量
+  END_STRUCT ;	
+BEGIN
+   Product_Total := 0.000000e+000; 
+   Product_White_Class := 0.000000e+000; 
+   Product_Hight_Class := 0.000000e+000; 
+   Product_Day := 0.000000e+000; 
+   Product_Month := 0.000000e+000; 
+   Product_Year := 0.000000e+000; 
+   roduct_White_3H_1 := 0.000000e+000; 
+   roduct_White_3H_2 := 0.000000e+000; 
+   roduct_White_3H_3 := 6.650544e+006; 
+   roduct_White_3H_4 := 0.000000e+000; 
+   Product_Night_3H_1 := 0.000000e+000; 
+   Product_Night_3H_2 := 0.000000e+000; 
+   Product_Night_3H_3 := 0.000000e+000; 
+   Product_Night_3H_4 := 0.000000e+000; 
+   Initialize := FALSE; 
+   Product_LastMonth := 0.000000e+000; 
+   Product_Yesterday := 0.000000e+000; 
+END_DATA_BLOCK
+

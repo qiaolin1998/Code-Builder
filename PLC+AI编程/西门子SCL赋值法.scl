@@ -1,0 +1,65 @@
+// 主程序 - OB1
+// 变量声明
+VAR
+    State : INT := 0;  // 状态寄存器
+    Timer1 : TON;      // 状态2使用的定时器
+    Timer2 : TON;      // 状态4使用的定时器
+END_VAR
+
+// 状态机实现
+
+// 初始化 - 首次扫描时初始化状态为0
+IF "First_Scan" THEN
+    State := 0;
+END_IF;
+
+// 状态0（初始状态）- 按下启动按钮进入状态1
+IF State = 0 AND "I0.0" THEN
+    State := 1;
+END_IF;
+
+// 状态1（小车向右运行）
+IF State = 1 THEN
+    "Q0.0" := TRUE;  // 启动向右运行
+    
+    // 检测右限位触发，进入状态2
+    IF "I0.1" THEN
+        "Q0.0" := FALSE;  // 停止向右运行
+        State := 2;
+        Timer1(IN := FALSE, PT := T#0S);  // 重置定时器
+    END_IF;
+END_IF;
+
+// 状态2（等待1秒）
+IF State = 2 THEN
+    Timer1(IN := TRUE, PT := T#1S);
+    
+    // 定时器到达设定时间，进入状态3
+    IF Timer1.Q THEN
+        State := 3;
+        Timer1(IN := FALSE, PT := T#0S);  // 重置定时器
+    END_IF;
+END_IF;
+
+// 状态3（小车向左运行）
+IF State = 3 THEN
+    "Q0.1" := TRUE;  // 启动向左运行
+    
+    // 检测左限位触发，进入状态4
+    IF "I0.2" THEN
+        "Q0.1" := FALSE;  // 停止向左运行
+        State := 4;
+        Timer2(IN := FALSE, PT := T#0S);  // 重置定时器
+    END_IF;
+END_IF;
+
+// 状态4（等待1秒）
+IF State = 4 THEN
+    Timer2(IN := TRUE, PT := T#1S);
+    
+    // 定时器到达设定时间，回到状态1
+    IF Timer2.Q THEN
+        State := 1;
+        Timer2(IN := FALSE, PT := T#0S);  // 重置定时器
+    END_IF;
+END_IF;
