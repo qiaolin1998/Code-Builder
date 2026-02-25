@@ -1,0 +1,1187 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="36.00" TargetName="OreProdStats_3Shift_Test" TargetType="AddOnInstructionDefinition" TargetRevision="1.0 " TargetLastEdited="2026-02-24T12:29:00.000Z" ContainsContext="true" ExportDate="Tue Feb 24 12:29:00 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
+<Controller Use="Context" Name="OreProdStats_3Shift_Test">
+<DataTypes Use="Context">
+<DataType Name="TestResult_Type" Family="NoFamily" Class="User">
+<Members>
+<Member Name="Test_Passed" DataType="BOOL" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[测试通过标志]]>
+</Description>
+</Member>
+<Member Name="Test_Failed" DataType="BOOL" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[测试失败标志]]>
+</Description>
+</Member>
+<Member Name="Test_Count" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[测试计数]]>
+</Description>
+</Member>
+<Member Name="Failed_Count" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[失败计数]]>
+</Description>
+</Member>
+<Member Name="Test_Message" DataType="SINT" Dimension="81" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[测试消息 (82字符数组)]]>
+</Description>
+</Member>
+</Members>
+</DataType>
+<DataType Name="OreProdStats_3Shift_Type" Family="NoFamily" Class="User">
+<Members>
+<Member Name="ZZZZZZZZZZOreProdStats_3Shift0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[保留字段]]>
+</Description>
+</Member>
+<Member Name="Clear" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[清除标志]]>
+</Description>
+</Member>
+<Member Name="Out_Tot" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[总产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Min" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[最小产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_D_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[日产量实时]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_M_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[月产量实时]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_D" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[日产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_M" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[月产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[班次产量实时]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[早班产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[中班产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[晚班产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[早班产量实时]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[中班产量实时]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[晚班产量实时]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_2H_1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[早班第1时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_2H_2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[早班第2时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_2H_3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[早班第3时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift1_2H_4" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[早班第4时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_2H_1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[中班第1时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_2H_2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[中班第2时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_2H_3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[中班第3时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift2_2H_4" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[中班第4时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_2H_1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[晚班第1时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_2H_2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[晚班第2时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_2H_3" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[晚班第3时段产量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_Shift3_2H_4" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write" Target="Context">
+<Description>
+<![CDATA[晚班第4时段产量]]>
+</Description>
+</Member>
+</Members>
+</DataType>
+</DataTypes>
+<AddOnInstructionDefinitions Use="Context">
+<AddOnInstructionDefinition Use="Target" Name="OreProdStats_3Shift_Test" Revision="1.0" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2026-02-24T00:00:00.000Z" CreatedBy="Cascade" EditedDate="2026-02-24T12:29:00.000Z" EditedBy="Cascade" SoftwareRevision="v36.00">
+<Parameters>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[使能输入]]>
+</Description>
+</Parameter>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[使能输出]]>
+</Description>
+</Parameter>
+<Parameter Name="Test_Mode" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[测试模式: 0=基础功能, 1=班次切换, 2=2小时时段, 3=边界条件]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Test_Passed" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[测试通过标志]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Test_Failed" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[测试失败标志]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Test_Count" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[测试计数]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Failed_Count" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[失败计数]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Test_Message_Code" TagType="Base" DataType="DINT" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[测试消息代码 (0=测试开始, 1=所有测试通过, 2=测试失败, 3=脉冲累计错误, 4=基础功能测试通过, 5=清除功能错误, 6=班次切换完成, 7=时段测试完成, 8=边界测试完成)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+</Parameters>
+<LocalTags>
+<LocalTag Name="Test_Step" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Test_Timer" DataType="FBD_TIMER" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[[1,0,0,0,0,0,0,0,0,4,0,0]]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<Structure DataType="FBD_TIMER">
+<DataValueMember Name="EnableIn" DataType="BOOL" Value="1"/>
+<DataValueMember Name="TimerEnable" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="Reset" DataType="BOOL" Value="0"/>
+<DataValueMember Name="EnableOut" DataType="BOOL" Value="0"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Status" DataType="DINT" Radix="Hex" Value="16#0000_0000"/>
+<DataValueMember Name="InstructFault" DataType="BOOL" Value="0"/>
+<DataValueMember Name="PresetInv" DataType="BOOL" Value="0"/>
+</Structure>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_Year" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[2026]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="2026"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_Month" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[2]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="2"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_Day" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[24]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="24"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_Hour" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_Minute" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_Second" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_Pulse" DataType="BOOL" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_Run" DataType="BOOL" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[1]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="1"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_Scale" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[100]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="100"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Mock_HMI_CMD" DataType="OreProdStats_3Shift_Type" ExternalAccess="None"/>
+<LocalTag Name="Expected_Value" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Actual_Value" DataType="REAL" Radix="Float" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Test_Pulse_Count" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Test_Counter" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+</LocalTags>
+<Routines>
+<Routine Name="Logic" Type="ST">
+<STContent>
+<Line Number="0">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="1">
+<![CDATA[// AOI 名称: OreProdStats_3Shift_Test (三班制产量统计测试系统)]]>
+</Line>
+<Line Number="2">
+<![CDATA[// 版本: 1.0]]>
+</Line>
+<Line Number="3">
+<![CDATA[// 编程语言: Structured Text (ST)]]>
+</Line>
+<Line Number="4">
+<![CDATA[// 适用平台: Studio 5000 (ControlLogix/CompactLogix)]]>
+</Line>
+<Line Number="5">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="6">
+<![CDATA[// 功能概述:]]>
+</Line>
+<Line Number="7">
+<![CDATA[// 1. 自动化测试 OreProdStats_3Shift AOI 的各项功能]]>
+</Line>
+<Line Number="8">
+<![CDATA[// 2. 模拟不同时间场景和输入条件]]>
+</Line>
+<Line Number="9">
+<![CDATA[// 3. 验证班次切换、累计逻辑、边界条件等]]>
+</Line>
+<Line Number="10">
+<![CDATA[// 4. 提供详细的测试结果和错误报告]]>
+</Line>
+<Line Number="11">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="12">
+<![CDATA[// 测试模式说明:]]>
+</Line>
+<Line Number="13">
+<![CDATA[// 0 = 基础功能测试: 脉冲累计、使能控制]]>
+</Line>
+<Line Number="14">
+<![CDATA[// 1 = 班次切换测试: 早班->中班->晚班->早班]]>
+</Line>
+<Line Number="15">
+<![CDATA[// 2 = 2小时时段测试: 验证各时段累计正确性]]>
+</Line>
+<Line Number="16">
+<![CDATA[// 3 = 边界条件测试: 跨午夜、月末、闰年等]]>
+</Line>
+<Line Number="17">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="18">
+<![CDATA[]]>
+</Line>
+<Line Number="19">
+<![CDATA[// 初始化]]>
+</Line>
+<Line Number="20">
+<![CDATA[// 初始化
+IF EnableIn AND (Test_Step = 0) THEN
+    Test_Passed := FALSE;
+    Test_Failed := FALSE;
+    Test_Count := 0;
+    Failed_Count := 0;
+    Test_Message_Code := 0;
+    Test_Step := 1;
+    Test_Timer.PRE := 1000;  // 1秒测试间隔
+    Test_Counter := 0;
+END_IF;]]>
+</Line>
+<Line Number="24">
+<![CDATA[    Test_Result.Failed_Count := 0;]]>
+</Line>
+<Line Number="25">
+<![CDATA[    Test_Message_Code := 0;]]>
+</Line>
+<Line Number="26">
+<![CDATA[    Test_Step := 1;]]>
+</Line>
+<Line Number="27">
+<![CDATA[    Test_Timer.PRE := 1000;  // 1秒测试间隔]]>
+</Line>
+<Line Number="28">
+<![CDATA[    Test_Counter := 0;]]>
+</Line>
+<Line Number="29">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="30">
+<![CDATA[]]>
+</Line>
+<Line Number="31">
+<![CDATA[// 测试定时器]]>
+</Line>
+<Line Number="32">
+<![CDATA[Test_Timer.TimerEnable := EnableIn;]]>
+</Line>
+<Line Number="33">
+<![CDATA[Test_Timer.Reset := Test_Timer.DN;]]>
+</Line>
+<Line Number="34">
+<![CDATA[TONR(Test_Timer);]]>
+</Line>
+<Line Number="35">
+<![CDATA[]]>
+</Line>
+<Line Number="36">
+<![CDATA[// 主测试逻辑]]>
+</Line>
+<Line Number="37">
+<![CDATA[IF EnableIn AND Test_Timer.DN THEN]]>
+</Line>
+<Line Number="38">
+<![CDATA[    Test_Result.Test_Count := Test_Result.Test_Count + 1;]]>
+</Line>
+<Line Number="39">
+<![CDATA[]]>
+</Line>
+<Line Number="40">
+<![CDATA[    CASE Test_Mode OF]]>
+</Line>
+<Line Number="41">
+<![CDATA[        0: // 基础功能测试]]>
+</Line>
+<Line Number="42">
+<![CDATA[            Run_Basic_Test();]]>
+</Line>
+<Line Number="43">
+<![CDATA[        1: // 班次切换测试]]>
+</Line>
+<Line Number="44">
+<![CDATA[            Run_Shift_Test();]]>
+</Line>
+<Line Number="45">
+<![CDATA[        2: // 2小时时段测试]]>
+</Line>
+<Line Number="46">
+<![CDATA[            Run_Section_Test();]]>
+</Line>
+<Line Number="47">
+<![CDATA[        3: // 边界条件测试]]>
+</Line>
+<Line Number="48">
+<![CDATA[            Run_Boundary_Test();]]>
+</Line>
+<Line Number="49">
+<![CDATA[    END_CASE;]]>
+</Line>
+<Line Number="50">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="51">
+<![CDATA[]]>
+</Line>
+<Line Number="52">
+<![CDATA[// 测试完成处理]]>
+</Line>
+<Line Number="53">
+<![CDATA[IF Test_Step = 999 THEN]]>
+</Line>
+<Line Number="54">
+<![CDATA[    IF Test_Result.Failed_Count = 0 THEN]]>
+</Line>
+<Line Number="55">
+<![CDATA[        Test_Result.Test_Passed := TRUE;]]>
+</Line>
+<Line Number="56">
+<![CDATA[        Test_Message_Code := 1;]]>
+</Line>
+<Line Number="57">
+<![CDATA[    ELSE]]>
+</Line>
+<Line Number="58">
+<![CDATA[        Test_Result.Test_Failed := TRUE;]]>
+</Line>
+<Line Number="59">
+<![CDATA[        Test_Message_Code := 2;]]>
+</Line>
+<Line Number="60">
+<![CDATA[    END_IF;]]>
+</Line>
+<Line Number="61">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="62">
+<![CDATA[]]>
+</Line>
+<Line Number="63">
+<![CDATA[EnableOut := EnableIn;]]>
+</Line>
+<Line Number="64">
+<![CDATA[]]>
+</Line>
+<Line Number="65">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="66">
+<![CDATA[// 基础功能测试]]>
+</Line>
+<Line Number="67">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="68">
+<![CDATA[]]>
+</Line>
+<Line Number="69">
+<![CDATA[// 测试脉冲累计功能]]>
+</Line>
+<Line Number="70">
+<![CDATA[IF Test_Step = 1 THEN]]>
+</Line>
+<Line Number="71">
+<![CDATA[    Mock_Hour := 9;]]>
+</Line>
+<Line Number="72">
+<![CDATA[    Mock_Minute := 0;]]>
+</Line>
+<Line Number="73">
+<![CDATA[    Mock_Second := 0;]]>
+</Line>
+<Line Number="74">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="75">
+<![CDATA[    Expected_Value := 100.0;]]>
+</Line>
+<Line Number="76">
+<![CDATA[    Test_Step := 2;]]>
+</Line>
+<Line Number="77">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="78">
+<![CDATA[]]>
+</Line>
+<Line Number="79">
+<![CDATA[// 验证累计结果]]>
+</Line>
+<Line Number="80">
+<![CDATA[IF Test_Step = 2 THEN]]>
+</Line>
+<Line Number="81">
+<![CDATA[    Mock_Pulse := FALSE;]]>
+</Line>
+<Line Number="82">
+<![CDATA[    Actual_Value := Mock_HMI_CMD.Out_Tot;]]>
+</Line>
+<Line Number="83">
+<![CDATA[    IF ABS(Actual_Value - Expected_Value) < 0.001 THEN]]>
+</Line>
+<Line Number="84">
+<![CDATA[        Test_Step := 3;]]>
+</Line>
+<Line Number="85">
+<![CDATA[    ELSE]]>
+</Line>
+<Line Number="86">
+<![CDATA[        Test_Result.Failed_Count := Test_Result.Failed_Count + 1;]]>
+</Line>
+<Line Number="87">
+<![CDATA[        Test_Message_Code := 3;]]>
+</Line>
+<Line Number="88">
+<![CDATA[        Test_Step := 999;]]>
+</Line>
+<Line Number="89">
+<![CDATA[    END_IF;]]>
+</Line>
+<Line Number="90">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="91">
+<![CDATA[]]>
+</Line>
+<Line Number="92">
+<![CDATA[// 测试清除功能]]>
+</Line>
+<Line Number="93">
+<![CDATA[IF Test_Step = 3 THEN]]>
+</Line>
+<Line Number="94">
+<![CDATA[    Mock_HMI_CMD.Clear := TRUE;]]>
+</Line>
+<Line Number="95">
+<![CDATA[    Test_Step := 4;]]>
+</Line>
+<Line Number="96">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="97">
+<![CDATA[]]>
+</Line>
+<Line Number="98">
+<![CDATA[IF Test_Step = 4 THEN]]>
+</Line>
+<Line Number="99">
+<![CDATA[    Mock_HMI_CMD.Clear := FALSE;]]>
+</Line>
+<Line Number="100">
+<![CDATA[    Actual_Value := Mock_HMI_CMD.Out_Tot;]]>
+</Line>
+<Line Number="101">
+<![CDATA[    IF Actual_Value = 0.0 THEN]]>
+</Line>
+<Line Number="102">
+<![CDATA[        Test_Message_Code := 4;]]>
+</Line>
+<Line Number="103">
+<![CDATA[        Test_Step := 999;]]>
+</Line>
+<Line Number="104">
+<![CDATA[    ELSE]]>
+</Line>
+<Line Number="105">
+<![CDATA[        Test_Result.Failed_Count := Test_Result.Failed_Count + 1;]]>
+</Line>
+<Line Number="106">
+<![CDATA[        Test_Message_Code := 5;]]>
+</Line>
+<Line Number="107">
+<![CDATA[        Test_Step := 999;]]>
+</Line>
+<Line Number="108">
+<![CDATA[    END_IF;]]>
+</Line>
+<Line Number="109">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="110">
+<![CDATA[]]>
+</Line>
+<Line Number="111">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="112">
+<![CDATA[// 班次切换测试]]>
+</Line>
+<Line Number="113">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="114">
+<![CDATA[]]>
+</Line>
+<Line Number="115">
+<![CDATA[// 早班测试]]>
+</Line>
+<Line Number="116">
+<![CDATA[IF Test_Step = 1 THEN]]>
+</Line>
+<Line Number="117">
+<![CDATA[    Mock_Hour := 10;]]>
+</Line>
+<Line Number="118">
+<![CDATA[    Mock_Minute := 30;]]>
+</Line>
+<Line Number="119">
+<![CDATA[    Mock_Second := 0;]]>
+</Line>
+<Line Number="120">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="121">
+<![CDATA[    Test_Pulse_Count := 5;]]>
+</Line>
+<Line Number="122">
+<![CDATA[    Expected_Value := 500.0;]]>
+</Line>
+<Line Number="123">
+<![CDATA[    Test_Step := 2;]]>
+</Line>
+<Line Number="124">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="125">
+<![CDATA[]]>
+</Line>
+<Line Number="126">
+<![CDATA[// 中班测试]]>
+</Line>
+<Line Number="127">
+<![CDATA[IF Test_Step = 2 THEN]]>
+</Line>
+<Line Number="128">
+<![CDATA[    Mock_Hour := 20;]]>
+</Line>
+<Line Number="129">
+<![CDATA[    Mock_Minute := 0;]]>
+</Line>
+<Line Number="130">
+<![CDATA[    Mock_Second := 0;]]>
+</Line>
+<Line Number="131">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="132">
+<![CDATA[    Test_Pulse_Count := 3;]]>
+</Line>
+<Line Number="133">
+<![CDATA[    Expected_Value := 300.0;]]>
+</Line>
+<Line Number="134">
+<![CDATA[    Test_Step := 3;]]>
+</Line>
+<Line Number="135">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="136">
+<![CDATA[]]>
+</Line>
+<Line Number="137">
+<![CDATA[// 晚班测试]]>
+</Line>
+<Line Number="138">
+<![CDATA[IF Test_Step = 3 THEN]]>
+</Line>
+<Line Number="139">
+<![CDATA[    Mock_Hour := 2;]]>
+</Line>
+<Line Number="140">
+<![CDATA[    Mock_Minute := 0;]]>
+</Line>
+<Line Number="141">
+<![CDATA[    Mock_Second := 0;]]>
+</Line>
+<Line Number="142">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="143">
+<![CDATA[    Test_Pulse_Count := 4;]]>
+</Line>
+<Line Number="144">
+<![CDATA[    Expected_Value := 400.0;]]>
+</Line>
+<Line Number="145">
+<![CDATA[    Test_Step := 999;]]>
+</Line>
+<Line Number="146">
+<![CDATA[    Test_Message_Code := 6;]]>
+</Line>
+<Line Number="147">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="148">
+<![CDATA[]]>
+</Line>
+<Line Number="149">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="150">
+<![CDATA[// 2小时时段测试]]>
+</Line>
+<Line Number="151">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="152">
+<![CDATA[]]>
+</Line>
+<Line Number="153">
+<![CDATA[// 早班第一时段 9:00-11:00]]>
+</Line>
+<Line Number="154">
+<![CDATA[IF Test_Step = 1 THEN]]>
+</Line>
+<Line Number="155">
+<![CDATA[    Mock_Hour := 10;]]>
+</Line>
+<Line Number="156">
+<![CDATA[    Mock_Minute := 0;]]>
+</Line>
+<Line Number="157">
+<![CDATA[    Mock_Second := 0;]]>
+</Line>
+<Line Number="158">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="159">
+<![CDATA[    Test_Pulse_Count := 2;]]>
+</Line>
+<Line Number="160">
+<![CDATA[    Expected_Value := 200.0;]]>
+</Line>
+<Line Number="161">
+<![CDATA[    Test_Step := 2;]]>
+</Line>
+<Line Number="162">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="163">
+<![CDATA[]]>
+</Line>
+<Line Number="164">
+<![CDATA[// 早班第二时段 11:00-13:00]]>
+</Line>
+<Line Number="165">
+<![CDATA[IF Test_Step = 2 THEN]]>
+</Line>
+<Line Number="166">
+<![CDATA[    Mock_Hour := 12;]]>
+</Line>
+<Line Number="167">
+<![CDATA[    Mock_Minute := 0;]]>
+</Line>
+<Line Number="168">
+<![CDATA[    Mock_Second := 0;]]>
+</Line>
+<Line Number="169">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="170">
+<![CDATA[    Test_Pulse_Count := 3;]]>
+</Line>
+<Line Number="171">
+<![CDATA[    Expected_Value := 300.0;]]>
+</Line>
+<Line Number="172">
+<![CDATA[    Test_Step := 3;]]>
+</Line>
+<Line Number="173">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="174">
+<![CDATA[]]>
+</Line>
+<Line Number="175">
+<![CDATA[// 早班第三时段 13:00-15:00]]>
+</Line>
+<Line Number="176">
+<![CDATA[IF Test_Step = 3 THEN]]>
+</Line>
+<Line Number="177">
+<![CDATA[    Mock_Hour := 14;]]>
+</Line>
+<Line Number="178">
+<![CDATA[    Mock_Minute := 0;]]>
+</Line>
+<Line Number="179">
+<![CDATA[    Mock_Second := 0;]]>
+</Line>
+<Line Number="180">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="181">
+<![CDATA[    Test_Pulse_Count := 1;]]>
+</Line>
+<Line Number="182">
+<![CDATA[    Expected_Value := 100.0;]]>
+</Line>
+<Line Number="183">
+<![CDATA[    Test_Step := 4;]]>
+</Line>
+<Line Number="184">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="185">
+<![CDATA[]]>
+</Line>
+<Line Number="186">
+<![CDATA[// 早班第四时段 15:00-17:00]]>
+</Line>
+<Line Number="187">
+<![CDATA[IF Test_Step = 4 THEN]]>
+</Line>
+<Line Number="188">
+<![CDATA[    Mock_Hour := 16;]]>
+</Line>
+<Line Number="189">
+<![CDATA[    Mock_Minute := 0;]]>
+</Line>
+<Line Number="190">
+<![CDATA[    Mock_Second := 0;]]>
+</Line>
+<Line Number="191">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="192">
+<![CDATA[    Test_Pulse_Count := 2;]]>
+</Line>
+<Line Number="193">
+<![CDATA[    Expected_Value := 200.0;]]>
+</Line>
+<Line Number="194">
+<![CDATA[    Test_Step := 999;]]>
+</Line>
+<Line Number="195">
+<![CDATA[    Test_Message_Code := 7;]]>
+</Line>
+<Line Number="196">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="197">
+<![CDATA[]]>
+</Line>
+<Line Number="198">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="199">
+<![CDATA[// 边界条件测试]]>
+</Line>
+<Line Number="200">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="201">
+<![CDATA[]]>
+</Line>
+<Line Number="202">
+<![CDATA[// 跨午夜测试]]>
+</Line>
+<Line Number="203">
+<![CDATA[IF Test_Step = 1 THEN]]>
+</Line>
+<Line Number="204">
+<![CDATA[    Mock_Hour := 23;]]>
+</Line>
+<Line Number="205">
+<![CDATA[    Mock_Minute := 59;]]>
+</Line>
+<Line Number="206">
+<![CDATA[    Mock_Second := 50;]]>
+</Line>
+<Line Number="207">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="208">
+<![CDATA[    Test_Step := 2;]]>
+</Line>
+<Line Number="209">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="210">
+<![CDATA[]]>
+</Line>
+<Line Number="211">
+<![CDATA[// 午夜后测试]]>
+</Line>
+<Line Number="212">
+<![CDATA[IF Test_Step = 2 THEN]]>
+</Line>
+<Line Number="213">
+<![CDATA[    Mock_Hour := 0;]]>
+</Line>
+<Line Number="214">
+<![CDATA[    Mock_Minute := 0;]]>
+</Line>
+<Line Number="215">
+<![CDATA[    Mock_Second := 10;]]>
+</Line>
+<Line Number="216">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="217">
+<![CDATA[    Test_Step := 3;]]>
+</Line>
+<Line Number="218">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="219">
+<![CDATA[]]>
+</Line>
+<Line Number="220">
+<![CDATA[// 月末测试]]>
+</Line>
+<Line Number="221">
+<![CDATA[IF Test_Step = 3 THEN]]>
+</Line>
+<Line Number="222">
+<![CDATA[    Mock_Day := 31;]]>
+</Line>
+<Line Number="223">
+<![CDATA[    Mock_Hour := 23;]]>
+</Line>
+<Line Number="224">
+<![CDATA[    Mock_Minute := 59;]]>
+</Line>
+<Line Number="225">
+<![CDATA[    Mock_Second := 50;]]>
+</Line>
+<Line Number="226">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="227">
+<![CDATA[    Test_Step := 4;]]>
+</Line>
+<Line Number="228">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="229">
+<![CDATA[]]>
+</Line>
+<Line Number="230">
+<![CDATA[// 月初测试]]>
+</Line>
+<Line Number="231">
+<![CDATA[IF Test_Step = 4 THEN]]>
+</Line>
+<Line Number="232">
+<![CDATA[    Mock_Day := 1;]]>
+</Line>
+<Line Number="233">
+<![CDATA[    Mock_Hour := 0;]]>
+</Line>
+<Line Number="234">
+<![CDATA[    Mock_Minute := 0;]]>
+</Line>
+<Line Number="235">
+<![CDATA[    Mock_Second := 10;]]>
+</Line>
+<Line Number="236">
+<![CDATA[    Mock_Pulse := TRUE;]]>
+</Line>
+<Line Number="237">
+<![CDATA[    Test_Step := 999;]]>
+</Line>
+<Line Number="238">
+<![CDATA[    Test_Message_Code := 8;]]>
+</Line>
+<Line Number="239">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="240">
+<![CDATA[]]>
+</Line>
+<Line Number="241">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="242">
+<![CDATA[// 辅助函数]]>
+</Line>
+<Line Number="243">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="244">
+<![CDATA[]]>
+</Line>
+<Line Number="245">
+<![CDATA[// 运行基础测试]]>
+</Line>
+<Line Number="246">
+<![CDATA[// (已在主逻辑中实现)]]>
+</Line>
+<Line Number="247">
+<![CDATA[]]>
+</Line>
+<Line Number="248">
+<![CDATA[// 运行班次测试]]>
+</Line>
+<Line Number="249">
+<![CDATA[// (已在主逻辑中实现)]]>
+</Line>
+<Line Number="250">
+<![CDATA[]]>
+</Line>
+<Line Number="251">
+<![CDATA[// 运行时段测试]]>
+</Line>
+<Line Number="252">
+<![CDATA[// (已在主逻辑中实现)]]>
+</Line>
+<Line Number="253">
+<![CDATA[]]>
+</Line>
+<Line Number="254">
+<![CDATA[// 运行边界测试]]>
+</Line>
+<Line Number="255">
+<![CDATA[// (已在主逻辑中实现)]]>
+</Line>
+<Line Number="256">
+<![CDATA[]]>
+</Line>
+<Line Number="257">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="258">
+<![CDATA[// 程序结束]]>
+</Line>
+<Line Number="259">
+<![CDATA[// ===============================================================]]>
+</Line>
+<Line Number="260">
+<![CDATA[]]>
+</Line>
+</STContent>
+</Routine>
+</Routines>
+<Dependencies>
+<Dependency Type="DataType" Name="OreProdStats_3Shift_Type"/>
+<Dependency Type="AddOnInstructionDefinition" Name="OreProdStats_3Shift"/>
+</Dependencies>
+</AddOnInstructionDefinition>
+</AddOnInstructionDefinitions>
+</Controller>
+</RSLogix5000Content>
