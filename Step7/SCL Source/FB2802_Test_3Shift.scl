@@ -1,0 +1,132 @@
+FUNCTION_BLOCK FB2802 
+
+ TITLE = 'Test3ShiftYieldCalculation' 
+ // 
+ // 主要用于测试FB2801三班产量计算功能块， 
+ // 模拟实时产量数据输入， 
+ // 显示各班次产量和每两小时产量
+ // 
+ VERSION: '1.0' 
+ AUTHOR: QIAO 
+ NAME:TestProCount
+ FAMILY:QFam
+
+
+ //输入 
+ VAR_INPUT 
+ //模拟累计产量
+ Test_Product_Total:REAL; 
+ //模拟产量增加速率(吨/小时)
+ Test_Product_Rate:REAL:=100.0; 
+ //模拟扫描周期(小时)
+ Test_Scan_Cycle:REAL:=0.01; 
+ //初始化信号（上升沿有效）
+ Test_Initialize:BOOL;
+ END_VAR 
+  
+
+  //输出 
+ VAR_OUTPUT 
+
+//班次产量
+ Product_Shift1:REAL:=0.0;
+ Product_Shift2:REAL:=0.0;
+ Product_Shift3:REAL:=0.0;
+//日/月/年/历史产量
+ Product_Day:REAL:=0.0;
+ Product_Month:REAL:=0.0;
+ Product_Year:REAL:=0.0;
+ Product_LastMonth:REAL:=0.0;
+ Product_Yesterday:REAL:=0.0;
+//班次1每两小时产量
+ Product_Shift1_2H_1:REAL:=0.0;
+ Product_Shift1_2H_2:REAL:=0.0;
+ Product_Shift1_2H_3:REAL:=0.0;
+ Product_Shift1_2H_4:REAL:=0.0;
+//班次2每两小时产量
+ Product_Shift2_2H_1:REAL:=0.0;
+ Product_Shift2_2H_2:REAL:=0.0;
+ Product_Shift2_2H_3:REAL:=0.0;
+ Product_Shift2_2H_4:REAL:=0.0;
+//班次3每两小时产量
+ Product_Shift3_2H_1:REAL:=0.0;
+ Product_Shift3_2H_2:REAL:=0.0;
+ Product_Shift3_2H_3:REAL:=0.0;
+ Product_Shift3_2H_4:REAL:=0.0;
+//初始化完成标志
+ Init_Done:BOOL:=FALSE; 
+ END_VAR 
+
+ // Temporary Variables 
+ VAR_TEMP 
+           Read_Return :INT ; 
+ END_VAR 
+
+ // Static Variables 
+ VAR 
+       //FB2801功能块实例
+      YieldCalc:FB2801; 
+      //模拟累计产量存储
+      Sim_Product_Total:REAL:=0.0; 
+      //初始化上升沿检测
+      Initialize_Prev:BOOL:=FALSE;
+      Initialize_Edge:BOOL:=FALSE;
+ END_VAR 
+
+ //程序逻辑从这里开始 
+
+ //模拟产量数据生成
+ Sim_Product_Total := Sim_Product_Total + Test_Product_Rate * Test_Scan_Cycle;
+
+ //初始化信号上升沿检测
+ Initialize_Edge := Test_Initialize AND NOT Initialize_Prev;
+ Initialize_Prev := Test_Initialize;
+
+ //调用FB2801功能块
+ YieldCalc(
+    Product_Total:=Sim_Product_Total,
+    Initialize:=Initialize_Edge,
+    Shift1_Start:=540,
+    Shift1_End:=1020,
+    Shift2_Start:=1020,
+    Shift2_End:=60,
+    Shift3_Start:=60,
+    Shift3_End:=540
+ );
+
+ //读取输出数据
+ Product_Shift1:=YieldCalc.Product_Shift1;
+ Product_Shift2:=YieldCalc.Product_Shift2;
+ Product_Shift3:=YieldCalc.Product_Shift3;
+ Product_Day:=YieldCalc.Product_Day;
+ Product_Month:=YieldCalc.Product_Month;
+ Product_Year:=YieldCalc.Product_Year;
+ Product_LastMonth:=YieldCalc.Product_LastMonth;
+ Product_Yesterday:=YieldCalc.Product_Yesterday;
+
+ //班次1每两小时产量
+ Product_Shift1_2H_1:=YieldCalc.Product_Shift1_2H_1;
+ Product_Shift1_2H_2:=YieldCalc.Product_Shift1_2H_2;
+ Product_Shift1_2H_3:=YieldCalc.Product_Shift1_2H_3;
+ Product_Shift1_2H_4:=YieldCalc.Product_Shift1_2H_4;
+
+ //班次2每两小时产量
+ Product_Shift2_2H_1:=YieldCalc.Product_Shift2_2H_1;
+ Product_Shift2_2H_2:=YieldCalc.Product_Shift2_2H_2;
+ Product_Shift2_2H_3:=YieldCalc.Product_Shift2_2H_3;
+ Product_Shift2_2H_4:=YieldCalc.Product_Shift2_2H_4;
+
+ //班次3每两小时产量
+ Product_Shift3_2H_1:=YieldCalc.Product_Shift3_2H_1;
+ Product_Shift3_2H_2:=YieldCalc.Product_Shift3_2H_2;
+ Product_Shift3_2H_3:=YieldCalc.Product_Shift3_2H_3;
+ Product_Shift3_2H_4:=YieldCalc.Product_Shift3_2H_4;
+
+ //初始化完成标志
+ Init_Done:=YieldCalc.Init_Done;
+
+ END_FUNCTION_BLOCK
+
+DATA_BLOCK DB2802 FB2802
+ BEGIN
+ END_DATA_BLOCK

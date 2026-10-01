@@ -1,0 +1,766 @@
+FUNCTION_BLOCK FB2801 
+
+TITLE = 'ThreeShiftYieldCalculation' 
+// 
+// 功能块名称：FB2801 三班产量统计功能块
+// 版本：V1.0
+// 作者：QIAO
+// 创建日期：2026-07-16
+// 
+// 功能概述：
+//   本功能块用于根据皮带秤的实时累计产量，自动统计三个班次的产量数据。
+//   支持用户自定义每个班次的开始和结束时间，支持跨午夜的班次配置。
+//   除了统计每个班次的总产量外，还会自动将每个班次划分为4个2小时时段，
+//   分别统计每个时段的产量。同时支持日产量、月产量、年产量的统计。
+// 
+// 适用场景：
+//   - 矿山、工厂等需要按班次统计产量的场所
+//   - 需要实时监控各时段产量的生产管理系统
+//   - 三班倒或多班次交替的生产环境
+// 
+// 核心原理：
+//   通过记录每个班次/时段开始时刻的累计产量值，用当前累计产量减去
+//   开始时刻的累计产量，得到该班次/时段的产量。当到达班次/时段切换点时，
+//   自动更新开始时刻的产量记录值。
+// 
+VERSION: '1.0' 
+AUTHOR: QIAO 
+NAME:ProCount
+FAMILY:QFam
+
+
+// ============================================================
+// 输入参数（VAR_INPUT）
+// ============================================================
+VAR_INPUT 
+    // 实时皮带秤总累计量（单位：吨）
+    // 说明：这是来自现场皮带秤传感器的累计产量值，该值会持续增加。
+    // 格式：REAL类型，正数，精度根据现场传感器而定。
+    Product_Total:REAL; 
+
+    // 初始化信号（上升沿有效）
+    // 说明：当此信号从FALSE变为TRUE时，会重置所有产量统计数据，
+    // 将当前的累计产量作为新的起始值。用于系统重启或手动清零。
+    // 使用方法：在HMI上放置一个按钮，点击后触发一次上升沿即可。
+    Initialize:BOOL;
+
+    // ============================================================
+    // 班次时间配置参数（单位：分钟，范围0-1439）
+    // ============================================================
+    // 说明：一天共有1440分钟（24小时×60分钟）。
+    //       例如：8:00 = 8×60 = 480分钟， 20:00 = 20×60 = 1200分钟
+    // 
+    // 跨午夜配置说明：
+    //   如果班次开始时间大于结束时间（如Start=1020, End=60），
+    //   表示该班次跨午夜，即从当天17:00到第二天01:00。
+    // ============================================================
+
+    // 班次1开始时间（分钟）
+    // 默认值：540（即9:00）
+    Shift1_Start:INT:=540;
+
+    // 班次1结束时间（分钟）
+    // 默认值：1020（即17:00）
+    Shift1_End:INT:=1020;
+
+    // 班次2开始时间（分钟）
+    // 默认值：1020（即17:00）
+    Shift2_Start:INT:=1020;
+
+    // 班次2结束时间（分钟）
+    // 默认值：60（即01:00，跨午夜）
+    Shift2_End:INT:=60;
+
+    // 班次3开始时间（分钟）
+    // 默认值：60（即01:00）
+    Shift3_Start:INT:=60;
+
+    // 班次3结束时间（分钟）
+    // 默认值：540（即09:00）
+    Shift3_End:INT:=540;
+END_VAR 
+
+
+// ============================================================
+// 输出参数（VAR_OUTPUT）
+// ============================================================
+VAR_OUTPUT 
+
+    // ============================================================
+    // 班次产量输出（单位：吨）
+    // ============================================================
+    Product_Shift1:REAL:=0.0;      // 班次1产量（早班）
+    Product_Shift2:REAL:=0.0;      // 班次2产量（中班）
+    Product_Shift3:REAL:=0.0;      // 班次3产量（晚班）
+
+    // ============================================================
+    // 日/月/年产量输出（单位：吨）
+    // ============================================================
+    Product_Day:REAL:=0.0;           // 今日产量
+    Product_Month:REAL:=0.0;         // 本月产量
+    Product_Year:REAL:=0.0;          // 本年产量
+    Product_LastMonth:REAL:=0.0;     // 上月产量（月末冻结）
+    Product_Yesterday:REAL:=0.0;     // 昨日产量（每日冻结）
+
+    // ============================================================
+    // 班次1每两小时产量（单位：吨）
+    // 时段划分：基于班次1开始时间计算
+    //   第一段：Shift1_Start ~ Shift1_Start+120分钟
+    //   第二段：Shift1_Start+120 ~ Shift1_Start+240分钟
+    //   第三段：Shift1_Start+240 ~ Shift1_Start+360分钟
+    //   第四段：Shift1_Start+360 ~ Shift1_End
+    // ============================================================
+    Product_Shift1_2H_1:REAL:=0.0;   // 班次1第一段（前2小时）
+    Product_Shift1_2H_2:REAL:=0.0;   // 班次1第二段（中间2小时）
+    Product_Shift1_2H_3:REAL:=0.0;   // 班次1第三段（中间2小时）
+    Product_Shift1_2H_4:REAL:=0.0;   // 班次1第四段（最后时段）
+
+    // ============================================================
+    // 班次2每两小时产量（单位：吨）
+    // 时段划分：基于班次2开始时间计算
+    // ============================================================
+    Product_Shift2_2H_1:REAL:=0.0;   // 班次2第一段（前2小时）
+    Product_Shift2_2H_2:REAL:=0.0;   // 班次2第二段（中间2小时）
+    Product_Shift2_2H_3:REAL:=0.0;   // 班次2第三段（中间2小时）
+    Product_Shift2_2H_4:REAL:=0.0;   // 班次2第四段（最后时段）
+
+    // ============================================================
+    // 班次3每两小时产量（单位：吨）
+    // 时段划分：基于班次3开始时间计算
+    // ============================================================
+    Product_Shift3_2H_1:REAL:=0.0;   // 班次3第一段（前2小时）
+    Product_Shift3_2H_2:REAL:=0.0;   // 班次3第二段（中间2小时）
+    Product_Shift3_2H_3:REAL:=0.0;   // 班次3第三段（中间2小时）
+    Product_Shift3_2H_4:REAL:=0.0;   // 班次3第四段（最后时段）
+
+    // ============================================================
+    // 状态输出
+    // ============================================================
+    Init_Done:BOOL:=FALSE;           // 初始化完成标志
+                                     // TRUE表示功能块已完成初始化，可以正常工作
+END_VAR 
+
+// ============================================================
+// 临时变量（VAR_TEMP）
+// ============================================================
+// 说明：临时变量在每次扫描周期结束后会被清除，不能保存数据。
+VAR_TEMP 
+    Read_Return:INT;                 // 读取系统时间函数的返回值
+                                     // 0表示读取成功，其他值表示错误
+
+    CurrentTotalMinutes:INT;         // 当前时间的总分钟数（0-1439）
+                                     // 计算方式：小时×60 + 分钟
+                                     // 例如：14:30 = 14×60 + 30 = 870分钟
+
+    LastTotalMinutes:INT;            // 上一次扫描时的总分钟数
+                                     // 用于检测时间是否跨过某个临界点
+END_VAR 
+
+// ============================================================
+// 静态变量（VAR）
+// ============================================================
+// 说明：静态变量在功能块调用期间会保持其值，不会被清除。
+//       用于保存需要跨扫描周期使用的数据。
+VAR 
+    // ============================================================
+    // 系统时间相关变量
+    // ============================================================
+    DateAndTimeNow:DATE_AND_TIME;    // 当前系统日期时间（PLC内部格式）
+
+    // 将日期时间转换为可读的结构体格式
+    // 使用AT关键字将DateAndTimeNow映射为结构体，方便读取年月日时分秒
+    DateAndTimeNowCoporate AT DateAndTimeNow:STRUCT 
+        Year:BYTE;                   // 年份（BCD格式）
+        Month:BYTE;                  // 月份（BCD格式）
+        Day:BYTE;                    // 日期（BCD格式）
+        Hour:BYTE;                   // 小时（BCD格式，0-23）
+        Minute:BYTE;                 // 分钟（BCD格式，0-59）
+        Second:BYTE;                 // 秒（BCD格式，0-59）
+        milliSecond:WORD;            // 毫秒（0-999）
+    END_STRUCT; 
+
+    // 当前时间变量（转换为整数格式，方便计算）
+    YearNow:INT;                     // 当前年份（如2026）
+    MonthNow:INT;                    // 当前月份（1-12）
+    DayNow:INT;                      // 当前日期（1-31）
+    HourNow:INT;                     // 当前小时（0-23）
+    MinuteNow:INT;                   // 当前分钟（0-59）
+    SecondNow:INT;                   // 当前秒（0-59）
+
+    // 上一次扫描的时间变量（用于比较时间变化）
+    HourLast:INT;                    // 上一次扫描的小时
+    MinuteLast:INT;                  // 上一次扫描的分钟
+    SecondLast:INT;                  // 上一次扫描的秒
+    DayLast:INT;                     // 上一次扫描的日期
+    MonthLast:INT;                   // 上一次扫描的月份
+    YearLast:INT;                    // 上一次扫描的年份
+
+    // 备用时间变量（预留，暂未使用）
+    MonthNowFormer:INT; 
+    YearNowFormer:INT; 
+    DayNowFormer:INT; 
+
+    // ============================================================
+    // 产量起始值变量（保存各统计周期开始时的累计产量）
+    // ============================================================
+    // 原理：产量 = 当前累计产量 - 开始时刻的累计产量
+    StartShift1Pro:REAL:=0.0;        // 班次1开始时的累计产量
+    StartShift2Pro:REAL:=0.0;        // 班次2开始时的累计产量
+    StartShift3Pro:REAL:=0.0;        // 班次3开始时的累计产量
+    StartDayClassPro:REAL:=0.0;      // 今日开始时的累计产量
+    StartMonthClassPro:REAL:=0.0;    // 本月开始时的累计产量
+    StartYearClassPro:REAL:=0.0;     // 本年开始时的累计产量
+
+    // ============================================================
+    // 班次1每两小时产量起始值
+    // ============================================================
+    StartShift1_2H_1:REAL:=0.0;      // 班次1第一段开始时的累计产量
+    StartShift1_2H_2:REAL:=0.0;      // 班次1第二段开始时的累计产量
+    StartShift1_2H_3:REAL:=0.0;      // 班次1第三段开始时的累计产量
+    StartShift1_2H_4:REAL:=0.0;      // 班次1第四段开始时的累计产量
+
+    // ============================================================
+    // 班次2每两小时产量起始值
+    // ============================================================
+    StartShift2_2H_1:REAL:=0.0;      // 班次2第一段开始时的累计产量
+    StartShift2_2H_2:REAL:=0.0;      // 班次2第二段开始时的累计产量
+    StartShift2_2H_3:REAL:=0.0;      // 班次2第三段开始时的累计产量
+    StartShift2_2H_4:REAL:=0.0;      // 班次2第四段开始时的累计产量
+
+    // ============================================================
+    // 班次3每两小时产量起始值
+    // ============================================================
+    StartShift3_2H_1:REAL:=0.0;      // 班次3第一段开始时的累计产量
+    StartShift3_2H_2:REAL:=0.0;      // 班次3第二段开始时的累计产量
+    StartShift3_2H_3:REAL:=0.0;      // 班次3第三段开始时的累计产量
+    StartShift3_2H_4:REAL:=0.0;      // 班次3第四段开始时的累计产量
+
+    // ============================================================
+    // 时段标志位（用于控制产量计算）
+    // ============================================================
+    // 说明：当进入某个时段时，对应的标志位为TRUE，此时计算该时段的产量。
+    //       当离开该时段时，标志位变为FALSE，产量值保持不变。
+    Shift1_2H_1_Flag:BOOL:=FALSE;    // 班次1第一段标志位
+    Shift1_2H_2_Flag:BOOL:=FALSE;    // 班次1第二段标志位
+    Shift1_2H_3_Flag:BOOL:=FALSE;    // 班次1第三段标志位
+    Shift1_2H_4_Flag:BOOL:=FALSE;    // 班次1第四段标志位
+
+    Shift2_2H_1_Flag:BOOL:=FALSE;    // 班次2第一段标志位
+    Shift2_2H_2_Flag:BOOL:=FALSE;    // 班次2第二段标志位
+    Shift2_2H_3_Flag:BOOL:=FALSE;    // 班次2第三段标志位
+    Shift2_2H_4_Flag:BOOL:=FALSE;    // 班次2第四段标志位
+
+    Shift3_2H_1_Flag:BOOL:=FALSE;    // 班次3第一段标志位
+    Shift3_2H_2_Flag:BOOL:=FALSE;    // 班次3第二段标志位
+    Shift3_2H_3_Flag:BOOL:=FALSE;    // 班次3第三段标志位
+    Shift3_2H_4_Flag:BOOL:=FALSE;    // 班次3第四段标志位
+
+    // ============================================================
+    // 功能块状态标志位
+    // ============================================================
+    IsFirstScan:BOOL:=TRUE;          // 首次扫描标志
+                                     // TRUE表示功能块第一次运行，需要初始化
+
+    Shift1Flag:BOOL:=FALSE;          // 当前是否在班次1内
+    Shift2Flag:BOOL:=FALSE;          // 当前是否在班次2内
+    Shift3Flag:BOOL:=FALSE;          // 当前是否在班次3内
+
+    DayFlag:BOOL:=FALSE;             // 日切换标志（用于记录昨日产量）
+    MonthFlag:BOOL:=FALSE;           // 月切换标志（用于记录上月产量）
+    YearFlag:BOOL:=FALSE;            // 年切换标志（暂未使用）
+
+    // ============================================================
+    // 历史产量记录
+    // ============================================================
+    LastMonth_Total:REAL:=0.0;       // 上月产量记录
+    Yesterday_Total:REAL:=0.0;       // 昨日产量记录
+
+END_VAR 
+
+// ============================================================
+// 程序主逻辑开始
+// ============================================================
+
+// ------------------------------------------------------------
+// 第一步：获取系统当前时间
+// ------------------------------------------------------------
+// 使用PLC内置函数READ_CLK读取当前日期时间
+Read_Return:=READ_CLK(CDT :=DateAndTimeNow); 
+
+// 将BCD格式转换为整数格式（PLC内部时间为BCD码，需要转换）
+YearNow:=BCD_TO_INT(DateAndTimeNowCoporate.Year); 
+MonthNow:=BCD_TO_INT(DateAndTimeNowCoporate.Month); 
+DayNow:=BCD_TO_INT(DateAndTimeNowCoporate.Day); 
+HourNow:=BCD_TO_INT(DateAndTimeNowCoporate.Hour); 
+MinuteNow:=BCD_TO_INT(DateAndTimeNowCoporate.Minute); 
+SecondNow:=BCD_TO_INT(DateAndTimeNowCoporate.Second); 
+
+// 计算当前时间的总分钟数（便于时间比较）
+// 例如：8:30 = 8×60 + 30 = 510分钟
+CurrentTotalMinutes:=HourNow*60+MinuteNow;
+
+// 计算上一次扫描时的总分钟数
+LastTotalMinutes:=HourLast*60+MinuteLast;
+
+// ------------------------------------------------------------
+// 第二步：首次扫描初始化（只执行一次）
+// ------------------------------------------------------------
+// 当功能块第一次运行时，需要将当前累计产量作为所有统计的起始值
+IF IsFirstScan THEN
+    // 初始化班次产量起始值
+    StartShift1Pro:=Product_Total;
+    StartShift2Pro:=Product_Total;
+    StartShift3Pro:=Product_Total;
+
+    // 初始化日/月/年产量起始值
+    StartDayClassPro:=Product_Total;
+    StartMonthClassPro:=Product_Total;
+    StartYearClassPro:=Product_Total;
+
+    // 初始化班次1每两小时产量起始值
+    StartShift1_2H_1:=Product_Total;
+    StartShift1_2H_2:=Product_Total;
+    StartShift1_2H_3:=Product_Total;
+    StartShift1_2H_4:=Product_Total;
+
+    // 初始化班次2每两小时产量起始值
+    StartShift2_2H_1:=Product_Total;
+    StartShift2_2H_2:=Product_Total;
+    StartShift2_2H_3:=Product_Total;
+    StartShift2_2H_4:=Product_Total;
+
+    // 初始化班次3每两小时产量起始值
+    StartShift3_2H_1:=Product_Total;
+    StartShift3_2H_2:=Product_Total;
+    StartShift3_2H_3:=Product_Total;
+    StartShift3_2H_4:=Product_Total;
+
+    // 保存当前时间作为上一次扫描的时间
+    YearLast:=YearNow;
+    MonthLast:=MonthNow;
+    DayLast:=DayNow;
+    HourLast:=HourNow;
+    MinuteLast:=MinuteNow;
+    SecondLast:=SecondNow;
+
+    // 标记首次扫描完成
+    IsFirstScan:=FALSE;
+    Init_Done:=TRUE;
+END_IF;
+
+// ------------------------------------------------------------
+// 第三步：手动初始化（由用户触发）
+// ------------------------------------------------------------
+// 当Initialize信号为TRUE时，重新初始化所有数据
+// 常用于系统重启、产量清零等场景
+IF Initialize THEN
+    // 重置班次产量起始值
+    StartShift1Pro:=Product_Total;
+    StartShift2Pro:=Product_Total;
+    StartShift3Pro:=Product_Total;
+    StartDayClassPro:=Product_Total;
+    StartMonthClassPro:=Product_Total;
+    StartYearClassPro:=Product_Total;
+
+    // 重置班次1每两小时产量起始值
+    StartShift1_2H_1:=Product_Total;
+    StartShift1_2H_2:=Product_Total;
+    StartShift1_2H_3:=Product_Total;
+    StartShift1_2H_4:=Product_Total;
+
+    // 重置班次2每两小时产量起始值
+    StartShift2_2H_1:=Product_Total;
+    StartShift2_2H_2:=Product_Total;
+    StartShift2_2H_3:=Product_Total;
+    StartShift2_2H_4:=Product_Total;
+
+    // 重置班次3每两小时产量起始值
+    StartShift3_2H_1:=Product_Total;
+    StartShift3_2H_2:=Product_Total;
+    StartShift3_2H_3:=Product_Total;
+    StartShift3_2H_4:=Product_Total;
+
+    // 清零所有产量输出值
+    Product_Shift1:=0.0;
+    Product_Shift2:=0.0;
+    Product_Shift3:=0.0;
+    Product_Day:=0.0;
+    Product_Month:=0.0;
+    Product_Year:=0.0;
+    Product_Shift1_2H_1:=0.0;
+    Product_Shift1_2H_2:=0.0;
+    Product_Shift1_2H_3:=0.0;
+    Product_Shift1_2H_4:=0.0;
+    Product_Shift2_2H_1:=0.0;
+    Product_Shift2_2H_2:=0.0;
+    Product_Shift2_2H_3:=0.0;
+    Product_Shift2_2H_4:=0.0;
+    Product_Shift3_2H_1:=0.0;
+    Product_Shift3_2H_2:=0.0;
+    Product_Shift3_2H_3:=0.0;
+    Product_Shift3_2H_4:=0.0;
+
+    // 标记初始化完成
+    Init_Done:=TRUE;
+END_IF;
+
+// ------------------------------------------------------------
+// 第四步：班次1产量计算
+// ------------------------------------------------------------
+// 判断班次1是否跨午夜（开始时间 < 结束时间表示不跨午夜）
+IF Shift1_Start < Shift1_End THEN
+    // 情况一：班次1不跨午夜（如9:00-17:00）
+
+    // 检测是否到达班次1开始时间
+    // 条件：当前时间正好是开始时间且秒数为0，或者从上一次扫描跨过了开始时间
+    IF (CurrentTotalMinutes = Shift1_Start AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift1_Start AND CurrentTotalMinutes >= Shift1_Start) THEN
+        // 记录当前累计产量作为班次1的起始值
+        StartShift1Pro:=Product_Total;
+        // 同时记录班次1第一段的起始值
+        StartShift1_2H_1:=Product_Total;
+        // 设置标志位，表示当前在班次1内
+        Shift1Flag:=TRUE;
+        Shift1_2H_1_Flag:=TRUE;
+    END_IF;
+
+    // 检测是否到达班次1结束时间
+    IF (CurrentTotalMinutes = Shift1_End AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift1_End AND CurrentTotalMinutes >= Shift1_End) THEN
+        // 清除标志位，表示离开班次1
+        Shift1Flag:=FALSE;
+        Shift1_2H_4_Flag:=FALSE;
+    END_IF;
+
+    // 如果当前在班次1时间范围内，计算班次1产量
+    IF CurrentTotalMinutes >= Shift1_Start AND CurrentTotalMinutes < Shift1_End THEN
+        Product_Shift1:=Product_Total - StartShift1Pro;
+    END_IF;
+
+ELSE
+    // 情况二：班次1跨午夜（如22:00-06:00）
+    // 此时开始时间 > 结束时间，需要特殊处理
+
+    // 检测是否到达班次1开始时间（跨日情况）
+    IF (CurrentTotalMinutes = Shift1_Start AND SecondNow=0) OR 
+       (LastTotalMinutes >= Shift1_Start AND CurrentTotalMinutes < Shift1_End) THEN
+        StartShift1Pro:=Product_Total;
+        StartShift1_2H_1:=Product_Total;
+        Shift1Flag:=TRUE;
+        Shift1_2H_1_Flag:=TRUE;
+    END_IF;
+
+    // 检测是否到达班次1结束时间（跨日情况）
+    IF (CurrentTotalMinutes = Shift1_End AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift1_End AND CurrentTotalMinutes >= Shift1_End) THEN
+        Shift1Flag:=FALSE;
+        Shift1_2H_4_Flag:=FALSE;
+    END_IF;
+
+    // 计算班次1产量（跨午夜的时间范围）
+    IF (CurrentTotalMinutes >= Shift1_Start AND CurrentTotalMinutes < 1440) OR 
+       (CurrentTotalMinutes >= 0 AND CurrentTotalMinutes < Shift1_End) THEN
+        Product_Shift1:=Product_Total - StartShift1Pro;
+    END_IF;
+END_IF;
+
+// ------------------------------------------------------------
+// 第五步：班次1每两小时产量计算
+// ------------------------------------------------------------
+// 说明：每个班次划分为4个2小时时段（共8小时）
+//       时段边界：开始+120分钟、开始+240分钟、开始+360分钟
+
+IF Shift1Flag THEN
+    // 检测是否到达第二段开始时间（班次开始后2小时）
+    IF (CurrentTotalMinutes = Shift1_Start + 120 AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift1_Start + 120 AND CurrentTotalMinutes >= Shift1_Start + 120) THEN
+        Shift1_2H_1_Flag:=FALSE;       // 第一段结束
+        StartShift1_2H_2:=Product_Total; // 记录第二段起始产量
+        Shift1_2H_2_Flag:=TRUE;        // 第二段开始
+    END_IF;
+
+    // 检测是否到达第三段开始时间（班次开始后4小时）
+    IF (CurrentTotalMinutes = Shift1_Start + 240 AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift1_Start + 240 AND CurrentTotalMinutes >= Shift1_Start + 240) THEN
+        Shift1_2H_2_Flag:=FALSE;       // 第二段结束
+        StartShift1_2H_3:=Product_Total; // 记录第三段起始产量
+        Shift1_2H_3_Flag:=TRUE;        // 第三段开始
+    END_IF;
+
+    // 检测是否到达第四段开始时间（班次开始后6小时）
+    IF (CurrentTotalMinutes = Shift1_Start + 360 AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift1_Start + 360 AND CurrentTotalMinutes >= Shift1_Start + 360) THEN
+        Shift1_2H_3_Flag:=FALSE;       // 第三段结束
+        StartShift1_2H_4:=Product_Total; // 记录第四段起始产量
+        Shift1_2H_4_Flag:=TRUE;        // 第四段开始
+    END_IF;
+END_IF;
+
+// 根据标志位计算各时段产量
+IF Shift1_2H_1_Flag THEN
+    Product_Shift1_2H_1:=Product_Total - StartShift1_2H_1;
+END_IF;
+IF Shift1_2H_2_Flag THEN
+    Product_Shift1_2H_2:=Product_Total - StartShift1_2H_2;
+END_IF;
+IF Shift1_2H_3_Flag THEN
+    Product_Shift1_2H_3:=Product_Total - StartShift1_2H_3;
+END_IF;
+IF Shift1_2H_4_Flag THEN
+    Product_Shift1_2H_4:=Product_Total - StartShift1_2H_4;
+END_IF;
+
+// ------------------------------------------------------------
+// 第六步：班次2产量计算
+// ------------------------------------------------------------
+// 逻辑与班次1相同，只是时间参数不同
+IF Shift2_Start < Shift2_End THEN
+    // 不跨午夜
+    IF (CurrentTotalMinutes = Shift2_Start AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift2_Start AND CurrentTotalMinutes >= Shift2_Start) THEN
+        StartShift2Pro:=Product_Total;
+        StartShift2_2H_1:=Product_Total;
+        Shift2Flag:=TRUE;
+        Shift2_2H_1_Flag:=TRUE;
+    END_IF;
+
+    IF (CurrentTotalMinutes = Shift2_End AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift2_End AND CurrentTotalMinutes >= Shift2_End) THEN
+        Shift2Flag:=FALSE;
+        Shift2_2H_4_Flag:=FALSE;
+    END_IF;
+
+    IF CurrentTotalMinutes >= Shift2_Start AND CurrentTotalMinutes < Shift2_End THEN
+        Product_Shift2:=Product_Total - StartShift2Pro;
+    END_IF;
+
+ELSE
+    // 跨午夜（默认配置：17:00-01:00）
+    IF (CurrentTotalMinutes = Shift2_Start AND SecondNow=0) OR 
+       (LastTotalMinutes >= Shift2_Start AND CurrentTotalMinutes < Shift2_End) THEN
+        StartShift2Pro:=Product_Total;
+        StartShift2_2H_1:=Product_Total;
+        Shift2Flag:=TRUE;
+        Shift2_2H_1_Flag:=TRUE;
+    END_IF;
+
+    IF (CurrentTotalMinutes = Shift2_End AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift2_End AND CurrentTotalMinutes >= Shift2_End) THEN
+        Shift2Flag:=FALSE;
+        Shift2_2H_4_Flag:=FALSE;
+    END_IF;
+
+    IF (CurrentTotalMinutes >= Shift2_Start AND CurrentTotalMinutes < 1440) OR 
+       (CurrentTotalMinutes >= 0 AND CurrentTotalMinutes < Shift2_End) THEN
+        Product_Shift2:=Product_Total - StartShift2Pro;
+    END_IF;
+END_IF;
+
+// ------------------------------------------------------------
+// 第七步：班次2每两小时产量计算
+// ------------------------------------------------------------
+IF Shift2Flag THEN
+    IF (CurrentTotalMinutes = Shift2_Start + 120 AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift2_Start + 120 AND CurrentTotalMinutes >= Shift2_Start + 120) THEN
+        Shift2_2H_1_Flag:=FALSE;
+        StartShift2_2H_2:=Product_Total;
+        Shift2_2H_2_Flag:=TRUE;
+    END_IF;
+
+    IF (CurrentTotalMinutes = Shift2_Start + 240 AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift2_Start + 240 AND CurrentTotalMinutes >= Shift2_Start + 240) THEN
+        Shift2_2H_2_Flag:=FALSE;
+        StartShift2_2H_3:=Product_Total;
+        Shift2_2H_3_Flag:=TRUE;
+    END_IF;
+
+    IF (CurrentTotalMinutes = Shift2_Start + 360 AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift2_Start + 360 AND CurrentTotalMinutes >= Shift2_Start + 360) THEN
+        Shift2_2H_3_Flag:=FALSE;
+        StartShift2_2H_4:=Product_Total;
+        Shift2_2H_4_Flag:=TRUE;
+    END_IF;
+END_IF;
+
+IF Shift2_2H_1_Flag THEN
+    Product_Shift2_2H_1:=Product_Total - StartShift2_2H_1;
+END_IF;
+IF Shift2_2H_2_Flag THEN
+    Product_Shift2_2H_2:=Product_Total - StartShift2_2H_2;
+END_IF;
+IF Shift2_2H_3_Flag THEN
+    Product_Shift2_2H_3:=Product_Total - StartShift2_2H_3;
+END_IF;
+IF Shift2_2H_4_Flag THEN
+    Product_Shift2_2H_4:=Product_Total - StartShift2_2H_4;
+END_IF;
+
+// ------------------------------------------------------------
+// 第八步：班次3产量计算
+// ------------------------------------------------------------
+IF Shift3_Start < Shift3_End THEN
+    // 不跨午夜（默认配置：01:00-09:00）
+    IF (CurrentTotalMinutes = Shift3_Start AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift3_Start AND CurrentTotalMinutes >= Shift3_Start) THEN
+        StartShift3Pro:=Product_Total;
+        StartShift3_2H_1:=Product_Total;
+        Shift3Flag:=TRUE;
+        Shift3_2H_1_Flag:=TRUE;
+    END_IF;
+
+    IF (CurrentTotalMinutes = Shift3_End AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift3_End AND CurrentTotalMinutes >= Shift3_End) THEN
+        Shift3Flag:=FALSE;
+        Shift3_2H_4_Flag:=FALSE;
+    END_IF;
+
+    IF CurrentTotalMinutes >= Shift3_Start AND CurrentTotalMinutes < Shift3_End THEN
+        Product_Shift3:=Product_Total - StartShift3Pro;
+    END_IF;
+
+ELSE
+    // 跨午夜
+    IF (CurrentTotalMinutes = Shift3_Start AND SecondNow=0) OR 
+       (LastTotalMinutes >= Shift3_Start AND CurrentTotalMinutes < Shift3_End) THEN
+        StartShift3Pro:=Product_Total;
+        StartShift3_2H_1:=Product_Total;
+        Shift3Flag:=TRUE;
+        Shift3_2H_1_Flag:=TRUE;
+    END_IF;
+
+    IF (CurrentTotalMinutes = Shift3_End AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift3_End AND CurrentTotalMinutes >= Shift3_End) THEN
+        Shift3Flag:=FALSE;
+        Shift3_2H_4_Flag:=FALSE;
+    END_IF;
+
+    IF (CurrentTotalMinutes >= Shift3_Start AND CurrentTotalMinutes < 1440) OR 
+       (CurrentTotalMinutes >= 0 AND CurrentTotalMinutes < Shift3_End) THEN
+        Product_Shift3:=Product_Total - StartShift3Pro;
+    END_IF;
+END_IF;
+
+// ------------------------------------------------------------
+// 第九步：班次3每两小时产量计算
+// ------------------------------------------------------------
+IF Shift3Flag THEN
+    IF (CurrentTotalMinutes = Shift3_Start + 120 AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift3_Start + 120 AND CurrentTotalMinutes >= Shift3_Start + 120) THEN
+        Shift3_2H_1_Flag:=FALSE;
+        StartShift3_2H_2:=Product_Total;
+        Shift3_2H_2_Flag:=TRUE;
+    END_IF;
+
+    IF (CurrentTotalMinutes = Shift3_Start + 240 AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift3_Start + 240 AND CurrentTotalMinutes >= Shift3_Start + 240) THEN
+        Shift3_2H_2_Flag:=FALSE;
+        StartShift3_2H_3:=Product_Total;
+        Shift3_2H_3_Flag:=TRUE;
+    END_IF;
+
+    IF (CurrentTotalMinutes = Shift3_Start + 360 AND SecondNow=0) OR 
+       (LastTotalMinutes < Shift3_Start + 360 AND CurrentTotalMinutes >= Shift3_Start + 360) THEN
+        Shift3_2H_3_Flag:=FALSE;
+        StartShift3_2H_4:=Product_Total;
+        Shift3_2H_4_Flag:=TRUE;
+    END_IF;
+END_IF;
+
+IF Shift3_2H_1_Flag THEN
+    Product_Shift3_2H_1:=Product_Total - StartShift3_2H_1;
+END_IF;
+IF Shift3_2H_2_Flag THEN
+    Product_Shift3_2H_2:=Product_Total - StartShift3_2H_2;
+END_IF;
+IF Shift3_2H_3_Flag THEN
+    Product_Shift3_2H_3:=Product_Total - StartShift3_2H_3;
+END_IF;
+IF Shift3_2H_4_Flag THEN
+    Product_Shift3_2H_4:=Product_Total - StartShift3_2H_4;
+END_IF;
+
+// ------------------------------------------------------------
+// 第十步：日产量计算
+// ------------------------------------------------------------
+// 说明：日产量以班次3结束时间为基准（默认09:00）
+//       当到达班次3结束时间时，视为新的一天开始
+
+// 检测是否到达日切换时间（班次3结束时间）
+IF (CurrentTotalMinutes = Shift3_End AND SecondNow=0) OR 
+   (LastTotalMinutes < Shift3_End AND CurrentTotalMinutes >= Shift3_End) THEN
+    // 记录当前累计产量作为新一天的起始值
+    StartDayClassPro:=Product_Total;
+    // 设置日切换标志，用于记录昨日产量
+    DayFlag:=TRUE;
+END_IF;
+
+// 计算今日产量
+Product_Day:=Product_Total - StartDayClassPro;
+
+// 如果发生了日切换，记录昨日产量
+IF DayFlag THEN
+    Yesterday_Total := Product_Day;
+    Product_Yesterday := Yesterday_Total;
+    DayFlag := FALSE;
+END_IF;
+
+// ------------------------------------------------------------
+// 第十一步：月产量计算
+// ------------------------------------------------------------
+// 说明：月产量以每月1日的班次3结束时间为基准
+
+// 检测是否到达月切换时间（每月1日，且时间>=班次3结束时间）
+IF (DayNow=1 AND CurrentTotalMinutes >= Shift3_End) AND 
+   (DayLast>1 OR (DayLast=1 AND LastTotalMinutes < Shift3_End)) THEN
+    // 记录当前累计产量作为新月份的起始值
+    StartMonthClassPro:=Product_Total;
+    MonthFlag:=TRUE;
+END_IF;
+
+// 计算本月产量
+Product_Month:=Product_Total - StartMonthClassPro;
+
+// 如果发生了月切换，记录上月产量
+IF MonthFlag THEN
+    LastMonth_Total := Product_Month;
+    Product_LastMonth := LastMonth_Total;
+    MonthFlag := FALSE;
+END_IF;
+
+// ------------------------------------------------------------
+// 第十二步：年产量计算
+// ------------------------------------------------------------
+// 说明：年产量以每年1月1日的班次3结束时间为基准
+
+// 检测是否到达年切换时间（1月1日，且时间>=班次3结束时间）
+IF (MonthNow=1 AND DayNow=1 AND CurrentTotalMinutes >= Shift3_End) AND 
+   ((MonthLast>1) OR (MonthLast=1 AND DayLast>1) OR (MonthLast=1 AND DayLast=1 AND LastTotalMinutes < Shift3_End)) THEN
+    // 记录当前累计产量作为新年份的起始值
+    StartYearClassPro:=Product_Total;
+    YearFlag:=TRUE;
+END_IF;
+
+// 计算本年产量
+Product_Year:=Product_Total - StartYearClassPro;
+
+// ------------------------------------------------------------
+// 第十三步：保存当前时间（供下一次扫描使用）
+// ------------------------------------------------------------
+// 将当前时间保存为"上一次扫描时间"，用于下次比较
+YearLast:=YearNow;
+MonthLast:=MonthNow;
+DayLast:=DayNow;
+HourLast:=HourNow;
+MinuteLast:=MinuteNow;
+SecondLast:=SecondNow;
+
+END_FUNCTION_BLOCK
+
+// ============================================================
+// 数据块定义
+// ============================================================
+// 说明：FB2801需要一个对应的背景数据块来存储运行时数据
+//       在Step7中创建数据块DB2801，类型选择FB2801即可
+DATA_BLOCK DB2801 FB2801
+BEGIN
+END_DATA_BLOCK

@@ -1,0 +1,158 @@
+FUNCTION_BLOCK StateControl
+VAR
+    // 状态变量
+    状态_初始 : BOOL := TRUE;  // 初始状态
+    状态_1 : BOOL := FALSE;    // 程序1
+    状态_2 : BOOL := FALSE;    // 程序2
+    状态_3 : BOOL := FALSE;    // 程序3
+    状态_4 : BOOL := FALSE;    // 程序4
+    状态_5 : BOOL := FALSE;    // 程序5
+    状态_6 : BOOL := FALSE;    // 程序6
+    状态_7 : BOOL := FALSE;    // 程序7
+    状态_8 : BOOL := FALSE;    // 程序8
+    状态_9 : BOOL := FALSE;    // 程序9
+    状态_10 : BOOL := FALSE;   // 程序10
+    状态_11 : BOOL := FALSE;   // 程序11
+    状态_12 : BOOL := FALSE;   // 程序12
+    状态_13 : BOOL := FALSE;   // 程序13
+    
+    // 输出变量
+    转阀 : BOOL := FALSE;      // 转阀
+    主阀 : BOOL := FALSE;      // 主阀
+    电机1 : BOOL := FALSE;     // 电机1
+    扭结电磁阀 : BOOL := FALSE; // 扭结电磁阀
+    
+    // 计时器变量
+    计时器1 : TON;
+    计时器1启动 : BOOL := FALSE;
+    计时器1完成 : BOOL := FALSE;
+END_VAR
+
+BEGIN
+    // 初始状态转换
+    IF 状态_初始 AND I0.7 THEN
+        状态_初始 := FALSE;
+        状态_1 := TRUE;
+    END_IF;
+    
+    IF 状态_初始 AND I1.6 THEN
+        状态_初始 := FALSE;
+        状态_2 := TRUE;
+    END_IF;
+    
+    // 程序1：当I0.5导通，进入程序3
+    IF 状态_1 AND I0.5 THEN
+        状态_1 := FALSE;
+        状态_3 := TRUE;
+    END_IF;
+    
+    // 程序3: 转阀启动，当I0.6通时，进入程序4
+    IF 状态_3 THEN
+        转阀 := TRUE;
+    END_IF;
+    
+    IF 状态_3 AND I0.6 THEN
+        状态_3 := FALSE;
+        状态_4 := TRUE;
+    END_IF;
+    
+    // 程序2：I0.0、I0.1、I0.6同时接通，进入程序4
+    IF 状态_2 AND I0.0 AND I0.1 AND I0.6 THEN
+        状态_2 := FALSE;
+        状态_4 := TRUE;
+    END_IF;
+    
+    // 程序4：主阀启动，当I0.2导通时，进入程序5
+    IF 状态_4 THEN
+        主阀 := TRUE;
+    END_IF;
+    
+    IF 状态_4 AND I0.2 THEN
+        状态_4 := FALSE;
+        状态_5 := TRUE;
+    END_IF;
+    
+    // 程序5：转阀停止，进入程序6
+    IF 状态_5 THEN
+        转阀 := FALSE;
+        状态_5 := FALSE;
+        状态_6 := TRUE;
+    END_IF;
+    
+    // 程序6：同时进入程序7和程序8
+    IF 状态_6 THEN
+        状态_6 := FALSE;
+        状态_7 := TRUE;
+        状态_8 := TRUE;
+    END_IF;
+    
+    // 程序7：当I1.4断开时，电机1启动，计时1秒后，电机1停止，断开程序7
+    IF 状态_7 AND NOT I1.4 AND NOT 计时器1启动 THEN
+        电机1 := TRUE;
+        计时器1启动 := TRUE;
+    END_IF;
+    
+    // 计时器控制
+    IF 计时器1启动 THEN
+        计时器1(IN := TRUE, PT := T#1S);
+        IF 计时器1.Q THEN
+            电机1 := FALSE;
+            计时器1启动 := FALSE;
+            计时器1(IN := FALSE);
+            状态_7 := FALSE;
+        END_IF;
+    END_IF;
+    
+    // 程序7：当I1.4导通时，断开程序7
+    IF 状态_7 AND I1.4 THEN
+        状态_7 := FALSE;
+    END_IF;
+    
+    // 程序8：当I0.5导通时，进入程序9
+    IF 状态_8 AND I0.5 THEN
+        状态_8 := FALSE;
+        状态_9 := TRUE;
+    END_IF;
+    
+    // 程序9：主阀停止，当I0.1导通时，进入程序10
+    IF 状态_9 THEN
+        主阀 := FALSE;
+    END_IF;
+    
+    IF 状态_9 AND I0.1 THEN
+        状态_9 := FALSE;
+        状态_10 := TRUE;
+    END_IF;
+    
+    // 程序10：当I1.4断开时，进入初始状态
+    IF 状态_10 AND NOT I1.4 THEN
+        状态_10 := FALSE;
+        状态_初始 := TRUE;
+    END_IF;
+    
+    // 程序10：当I1.4导通时，进入程序11
+    IF 状态_10 AND I1.4 THEN
+        状态_10 := FALSE;
+        状态_11 := TRUE;
+    END_IF;
+    
+    // 程序11：当I1.2导通时，扭结电磁阀启动，进入程序12
+    IF 状态_11 AND I1.2 THEN
+        扭结电磁阀 := TRUE;
+        状态_11 := FALSE;
+        状态_12 := TRUE;
+    END_IF;
+    
+    // 程序12：当I1.3导通时，扭结电磁阀停止，进入程序13
+    IF 状态_12 AND I1.3 THEN
+        扭结电磁阀 := FALSE;
+        状态_12 := FALSE;
+        状态_13 := TRUE;
+    END_IF;
+    
+    // 程序13：当I1.2导通时，进入初始状态
+    IF 状态_13 AND I1.2 THEN
+        状态_13 := FALSE;
+        状态_初始 := TRUE;
+    END_IF;
+END_FUNCTION_BLOCK; 

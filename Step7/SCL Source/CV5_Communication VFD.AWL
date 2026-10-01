@@ -1,0 +1,108 @@
+FUNCTION "Communication with Drive" : VOID
+TITLE =
+VERSION : 0.1
+
+
+VAR_TEMP
+  Ret_V : INT ;	
+END_VAR
+BEGIN
+NETWORK
+TITLE =CV05 MainMotor  infeed
+
+      L     DB2.DBW    0; 
+      T     PQW  512; 
+      L     PIW  512; 
+      T     DB2.DBW    2; 
+NETWORK
+TITLE =CV05 MainMotor  Driver1  motor1
+
+      L     DB2.DBW    4; 
+      T     PQW  652; 
+//    L     "CV05MainMotor".Driver1_Send_setpoint
+//     T     PQW  654
+      L     "CV05MainMotor".Driver1_Send_setpoint; 
+      T     PQW  654; 
+      L     PID  652; 
+      T     DB2.DBD    8; 
+      L     PID  656; 
+      T     DB2.DBD   12; 
+
+
+      L     PID  660; 
+      T     DB2.DBD   16; 
+
+
+
+NETWORK
+TITLE =临时改动   Motor2 为主 变回1号后删除此段
+
+      L     DB2.DBD   20; 
+      T     PQD  640; 
+
+
+      L     PID  640; 
+      T     DB2.DBD   24; 
+      L     PID  644; 
+      T     DB2.DBD   28; 
+      L     PID  648; 
+      T     DB2.DBD   32; 
+
+NETWORK
+TITLE =CV05 MainMotor  Driver2  motor2
+
+      L     DB10.DBW    0; 
+      T     PQW  526; 
+
+      L     PIW  526; 
+      T     DB10.DBW    2; 
+
+
+
+NETWORK
+TITLE =CV05 Motor3 infeed
+
+      L     DB10.DBW    4; 
+      T     PQW  708; 
+      L     "CV05_Motor_3".Driver1_Send_setpoint; 
+      T     PQW  710; 
+      L     PID  708; 
+      T     DB10.DBD    8; 
+      L     PID  712; 
+      T     DB10.DBD   12; 
+      L     PID  716; 
+      T     DB10.DBD   16; 
+
+NETWORK
+TITLE =CV05 Motor3 Driver
+
+
+
+
+NETWORK
+TITLE =
+
+
+
+NETWORK
+TITLE =
+
+
+
+NETWORK
+TITLE =
+
+
+
+NETWORK
+TITLE =
+
+
+
+NETWORK
+TITLE =
+
+
+
+END_FUNCTION
+

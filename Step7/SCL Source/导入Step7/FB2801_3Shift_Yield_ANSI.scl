@@ -1,0 +1,511 @@
+FUNCTION_BLOCK FB2801 
+
+ TITLE = 'ThreeShiftYieldCalculation' 
+ // 
+ // 主要用于计算三班产量， 
+ // 班次时间可配置，支持跨午夜班次
+ // 增加早班、中班、晚班每两小时的产量计算
+ // 
+ VERSION: '1.0' 
+ AUTHOR: QIAO 
+ NAME:ProCount
+ FAMILY:QFam
+
+
+ //输入 
+ VAR_INPUT 
+ //实时皮带秤总累计量 
+ Product_Total:REAL; 
+ //初始化信号（上升沿有效）
+ Initialize:BOOL;
+ //班次1开始时间（分钟，0-1439）
+ Shift1_Start:INT:=540;
+ //班次1结束时间（分钟，0-1439）
+ Shift1_End:INT:=1020;
+ //班次2开始时间（分钟，0-1439）
+ Shift2_Start:INT:=1020;
+ //班次2结束时间（分钟，0-1439）
+ Shift2_End:INT:=60;
+ //班次3开始时间（分钟，0-1439）
+ Shift3_Start:INT:=60;
+ //班次3结束时间（分钟，0-1439）
+ Shift3_End:INT:=540;
+ END_VAR 
+  
+
+  //输出 
+ VAR_OUTPUT 
+
+Product_Shift1:REAL:=0.0;      //班次1产量
+Product_Shift2:REAL:=0.0;    //班次2产量
+Product_Shift3:REAL:=0.0;     //班次3产量
+Product_Day:REAL:=0.0;           //日产量 
+Product_Month:REAL:=0.0;        //月产量 
+Product_Year:REAL:=0.0;        //年产量 
+Product_LastMonth:REAL:=0.0;  //上月产量
+Product_Yesterday:REAL:=0.0; //昨天产量
+//班次1每两小时产量
+ Product_Shift1_2H_1:REAL:=0.0;      //班次1第一段
+ Product_Shift1_2H_2:REAL:=0.0;      //班次1第二段
+ Product_Shift1_2H_3:REAL:=0.0;      //班次1第三段
+ Product_Shift1_2H_4:REAL:=0.0;      //班次1第四段
+ //班次2每两小时产量
+ Product_Shift2_2H_1:REAL:=0.0;     //班次2第一段
+ Product_Shift2_2H_2:REAL:=0.0;     //班次2第二段  
+ Product_Shift2_2H_3:REAL:=0.0;     //班次2第三段
+ Product_Shift2_2H_4:REAL:=0.0;     //班次2第四段
+ //班次3每两小时产量
+ Product_Shift3_2H_1:REAL:=0.0;      //班次3第一段
+ Product_Shift3_2H_2:REAL:=0.0;      //班次3第二段
+ Product_Shift3_2H_3:REAL:=0.0;      //班次3第三段
+ Product_Shift3_2H_4:REAL:=0.0;      //班次3第四段
+ //初始化完成标志
+ Init_Done:BOOL:=FALSE; 
+ END_VAR 
+
+ // Temporary Variables 
+ VAR_TEMP 
+           Read_Return :INT ; 
+           CurrentTotalMinutes:INT;
+           LastTotalMinutes:INT;
+ END_VAR 
+
+ // Static Variables 
+ VAR 
+       //当前时间 
+      DateAndTimeNow:DATE_AND_TIME; 
+      //时间结构体 
+      DateAndTimeNowCoporate AT DateAndTimeNow:STRUCT 
+      Year:BYTE; 
+      Month:BYTE; 
+      Day:BYTE; 
+      Hour:BYTE; 
+      Minute:BYTE; 
+      Second:BYTE; 
+      milliSecond:WORD; 
+ END_STRUCT; 
+     //存储当前时间变量 
+      YearNow:INT; 
+      MonthNow:INT; 
+      DayNow:INT; 
+      HourNow:INT; 
+      MinuteNow:INT; 
+      SecondNow:INT; 
+      //存储上一次扫描的时间变量
+      HourLast:INT; 
+      MinuteLast:INT; 
+      SecondLast:INT; 
+      DayLast:INT; 
+      MonthLast:INT; 
+      YearLast:INT; 
+      //月、年时间一次存储变量 
+      MonthNowFormer:INT; 
+      YearNowFormer:INT; 
+      DayNowFormer:INT; 
+
+      //开班、日、月、年时间的产量 
+      StartShift1Pro:REAL:=0.0; 
+      StartShift2Pro:REAL:=0.0; 
+      StartShift3Pro:REAL:=0.0; 
+      StartDayClassPro:REAL:=0.0; 
+      StartMonthClassPro:REAL:=0.0; 
+      StartYearClassPro:REAL:=0.0; 
+      //班次1每两小时产量起始值
+      StartShift1_2H_1:REAL:=0.0;
+      StartShift1_2H_2:REAL:=0.0;
+      StartShift1_2H_3:REAL:=0.0;
+      StartShift1_2H_4:REAL:=0.0;
+      //班次2每两小时产量起始值
+      StartShift2_2H_1:REAL:=0.0;
+      StartShift2_2H_2:REAL:=0.0;
+      StartShift2_2H_3:REAL:=0.0;
+      StartShift2_2H_4:REAL:=0.0;
+      //班次3每两小时产量起始值
+      StartShift3_2H_1:REAL:=0.0;
+      StartShift3_2H_2:REAL:=0.0;
+      StartShift3_2H_3:REAL:=0.0;
+      StartShift3_2H_4:REAL:=0.0;
+      //班次1每两小时产量标志位
+      Shift1_2H_1_Flag:BOOL:=FALSE;
+      Shift1_2H_2_Flag:BOOL:=FALSE;
+      Shift1_2H_3_Flag:BOOL:=FALSE;
+      Shift1_2H_4_Flag:BOOL:=FALSE;
+      //班次2每两小时产量标志位
+      Shift2_2H_1_Flag:BOOL:=FALSE;
+      Shift2_2H_2_Flag:BOOL:=FALSE;
+      Shift2_2H_3_Flag:BOOL:=FALSE;
+      Shift2_2H_4_Flag:BOOL:=FALSE;
+      //班次3每两小时产量标志位
+      Shift3_2H_1_Flag:BOOL:=FALSE;
+      Shift3_2H_2_Flag:BOOL:=FALSE;
+      Shift3_2H_3_Flag:BOOL:=FALSE;
+      Shift3_2H_4_Flag:BOOL:=FALSE;
+      
+      //首次扫描标志
+      IsFirstScan:BOOL:=TRUE;
+      //班别标志
+      Shift1Flag:BOOL:=FALSE;
+      Shift2Flag:BOOL:=FALSE;
+      Shift3Flag:BOOL:=FALSE;
+      //产量计算标志
+      DayFlag:BOOL:=FALSE;
+      MonthFlag:BOOL:=FALSE;
+      YearFlag:BOOL:=FALSE;
+      //上月产量记录
+      LastMonth_Total:REAL:=0.0;
+      //昨天产量记录
+      Yesterday_Total:REAL:=0.0;
+
+ END_VAR 
+
+ //程序逻辑从这里开始 
+ //获取系统时间 
+ Read_Return:=READ_CLK(CDT :=DateAndTimeNow ); 
+ YearNow:=BCD_TO_INT(DateAndTimeNowCoporate.Year); 
+ MonthNow:=BCD_TO_INT(DateAndTimeNowCoporate.Month); 
+ DayNow:=BCD_TO_INT(DateAndTimeNowCoporate.Day); 
+ HourNow:=BCD_TO_INT(DateAndTimeNowCoporate.Hour); 
+ MinuteNow:=BCD_TO_INT(DateAndTimeNowCoporate.Minute); 
+ SecondNow:=BCD_TO_INT(DateAndTimeNowCoporate.Second); 
+
+ //计算当前时间总分钟数
+ CurrentTotalMinutes:=HourNow*60+MinuteNow;
+ //计算上次扫描时间总分钟数
+ LastTotalMinutes:=HourLast*60+MinuteLast;
+
+ // 首次扫描初始化
+ IF IsFirstScan THEN
+     StartShift1Pro:=Product_Total;
+     StartShift2Pro:=Product_Total;
+     StartShift3Pro:=Product_Total;
+     StartDayClassPro:=Product_Total;
+     StartMonthClassPro:=Product_Total;
+     StartYearClassPro:=Product_Total;
+     StartShift1_2H_1:=Product_Total;
+     StartShift1_2H_2:=Product_Total;
+     StartShift1_2H_3:=Product_Total;
+     StartShift1_2H_4:=Product_Total;
+     StartShift2_2H_1:=Product_Total;
+     StartShift2_2H_2:=Product_Total;
+     StartShift2_2H_3:=Product_Total;
+     StartShift2_2H_4:=Product_Total;
+     StartShift3_2H_1:=Product_Total;
+     StartShift3_2H_2:=Product_Total;
+     StartShift3_2H_3:=Product_Total;
+     StartShift3_2H_4:=Product_Total;
+     YearLast:=YearNow;
+     MonthLast:=MonthNow;
+     DayLast:=DayNow;
+     HourLast:=HourNow;
+     MinuteLast:=MinuteNow;
+     SecondLast:=SecondNow;
+     IsFirstScan:=FALSE;
+     Init_Done:=TRUE;
+ END_IF;
+
+ // 初始化信号处理
+ IF Initialize THEN
+     StartShift1Pro:=Product_Total;
+     StartShift2Pro:=Product_Total;
+     StartShift3Pro:=Product_Total;
+     StartDayClassPro:=Product_Total;
+     StartMonthClassPro:=Product_Total;
+     StartYearClassPro:=Product_Total;
+     StartShift1_2H_1:=Product_Total;
+     StartShift1_2H_2:=Product_Total;
+     StartShift1_2H_3:=Product_Total;
+     StartShift1_2H_4:=Product_Total;
+     StartShift2_2H_1:=Product_Total;
+     StartShift2_2H_2:=Product_Total;
+     StartShift2_2H_3:=Product_Total;
+     StartShift2_2H_4:=Product_Total;
+     StartShift3_2H_1:=Product_Total;
+     StartShift3_2H_2:=Product_Total;
+     StartShift3_2H_3:=Product_Total;
+     StartShift3_2H_4:=Product_Total;
+     Product_Shift1:=0.0;
+     Product_Shift2:=0.0;
+     Product_Shift3:=0.0;
+     Product_Day:=0.0;
+     Product_Month:=0.0;
+     Product_Year:=0.0;
+     Product_Shift1_2H_1:=0.0;
+     Product_Shift1_2H_2:=0.0;
+     Product_Shift1_2H_3:=0.0;
+     Product_Shift1_2H_4:=0.0;
+     Product_Shift2_2H_1:=0.0;
+     Product_Shift2_2H_2:=0.0;
+     Product_Shift2_2H_3:=0.0;
+     Product_Shift2_2H_4:=0.0;
+     Product_Shift3_2H_1:=0.0;
+     Product_Shift3_2H_2:=0.0;
+     Product_Shift3_2H_3:=0.0;
+     Product_Shift3_2H_4:=0.0;
+     Init_Done:=TRUE;
+ END_IF;
+
+ // 班次1产量计算
+ IF Shift1_Start < Shift1_End THEN
+     IF (CurrentTotalMinutes = Shift1_Start AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift1_Start AND CurrentTotalMinutes >= Shift1_Start) THEN
+         StartShift1Pro:=Product_Total;
+         StartShift1_2H_1:=Product_Total;
+         Shift1Flag:=TRUE;
+         Shift1_2H_1_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift1_End AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift1_End AND CurrentTotalMinutes >= Shift1_End) THEN
+         Shift1Flag:=FALSE;
+         Shift1_2H_4_Flag:=FALSE;
+     END_IF;
+     IF CurrentTotalMinutes >= Shift1_Start AND CurrentTotalMinutes < Shift1_End THEN
+        Product_Shift1:=Product_Total - StartShift1Pro;
+     END_IF;
+ ELSE
+     IF (CurrentTotalMinutes = Shift1_Start AND SecondNow=0) OR 
+        (LastTotalMinutes >= Shift1_Start AND CurrentTotalMinutes < Shift1_End) THEN
+         StartShift1Pro:=Product_Total;
+         StartShift1_2H_1:=Product_Total;
+         Shift1Flag:=TRUE;
+         Shift1_2H_1_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift1_End AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift1_End AND CurrentTotalMinutes >= Shift1_End) THEN
+         Shift1Flag:=FALSE;
+         Shift1_2H_4_Flag:=FALSE;
+     END_IF;
+     IF (CurrentTotalMinutes >= Shift1_Start AND CurrentTotalMinutes < 1440) OR 
+        (CurrentTotalMinutes >= 0 AND CurrentTotalMinutes < Shift1_End) THEN
+        Product_Shift1:=Product_Total - StartShift1Pro;
+     END_IF;
+ END_IF;
+
+ // 班次1每两小时产量计算
+ IF Shift1Flag THEN
+     IF (CurrentTotalMinutes = Shift1_Start + 120 AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift1_Start + 120 AND CurrentTotalMinutes >= Shift1_Start + 120) THEN
+         Shift1_2H_1_Flag:=FALSE;
+         StartShift1_2H_2:=Product_Total;
+         Shift1_2H_2_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift1_Start + 240 AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift1_Start + 240 AND CurrentTotalMinutes >= Shift1_Start + 240) THEN
+         Shift1_2H_2_Flag:=FALSE;
+         StartShift1_2H_3:=Product_Total;
+         Shift1_2H_3_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift1_Start + 360 AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift1_Start + 360 AND CurrentTotalMinutes >= Shift1_Start + 360) THEN
+         Shift1_2H_3_Flag:=FALSE;
+         StartShift1_2H_4:=Product_Total;
+         Shift1_2H_4_Flag:=TRUE;
+     END_IF;
+ END_IF;
+
+ IF Shift1_2H_1_Flag THEN
+    Product_Shift1_2H_1:=Product_Total - StartShift1_2H_1;
+ END_IF;
+ IF Shift1_2H_2_Flag THEN
+    Product_Shift1_2H_2:=Product_Total - StartShift1_2H_2;
+ END_IF;
+ IF Shift1_2H_3_Flag THEN
+    Product_Shift1_2H_3:=Product_Total - StartShift1_2H_3;
+ END_IF;
+ IF Shift1_2H_4_Flag THEN
+    Product_Shift1_2H_4:=Product_Total - StartShift1_2H_4;
+ END_IF;
+
+ // 班次2产量计算
+ IF Shift2_Start < Shift2_End THEN
+     IF (CurrentTotalMinutes = Shift2_Start AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift2_Start AND CurrentTotalMinutes >= Shift2_Start) THEN
+         StartShift2Pro:=Product_Total;
+         StartShift2_2H_1:=Product_Total;
+         Shift2Flag:=TRUE;
+         Shift2_2H_1_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift2_End AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift2_End AND CurrentTotalMinutes >= Shift2_End) THEN
+         Shift2Flag:=FALSE;
+         Shift2_2H_4_Flag:=FALSE;
+     END_IF;
+     IF CurrentTotalMinutes >= Shift2_Start AND CurrentTotalMinutes < Shift2_End THEN
+        Product_Shift2:=Product_Total - StartShift2Pro;
+     END_IF;
+ ELSE
+     IF (CurrentTotalMinutes = Shift2_Start AND SecondNow=0) OR 
+        (LastTotalMinutes >= Shift2_Start AND CurrentTotalMinutes < Shift2_End) THEN
+         StartShift2Pro:=Product_Total;
+         StartShift2_2H_1:=Product_Total;
+         Shift2Flag:=TRUE;
+         Shift2_2H_1_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift2_End AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift2_End AND CurrentTotalMinutes >= Shift2_End) THEN
+         Shift2Flag:=FALSE;
+         Shift2_2H_4_Flag:=FALSE;
+     END_IF;
+     IF (CurrentTotalMinutes >= Shift2_Start AND CurrentTotalMinutes < 1440) OR 
+        (CurrentTotalMinutes >= 0 AND CurrentTotalMinutes < Shift2_End) THEN
+        Product_Shift2:=Product_Total - StartShift2Pro;
+     END_IF;
+ END_IF;
+
+ // 班次2每两小时产量计算
+ IF Shift2Flag THEN
+     IF (CurrentTotalMinutes = Shift2_Start + 120 AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift2_Start + 120 AND CurrentTotalMinutes >= Shift2_Start + 120) THEN
+         Shift2_2H_1_Flag:=FALSE;
+         StartShift2_2H_2:=Product_Total;
+         Shift2_2H_2_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift2_Start + 240 AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift2_Start + 240 AND CurrentTotalMinutes >= Shift2_Start + 240) THEN
+         Shift2_2H_2_Flag:=FALSE;
+         StartShift2_2H_3:=Product_Total;
+         Shift2_2H_3_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift2_Start + 360 AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift2_Start + 360 AND CurrentTotalMinutes >= Shift2_Start + 360) THEN
+         Shift2_2H_3_Flag:=FALSE;
+         StartShift2_2H_4:=Product_Total;
+         Shift2_2H_4_Flag:=TRUE;
+     END_IF;
+ END_IF;
+
+ IF Shift2_2H_1_Flag THEN
+    Product_Shift2_2H_1:=Product_Total - StartShift2_2H_1;
+ END_IF;
+ IF Shift2_2H_2_Flag THEN
+    Product_Shift2_2H_2:=Product_Total - StartShift2_2H_2;
+ END_IF;
+ IF Shift2_2H_3_Flag THEN
+    Product_Shift2_2H_3:=Product_Total - StartShift2_2H_3;
+ END_IF;
+ IF Shift2_2H_4_Flag THEN
+    Product_Shift2_2H_4:=Product_Total - StartShift2_2H_4;
+ END_IF;
+
+ // 班次3产量计算
+ IF Shift3_Start < Shift3_End THEN
+     IF (CurrentTotalMinutes = Shift3_Start AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift3_Start AND CurrentTotalMinutes >= Shift3_Start) THEN
+         StartShift3Pro:=Product_Total;
+         StartShift3_2H_1:=Product_Total;
+         Shift3Flag:=TRUE;
+         Shift3_2H_1_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift3_End AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift3_End AND CurrentTotalMinutes >= Shift3_End) THEN
+         Shift3Flag:=FALSE;
+         Shift3_2H_4_Flag:=FALSE;
+     END_IF;
+     IF CurrentTotalMinutes >= Shift3_Start AND CurrentTotalMinutes < Shift3_End THEN
+        Product_Shift3:=Product_Total - StartShift3Pro;
+     END_IF;
+ ELSE
+     IF (CurrentTotalMinutes = Shift3_Start AND SecondNow=0) OR 
+        (LastTotalMinutes >= Shift3_Start AND CurrentTotalMinutes < Shift3_End) THEN
+         StartShift3Pro:=Product_Total;
+         StartShift3_2H_1:=Product_Total;
+         Shift3Flag:=TRUE;
+         Shift3_2H_1_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift3_End AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift3_End AND CurrentTotalMinutes >= Shift3_End) THEN
+         Shift3Flag:=FALSE;
+         Shift3_2H_4_Flag:=FALSE;
+     END_IF;
+     IF (CurrentTotalMinutes >= Shift3_Start AND CurrentTotalMinutes < 1440) OR 
+        (CurrentTotalMinutes >= 0 AND CurrentTotalMinutes < Shift3_End) THEN
+        Product_Shift3:=Product_Total - StartShift3Pro;
+     END_IF;
+ END_IF;
+
+ // 班次3每两小时产量计算
+ IF Shift3Flag THEN
+     IF (CurrentTotalMinutes = Shift3_Start + 120 AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift3_Start + 120 AND CurrentTotalMinutes >= Shift3_Start + 120) THEN
+         Shift3_2H_1_Flag:=FALSE;
+         StartShift3_2H_2:=Product_Total;
+         Shift3_2H_2_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift3_Start + 240 AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift3_Start + 240 AND CurrentTotalMinutes >= Shift3_Start + 240) THEN
+         Shift3_2H_2_Flag:=FALSE;
+         StartShift3_2H_3:=Product_Total;
+         Shift3_2H_3_Flag:=TRUE;
+     END_IF;
+     IF (CurrentTotalMinutes = Shift3_Start + 360 AND SecondNow=0) OR 
+        (LastTotalMinutes < Shift3_Start + 360 AND CurrentTotalMinutes >= Shift3_Start + 360) THEN
+         Shift3_2H_3_Flag:=FALSE;
+         StartShift3_2H_4:=Product_Total;
+         Shift3_2H_4_Flag:=TRUE;
+     END_IF;
+ END_IF;
+
+ IF Shift3_2H_1_Flag THEN
+    Product_Shift3_2H_1:=Product_Total - StartShift3_2H_1;
+ END_IF;
+ IF Shift3_2H_2_Flag THEN
+    Product_Shift3_2H_2:=Product_Total - StartShift3_2H_2;
+ END_IF;
+ IF Shift3_2H_3_Flag THEN
+    Product_Shift3_2H_3:=Product_Total - StartShift3_2H_3;
+ END_IF;
+ IF Shift3_2H_4_Flag THEN
+    Product_Shift3_2H_4:=Product_Total - StartShift3_2H_4;
+ END_IF;
+
+ // 日产量计算
+ IF (CurrentTotalMinutes = Shift3_End AND SecondNow=0) OR 
+    (LastTotalMinutes < Shift3_End AND CurrentTotalMinutes >= Shift3_End) THEN
+     StartDayClassPro:=Product_Total;
+     DayFlag:=TRUE;
+ END_IF;
+
+ Product_Day:=Product_Total - StartDayClassPro;
+
+ IF DayFlag THEN
+    Yesterday_Total := Product_Day;
+    Product_Yesterday := Yesterday_Total;
+    DayFlag := FALSE;
+ END_IF;
+
+ // 月产量计算
+ IF (DayNow=1 AND CurrentTotalMinutes >= Shift3_End) AND 
+    (DayLast>1 OR (DayLast=1 AND LastTotalMinutes < Shift3_End)) THEN
+     StartMonthClassPro:=Product_Total;
+     MonthFlag:=TRUE;
+ END_IF;
+
+ Product_Month:=Product_Total - StartMonthClassPro;
+
+ IF MonthFlag THEN
+    LastMonth_Total := Product_Month;
+    Product_LastMonth := LastMonth_Total;
+    MonthFlag := FALSE;
+ END_IF;
+    
+ // 年产量计算
+ IF (MonthNow=1 AND DayNow=1 AND CurrentTotalMinutes >= Shift3_End) AND 
+    ((MonthLast>1) OR (MonthLast=1 AND DayLast>1) OR (MonthLast=1 AND DayLast=1 AND LastTotalMinutes < Shift3_End)) THEN
+     StartYearClassPro:=Product_Total;
+     YearFlag:=TRUE;
+ END_IF;
+
+ Product_Year:=Product_Total - StartYearClassPro;
+
+ // 保存当前时间作为下一次扫描的上一次时间
+ YearLast:=YearNow;
+ MonthLast:=MonthNow;
+ DayLast:=DayNow;
+ HourLast:=HourNow;
+ MinuteLast:=MinuteNow;
+ SecondLast:=SecondNow;
+
+ END_FUNCTION_BLOCK
+
+DATA_BLOCK DB2801 FB2801
+ BEGIN
+ END_DATA_BLOCK

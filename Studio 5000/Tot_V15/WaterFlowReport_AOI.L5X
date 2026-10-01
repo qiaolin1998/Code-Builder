@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="36.00" TargetName="WaterFlowReport" TargetType="AddOnInstructionDefinition" TargetRevision="1.0 " TargetLastEdited="2026-09-14T00:00:00.000Z" ContainsContext="true" ExportDate="Sun Sep 14 00:00:00 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
+<Controller Use="Context" Name="WaterFlowReport">
+<DataTypes Use="Context">
+<DataType Name="WaterFlowReport_Type" Family="NoFamily" Class="User">
+<Members>
+<Member Name="ZZZZZZZZZZWaterFlowReport0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="Clear" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZWaterFlowReport0" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[清除]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_D_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[当天实时累计量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_M_RT" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[当月实时累计量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_D" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[日总累计量]]>
+</Description>
+</Member>
+<Member Name="Out_Tot_M" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[月总累计量]]>
+</Description>
+</Member>
+</Members>
+</DataType>
+</DataTypes>
+<AddOnInstructionDefinitions Use="Context">
+<AddOnInstructionDefinition Use="Target" Name="WaterFlowReport" Revision="1.0" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2026-09-14T00:00:00.000Z" CreatedBy="Cursor" EditedDate="2026-09-14T00:00:00.000Z" EditedBy="ZBOOKFURY\meqia" SoftwareRevision="v36.00">
+<Parameters>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[使能输入]]>
+</Description>
+</Parameter>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[使能输出]]>
+</Description>
+</Parameter>
+<Parameter Name="In_Tot" TagType="Base" DataType="REAL" Usage="Input" Radix="Float" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[流量计总累计量(由 FlowRateTot 等累计 AOI 输出)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Run" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[运行信号]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Year" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[年]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Month" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[月]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Day" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[日]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[时]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="None">
+<Description>
+<![CDATA[分]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Second" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="None">
+<Description>
+<![CDATA[秒]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Day_Time_Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[天切换小时(报表日界点,默认8)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[8]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="8"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="In_Day_Time_Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[天切换分钟(默认0)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_D_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[当天实时累计量(当天切换时刻到当前的总累计差值)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_M_RT" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[当月实时累计量(当月1号到当前的总累计差值)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_D" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[日总累计量(每日切换时刻更新一次,保存上一日累计)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="Out_Tot_M" TagType="Base" DataType="REAL" Usage="Output" Radix="Float" Required="false" Visible="false" ExternalAccess="Read Only">
+<Description>
+<![CDATA[月总累计量(每月1号切换时刻更新一次,保存上一月累计)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</Parameter>
+<Parameter Name="HMI_CMD" TagType="Base" DataType="WaterFlowReport_Type" Usage="InOut" Required="true" Visible="true" Constant="false">
+<Description>
+<![CDATA[HMI命令与数据]]>
+</Description>
+</Parameter>
+</Parameters>
+<LocalTags>
+<LocalTag Name="Last_Tot_D" DataType="REAL" Radix="Float" ExternalAccess="None">
+<Description>
+<![CDATA[上次天切换时刻的总累计基准值]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Last_Tot_M" DataType="REAL" Radix="Float" ExternalAccess="None">
+<Description>
+<![CDATA[上次月切换时刻的总累计基准值]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0.00000000e+000]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Is_Leap_Year" DataType="BOOL" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Days_In_Month" DataType="DINT" Radix="Decimal" ExternalAccess="None">
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Day_Rollover_Done" DataType="BOOL" Radix="Decimal" ExternalAccess="None">
+<Description>
+<![CDATA[天切换已完成标志(防止同秒重复切换)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+<LocalTag Name="Month_Rollover_Done" DataType="BOOL" Radix="Decimal" ExternalAccess="None">
+<Description>
+<![CDATA[月切换已完成标志(防止同秒重复切换)]]>
+</Description>
+<DefaultData Format="L5K">
+<![CDATA[0]]>
+</DefaultData>
+<DefaultData Format="Decorated">
+<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
+</DefaultData>
+</LocalTag>
+</LocalTags>
+<Routines>
+<Routine Name="Logic" Type="ST">
+<STContent>
+<Line Number="0">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="1">
+<![CDATA[// AOI 名称: WaterFlowReport (流量报表计算)]]>
+</Line>
+<Line Number="2">
+<![CDATA[// 版本: 1.0]]>
+</Line>
+<Line Number="3">
+<![CDATA[// 编程语言: Structured Text (ST)]]>
+</Line>
+<Line Number="4">
+<![CDATA[// 适用平台: Studio 5000 (ControlLogix/CompactLogix)]]>
+</Line>
+<Line Number="5">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="6">
+<![CDATA[// 功能概述:]]>
+</Line>
+<Line Number="7">
+<![CDATA[//   本 AOI 不直接累加瞬时流量,而是基于流量计已有的总累计量(In_Tot)]]>
+</Line>
+<Line Number="8">
+<![CDATA[//   通过"差值法"计算报表所需的周期累计数据,适用于报表显示与能耗统计。]]>
+</Line>
+<Line Number="9">
+<![CDATA[//]]>
+</Line>
+<Line Number="10">
+<![CDATA[// 核心算法 - 差值法:]]>
+</Line>
+<Line Number="11">
+<![CDATA[//   周期累计量 = 当前总累计量(In_Tot) - 上次切换时刻总累计基准值(Last_Tot)]]>
+</Line>
+<Line Number="12">
+<![CDATA[//]]>
+</Line>
+<Line Number="13">
+<![CDATA[// 输入依赖:]]>
+</Line>
+<Line Number="14">
+<![CDATA[//   In_Tot  ← 来自 FlowRateTot 等累计 AOI 的 Out_Tot 输出]]>
+</Line>
+<Line Number="15">
+<![CDATA[//   Year/Month/Day/Hour/Minute/Second ← 来自控制系统时钟(GSV或WallClockTime)]]>
+</Line>
+<Line Number="16">
+<![CDATA[//]]>
+</Line>
+<Line Number="17">
+<![CDATA[// 输出报表数据:]]>
+</Line>
+<Line Number="18">
+<![CDATA[//   Out_Tot_D_RT  - 当天实时累计量(当天切换时刻到当前,实时刷新)]]>
+</Line>
+<Line Number="19">
+<![CDATA[//   Out_Tot_M_RT  - 当月实时累计量(当月1号切换时刻到当前,实时刷新)]]>
+</Line>
+<Line Number="20">
+<![CDATA[//   Out_Tot_D     - 日总累计量(每日切换时刻更新一次,保存上一日累计)]]>
+</Line>
+<Line Number="21">
+<![CDATA[//   Out_Tot_M     - 月总累计量(每月1号切换时刻更新一次,保存上一月累计)]]>
+</Line>
+<Line Number="22">
+<![CDATA[//]]>
+</Line>
+<Line Number="23">
+<![CDATA[// 切换时刻定义:]]>
+</Line>
+<Line Number="24">
+<![CDATA[//   天切换: 每日 In_Day_Time_Hour:In_Day_Time_Minute (默认8:00)]]>
+</Line>
+<Line Number="25">
+<![CDATA[//           表示当天8点到次日8点为一个"报表日"]]>
+</Line>
+<Line Number="26">
+<![CDATA[//   月切换: 每月1号 00:00:00 (自然月分界)]]>
+</Line>
+<Line Number="27">
+<![CDATA[//]]>
+</Line>
+<Line Number="28">
+<![CDATA[// 防抖机制:]]>
+</Line>
+<Line Number="29">
+<![CDATA[//   AOI 每个扫描周期执行一次,在切换时刻的同一秒内可能执行多次]]>
+</Line>
+<Line Number="30">
+<![CDATA[//   通过 Day_Rollover_Done / Month_Rollover_Done 标志位防止重复切换]]>
+</Line>
+<Line Number="31">
+<![CDATA[//   离开切换时刻后标志自动复位,为下次切换做准备]]>
+</Line>
+<Line Number="32">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="33">
+<![CDATA[]]>
+</Line>
+<Line Number="34">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="35">
+<![CDATA[// 功能段 1: 当天实时累计量与日总累计量]]>
+</Line>
+<Line Number="36">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="37">
+<![CDATA[// 说明:]]>
+</Line>
+<Line Number="38">
+<![CDATA[//   - 实时累计: 每个扫描周期都更新,反映"当前时刻距上次切换的累计差值"]]>
+</Line>
+<Line Number="39">
+<![CDATA[//   - 日总累计: 仅在切换瞬间(每日8:00:00)更新一次,作为历史报表数据]]>
+</Line>
+<Line Number="40">
+<![CDATA[//   - 切换时刻: In_Day_Time_Hour:In_Day_Time_Minute (默认8:00)]]>
+</Line>
+<Line Number="41">
+<![CDATA[//   - 基准变量: Last_Tot_D 记录上次天切换时刻的总累计值,初始为0]]>
+</Line>
+<Line Number="42">
+<![CDATA[//   - 防抖标志: Day_Rollover_Done,防止同秒多次扫描重复切换]]>
+</Line>
+<Line Number="43">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="44">
+<![CDATA[]]>
+</Line>
+<Line Number="45">
+<![CDATA[// 实时计算当天累计差值: 当前总累计 - 上次切换时刻总累计基准]]>
+</Line>
+<Line Number="46">
+<![CDATA[// 说明: 此语句每个扫描周期都执行,使 HMI 显示当天累计量实时增长]]>
+</Line>
+<Line Number="47">
+<![CDATA[Out_Tot_D_RT := In_Tot - Last_Tot_D;]]>
+</Line>
+<Line Number="48">
+<![CDATA[]]>
+</Line>
+<Line Number="49">
+<![CDATA[// 检测天切换时刻: 时间到达切换点 + 当前秒为0或1 + 本次切换尚未执行]]>
+</Line>
+<Line Number="50">
+<![CDATA[//   - Second <= 1: 给扫描周期留出2秒容错窗口,防止因扫描抖动错过切换点]]>
+</Line>
+<Line Number="51">
+<![CDATA[//   - NOT Day_Rollover_Done: 确保同一切换窗口内只执行一次切换动作]]>
+</Line>
+<Line Number="52">
+<![CDATA[IF (Hour = In_Day_Time_Hour) AND (Minute = In_Day_Time_Minute) AND (Second <= 1) AND (NOT Day_Rollover_Done) THEN]]>
+</Line>
+<Line Number="53">
+<![CDATA[    // 步骤1: 将切换瞬间的累计差值保存到日总累计量(报表用)]]>
+</Line>
+<Line Number="54">
+<![CDATA[    Out_Tot_D := In_Tot - Last_Tot_D;]]>
+</Line>
+<Line Number="55">
+<![CDATA[    // 步骤2: 更新基准值为当前总累计,作为下一日的计算起点]]>
+</Line>
+<Line Number="56">
+<![CDATA[    Last_Tot_D := In_Tot;]]>
+</Line>
+<Line Number="57">
+<![CDATA[    // 步骤3: 复位实时累计量,下一周期开始重新累计]]>
+</Line>
+<Line Number="58">
+<![CDATA[    Out_Tot_D_RT := 0.0;]]>
+</Line>
+<Line Number="59">
+<![CDATA[    // 步骤4: 置位完成标志,阻止本秒内后续扫描重复切换]]>
+</Line>
+<Line Number="60">
+<![CDATA[    Day_Rollover_Done := 1;]]>
+</Line>
+<Line Number="61">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="62">
+<![CDATA[]]>
+</Line>
+<Line Number="63">
+<![CDATA[// 离开切换时刻后复位标志,为下一次切换做准备]]>
+</Line>
+<Line Number="64">
+<![CDATA[//   只要时间不在切换点上(小时或分钟不匹配),就清零完成标志]]>
+</Line>
+<Line Number="65">
+<![CDATA[//   这样下次到达切换点时又能正常触发]]>
+</Line>
+<Line Number="66">
+<![CDATA[IF (Hour <> In_Day_Time_Hour) OR (Minute <> In_Day_Time_Minute) THEN]]>
+</Line>
+<Line Number="67">
+<![CDATA[    Day_Rollover_Done := 0;]]>
+</Line>
+<Line Number="68">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="69">
+<![CDATA[]]>
+</Line>
+<Line Number="70">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="71">
+<![CDATA[// 功能段 2: 当月实时累计量与月总累计量]]>
+</Line>
+<Line Number="72">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="73">
+<![CDATA[// 说明:]]>
+</Line>
+<Line Number="74">
+<![CDATA[//   - 实时累计: 每个扫描周期更新,反映"当前时刻距上月1号的累计差值"]]>
+</Line>
+<Line Number="75">
+<![CDATA[//   - 月总累计: 仅在每月1号00:00:00切换瞬间更新一次,作为月报表数据]]>
+</Line>
+<Line Number="76">
+<![CDATA[//   - 切换时刻: 每月1号 00:00:00 (自然月分界)]]>
+</Line>
+<Line Number="77">
+<![CDATA[//   - 基准变量: Last_Tot_M 记录上次月切换时刻的总累计值]]>
+</Line>
+<Line Number="78">
+<![CDATA[//   - 防抖标志: Month_Rollover_Done,防止同秒多次扫描重复切换]]>
+</Line>
+<Line Number="79">
+<![CDATA[//   - 闰年判断: 用于2月天数计算,虽然不直接决定切换逻辑,]]>
+</Line>
+<Line Number="80">
+<![CDATA[//               但 Days_In_Month 用于有效性检查(Day范围合法)]]>
+</Line>
+<Line Number="81">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="82">
+<![CDATA[]]>
+</Line>
+<Line Number="83">
+<![CDATA[// 闰年判断: 能被4整除且不能被100整除,或者能被400整除]]>
+</Line>
+<Line Number="84">
+<![CDATA[Is_Leap_Year := (Year MOD 4 = 0) AND (Year MOD 100 <> 0) OR (Year MOD 400 = 0);]]>
+</Line>
+<Line Number="85">
+<![CDATA[]]>
+</Line>
+<Line Number="86">
+<![CDATA[// 根据月份获取当月天数(用于有效性检查)]]>
+</Line>
+<Line Number="87">
+<![CDATA[CASE Month OF]]>
+</Line>
+<Line Number="88">
+<![CDATA[    1, 3, 5, 7, 8, 10, 12: Days_In_Month := 31;]]>
+</Line>
+<Line Number="89">
+<![CDATA[    4, 6, 9, 11: Days_In_Month := 30;]]>
+</Line>
+<Line Number="90">
+<![CDATA[    2:]]>
+</Line>
+<Line Number="91">
+<![CDATA[        // 闰年2月29天,平年2月28天]]>
+</Line>
+<Line Number="92">
+<![CDATA[        IF Is_Leap_Year THEN]]>
+</Line>
+<Line Number="93">
+<![CDATA[            Days_In_Month := 29;]]>
+</Line>
+<Line Number="94">
+<![CDATA[        ELSE]]>
+</Line>
+<Line Number="95">
+<![CDATA[            Days_In_Month := 28;]]>
+</Line>
+<Line Number="96">
+<![CDATA[        END_IF;]]>
+</Line>
+<Line Number="97">
+<![CDATA[END_CASE;]]>
+</Line>
+<Line Number="98">
+<![CDATA[]]>
+</Line>
+<Line Number="99">
+<![CDATA[// 实时计算当月累计差值: 仅当 Day 在合法范围内时输出]]>
+</Line>
+<Line Number="100">
+<![CDATA[// 说明: 当前总累计 - 上次月切换时刻总累计基准]]>
+</Line>
+<Line Number="101">
+<![CDATA[IF (Day >= 1) AND (Day <= Days_In_Month) THEN]]>
+</Line>
+<Line Number="102">
+<![CDATA[    Out_Tot_M_RT := In_Tot - Last_Tot_M;]]>
+</Line>
+<Line Number="103">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="104">
+<![CDATA[]]>
+</Line>
+<Line Number="105">
+<![CDATA[// 检测月切换时刻: 每月1号00:00:00 + 当前秒为0或1 + 本次切换尚未执行]]>
+</Line>
+<Line Number="106">
+<![CDATA[//   - Day = 1:    必须1号(自然月起始)]]>
+</Line>
+<Line Number="107">
+<![CDATA[//   - Hour = 0:   0点(自然日起始)]]>
+</Line>
+<Line Number="108">
+<![CDATA[//   - Minute = 0: 0分(精确到分)]]>
+</Line>
+<Line Number="109">
+<![CDATA[//   - Second <= 1: 给扫描周期留2秒容错窗口]]>
+</Line>
+<Line Number="110">
+<![CDATA[//   - NOT Month_Rollover_Done: 防止同一秒内重复切换]]>
+</Line>
+<Line Number="111">
+<![CDATA[IF (Day = 1) AND (Hour = 0) AND (Minute = 0) AND (Second <= 1) AND (NOT Month_Rollover_Done) THEN]]>
+</Line>
+<Line Number="112">
+<![CDATA[    // 步骤1: 将切换瞬间的累计差值保存到月总累计量(报表用)]]>
+</Line>
+<Line Number="113">
+<![CDATA[    Out_Tot_M := In_Tot - Last_Tot_M;]]>
+</Line>
+<Line Number="114">
+<![CDATA[    // 步骤2: 更新基准值为当前总累计,作为下个月的计算起点]]>
+</Line>
+<Line Number="115">
+<![CDATA[    Last_Tot_M := In_Tot;]]>
+</Line>
+<Line Number="116">
+<![CDATA[    // 步骤3: 复位实时累计量,下月从0开始重新累计]]>
+</Line>
+<Line Number="117">
+<![CDATA[    Out_Tot_M_RT := 0.0;]]>
+</Line>
+<Line Number="118">
+<![CDATA[    // 步骤4: 置位完成标志,阻止本秒内后续扫描重复切换]]>
+</Line>
+<Line Number="119">
+<![CDATA[    Month_Rollover_Done := 1;]]>
+</Line>
+<Line Number="120">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="121">
+<![CDATA[]]>
+</Line>
+<Line Number="122">
+<![CDATA[// 离开月切换时刻后复位标志,为下一次切换做准备]]>
+</Line>
+<Line Number="123">
+<![CDATA[//   只要时间不在切换点上(非1号0点),就清零完成标志]]>
+</Line>
+<Line Number="124">
+<![CDATA[IF NOT ((Day = 1) AND (Hour = 0) AND (Minute = 0)) THEN]]>
+</Line>
+<Line Number="125">
+<![CDATA[    Month_Rollover_Done := 0;]]>
+</Line>
+<Line Number="126">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="127">
+<![CDATA[]]>
+</Line>
+<Line Number="128">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="129">
+<![CDATA[// 功能段 3: HMI 命令处理(清零)]]>
+</Line>
+<Line Number="130">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="131">
+<![CDATA[// 说明:]]>
+</Line>
+<Line Number="132">
+<![CDATA[//   当操作员通过 HMI 触发 Clear 命令时,将所有报表数据清零]]>
+</Line>
+<Line Number="133">
+<![CDATA[//   清零策略: 将基准值重设为当前总累计量,使后续差值从0开始]]>
+</Line>
+<Line Number="134">
+<![CDATA[//   注意: 不影响 FlowRateTot 等上游 AOI 的累计工作]]>
+</Line>
+<Line Number="135">
+<![CDATA[//   注意: HMI_CMD.Clear 需要在 HMI 上设为触发型按钮(瞬时置位)]]>
+</Line>
+<Line Number="136">
+<![CDATA[//         AOI 处理完会自动复位 Clear 位,等待下次触发]]>
+</Line>
+<Line Number="137">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="138">
+<![CDATA[]]>
+</Line>
+<Line Number="139">
+<![CDATA[IF HMI_CMD.Clear THEN]]>
+</Line>
+<Line Number="140">
+<![CDATA[    // 重置基准值: 以当前总累计为新基准,使差值从0开始]]>
+</Line>
+<Line Number="141">
+<![CDATA[    Last_Tot_D := In_Tot;]]>
+</Line>
+<Line Number="142">
+<![CDATA[    Last_Tot_M := In_Tot;]]>
+</Line>
+<Line Number="143">
+<![CDATA[    // 清零历史报表数据]]>
+</Line>
+<Line Number="144">
+<![CDATA[    Out_Tot_D := 0;]]>
+</Line>
+<Line Number="145">
+<![CDATA[    Out_Tot_M := 0;]]>
+</Line>
+<Line Number="146">
+<![CDATA[    // 清零实时累计数据]]>
+</Line>
+<Line Number="147">
+<![CDATA[    Out_Tot_D_RT := 0;]]>
+</Line>
+<Line Number="148">
+<![CDATA[    Out_Tot_M_RT := 0;]]>
+</Line>
+<Line Number="149">
+<![CDATA[    // 复位防抖标志,允许下次切换正常触发]]>
+</Line>
+<Line Number="150">
+<![CDATA[    Day_Rollover_Done := 0;]]>
+</Line>
+<Line Number="151">
+<![CDATA[    Month_Rollover_Done := 0;]]>
+</Line>
+<Line Number="152">
+<![CDATA[    // 自动复位 Clear 命令位,等待下一次 HMI 触发]]>
+</Line>
+<Line Number="153">
+<![CDATA[    HMI_CMD.Clear := 0;]]>
+</Line>
+<Line Number="154">
+<![CDATA[END_IF;]]>
+</Line>
+<Line Number="155">
+<![CDATA[]]>
+</Line>
+<Line Number="156">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="157">
+<![CDATA[// 功能段 4: HMI 数据同步]]>
+</Line>
+<Line Number="158">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="159">
+<![CDATA[// 说明:]]>
+</Line>
+<Line Number="160">
+<![CDATA[//   将 Output 参数同步到 HMI_CMD 结构体(InOut参数)中]]>
+</Line>
+<Line Number="161">
+<![CDATA[//   原因: HMI 通常通过一个 Tag 读取数据,InOut 结构体便于集中访问]]>
+</Line>
+<Line Number="162">
+<![CDATA[//   设计: Output 参数为 Read Only 供程序逻辑使用,]]>
+</Line>
+<Line Number="163">
+<![CDATA[//         HMI_CMD 结构体为 Read/Write 供 HMI 读写使用]]>
+</Line>
+<Line Number="164">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="165">
+<![CDATA[]]>
+</Line>
+<Line Number="166">
+<![CDATA[HMI_CMD.Out_Tot_D_RT := Out_Tot_D_RT;]]>
+</Line>
+<Line Number="167">
+<![CDATA[HMI_CMD.Out_Tot_M_RT := Out_Tot_M_RT;]]>
+</Line>
+<Line Number="168">
+<![CDATA[HMI_CMD.Out_Tot_D := Out_Tot_D;]]>
+</Line>
+<Line Number="169">
+<![CDATA[HMI_CMD.Out_Tot_M := Out_Tot_M;]]>
+</Line>
+<Line Number="170">
+<![CDATA[]]>
+</Line>
+<Line Number="171">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="172">
+<![CDATA[// 功能段 5: 启用状态输出]]>
+</Line>
+<Line Number="173">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="174">
+<![CDATA[// 说明:]]>
+</Line>
+<Line Number="175">
+<![CDATA[//   EnableOut 跟随 EnableIn,用于梯形图中级联 AOI 的使能传递]]>
+</Line>
+<Line Number="176">
+<![CDATA[//   当 AOI 在梯形图中被使能(EnableIn=1)时,EnableOut=1,]]>
+</Line>
+<Line Number="177">
+<![CDATA[//   可用于驱动后续指令的使能条件]]>
+</Line>
+<Line Number="178">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="179">
+<![CDATA[]]>
+</Line>
+<Line Number="180">
+<![CDATA[EnableOut := EnableIn;]]>
+</Line>
+<Line Number="181">
+<![CDATA[]]>
+</Line>
+<Line Number="182">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="183">
+<![CDATA[// 程序结束]]>
+</Line>
+<Line Number="184">
+<![CDATA[// ======================================================================]]>
+</Line>
+<Line Number="185">
+<![CDATA[]]>
+</Line>
+</STContent>
+</Routine>
+</Routines>
+<Dependencies>
+<Dependency Type="DataType" Name="WaterFlowReport_Type"/>
+</Dependencies>
+</AddOnInstructionDefinition>
+</AddOnInstructionDefinitions>
+</Controller>
+</RSLogix5000Content>

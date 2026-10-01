@@ -1,0 +1,232 @@
+DATA_BLOCK "CV05MainMotor"
+TITLE =
+VERSION : 0.1
+
+
+  STRUCT 	
+   Infeed_Send_0 : BOOL ;	//Reserved
+   Infeed_Send_1 : BOOL ;	//Reserved
+   Infeed_Send_2 : BOOL ;	//Control by PLC/No Control by PLC(1=On/0=Off)
+   Infeed_Send_3 : BOOL ;	//Reserved
+   Infeed_Send_4 : BOOL ;	//Reserved
+   Infeed_Send_5 : BOOL ;	//Reserved
+   Infeed_Send_6 : BOOL ;	//Reserved
+   Infeed_Send_7 : BOOL ;	//Reserved
+   Infeed_Send_8 : BOOL ;	//On/Off (OFF1)(1=On/0=Off)
+   Infeed_Send_9 : BOOL ;	//No coast-down/coast-down(OFF2)(1=On/0=Off)
+   Infeed_Send_10 : BOOL ;	//Enable operation/inhibit operation(1=On/0=Off)
+   Infeed_Send_11 : BOOL ;	//Reserved
+   Infeed_Send_12 : BOOL ;	//Reserved
+   Infeed_Send_13 : BOOL ;	//Reserved
+   Infeed_Send_14 : BOOL ;	//Infeed inhibit generator mode(1=On/0=Off)
+   Infeed_Send_15 : BOOL ;	//1st acknowledge faults(1=On/0=Off)
+   Infeed_Receive_0 : BOOL ;	//Reserved
+   Infeed_Receive_1 : BOOL ;	//Control request(1=Yes/0=No)
+   Infeed_Receive_2 : BOOL ;	//Reserved
+   Infeed_Receive_3 : BOOL ;	//Precharging complete(1=Yes/0=No)
+   Infeed_Receive_4 : BOOL ;	//Line contactor closed(1=Yes/0=No)
+   Infeed_Receive_5 : BOOL ;	//Reserved
+   Infeed_Receive_6 : BOOL ;	//Reserved
+   Infeed_Receive_7 : BOOL ;	//Reserved
+   Infeed_Receive_8 : BOOL ;	//Ready for switching on(1=Yes/0=No)
+   Infeed_Receive_9 : BOOL ;	//Ready(1=Yes/0=No)
+   Infeed_Receive_10 : BOOL ;	//Operation enable(1=Yes/0=No)
+   Infeed_Receive_11 : BOOL ;	//Fault present(1=Yes/0=No)
+   Infeed_Receive_12 : BOOL ;	//No OFF2 active(1=OFF2 inactive/0=OFF2 active)
+   Infeed_Receive_13 : BOOL ;	//Reserved
+   Infeed_Receive_14 : BOOL ;	//Switching-on inhibited(1=Yes/0=No)
+   Infeed_Receive_15 : BOOL ;	//Alarm present(1=Yes/0=No)
+   Driver1_Send_0 : BOOL ;	//Reserved
+   Driver1_Send_1 : BOOL ;	//Reserved
+   Driver1_Send_2 : BOOL ;	//Control by PLC/No Control by PLC(1=On/0=Off)
+   Driver1_Send_3 : BOOL ;	//Setpoint inversion(1=On/0=Off)
+   Driver1_Send_4 : BOOL ;	//Reserved
+   Driver1_Send_5 : BOOL ;	//Motorized potentiometer setpoint raise(1=On/0=Off)
+   Driver1_Send_6 : BOOL ;	//Motorized potentiometer lower setpoint(1=On/0=Off)
+   Driver1_Send_7 : BOOL ;	//Reserved
+   Driver1_Send_8 : BOOL ;	//On/Off (OFF1)(1=On/0=Off)
+   Driver1_Send_9 : BOOL ;	//No coast-down/coast-down(OFF2)signal source1(1=On/0=Off)
+   Driver1_Send_10 : BOOL ;	//No Quick Stop/Quick Stop(OFF3)signa
+   Driver1_Send_11 : BOOL ;	//Enable operation/inhibit operation(1=On/0=Off)
+   Driver1_Send_12 : BOOL ;	//Enable ramp-function generator/inhibit ramp-function generator(1=On/0=O
+   Driver1_Send_13 : BOOL ;	//Continue ramp-function generator/freeze ramp-function generator(1=On/0=Off)
+   Driver1_Send_14 : BOOL ;	//Enable setpoint/inhibit setpoint(1=On/0=Off)
+   Driver1_Send_15 : BOOL ;	//1st acknowledge fault(1=On/0=Off)
+   Driver1_Send_setpoint : INT ;	//Speed Setpoint
+   Driver1_Receive_0 : BOOL ;	//Speed setp-act val deviation in tolerance t_off(1=Yes/0=No)
+   Driver1_Receive_1 : BOOL ;	//Control request(1=Yes/0=No)
+   Driver1_Receive_2 : BOOL ;	//f or n comparison value reached or exceeded(1=Yes/0=No)
+   Driver1_Receive_3 : BOOL ;	//Torque limit reached(1=Yes/0=No)
+   Driver1_Receive_4 : BOOL ;	//Open holding brake(1=Yes/0=No)
+   Driver1_Receive_5 : BOOL ;	//Alarm motor overtemperature(1=No/0=Yes)
+   Driver1_Receive_6 : BOOL ;	//n_act>0(1=Yes/0=No)
+   Driver1_Receive_7 : BOOL ;	//Alarm power unit thermal overload(1=No/0=Yes)
+   Driver1_Receive_8 : BOOL ;	//Ready for switching on(1=Yes/0=No)
+   Driver1_Receive_9 : BOOL ;	//Ready(1=Yes/0=No)
+   Driver1_Receive_10 : BOOL ;	//Operation enable(1=Yes/0=No)
+   Driver1_Receive_11 : BOOL ;	//Fault present(1=Yes/0=No)
+   Driver1_Receive_12 : BOOL ;	//No coasting active(1=OFF2 inactive/0=OFF2 active)
+   Driver1_Receive_13 : BOOL ;	//No Quick stop active(1=OFF3 inactive/0=OFF3 active)
+   Driver1_Receive_14 : BOOL ;	//Switching-on inhibited(1=Yes/0=No)
+   Driver1_Receive_15 : BOOL ;	//Alarm present(1=Yes/0=No)
+   Driver1_Receive_Speed : INT ;	//Speed actual value
+   Driver1_Receive_Current : INT ;	//Current actual value
+   Driver1_Receive_Torque : INT ;	//Torque actual value
+   Driver1_AlarmCode : INT ;	//Alarm Code
+   Driver1_FaultCode : INT ;	//Fault Code
+   Driver2_Send_0 : BOOL ;	//Reserved
+   Driver2_Send_1 : BOOL ;	//Reserved
+   Driver2_Send_2 : BOOL ;	//Control by PLC/No Control by PLC(1=On/0=Off)
+   Driver2_Send_3 : BOOL ;	//Setpoint inversion(1=On/0=Off)
+   Driver2_Send_4 : BOOL ;	//Reserved
+   Driver2_Send_5 : BOOL ;	//Motorized potentiometer setpoint raise(1=On/0=Off)
+   Driver2_Send_6 : BOOL ;	//Motorized potentiometer lower setpoint(1=On/0=Off)
+   Driver2_Send_7 : BOOL ;	//Reserved
+   Driver2_Send_8 : BOOL ;	//On/Off (OFF1)(1=On/0=Off)
+   Driver2_Send_9 : BOOL ;	//No coast-down/coast-down(OFF2)signal source1(1=On/0=Off)
+   Driver2_Send_10 : BOOL ;	//No Quick Stop/Quick Stop(OFF3)signa
+   Driver2_Send_11 : BOOL ;	//Enable operation/inhibit operation(1=On/0=Off)
+   Driver2_Send_12 : BOOL ;	//Enable ramp-function generator/inhibit ramp-function generator(1=On/0=O
+   Driver2_Send_13 : BOOL ;	//Continue ramp-function generator/freeze ramp-function generator(1=On/0=Off)
+   Driver2_Send_14 : BOOL ;	//Enable setpoint/inhibit setpoint(1=On/0=Off)
+   Driver2_Send_15 : BOOL ;	//1st acknowledge fault(1=On/0=Off)
+   Driver2_Send_setpoint : INT ;	//Speed Setpoint
+   Driver2_Receive_0 : BOOL ;	//Speed setp-act val deviation in tolerance t_off(1=Yes/0=No)
+   Driver2_Receive_1 : BOOL ;	//Control request(1=Yes/0=No)
+   Driver2_Receive_2 : BOOL ;	//f or n comparison value reached or exceeded(1=Yes/0=No)
+   Driver2_Receive_3 : BOOL ;	//Torque limit reached(1=Yes/0=No)
+   Driver2_Receive_4 : BOOL ;	//Open holding brake(1=Yes/0=No)
+   Driver2_Receive_5 : BOOL ;	//Alarm motor overtemperature(1=No/0=Yes)
+   Driver2_Receive_6 : BOOL ;	//n_act>0(1=Yes/0=No)
+   Driver2_Receive_7 : BOOL ;	//Alarm power unit thermal overload(1=No/0=Yes)
+   Driver2_Receive_8 : BOOL ;	//Ready for switching on(1=Yes/0=No)
+   Driver2_Receive_9 : BOOL ;	//Ready(1=Yes/0=No)
+   Driver2_Receive_10 : BOOL ;	//Operation enable(1=Yes/0=No)
+   Driver2_Receive_11 : BOOL ;	//Fault present(1=Yes/0=No)
+   Driver2_Receive_12 : BOOL ;	//No coasting active(1=OFF2 inactive/0=OFF2 active)
+   Driver2_Receive_13 : BOOL ;	//No Quick stop active(1=OFF3 inactive/0=OFF3 active)
+   Driver2_Receive_14 : BOOL ;	//Switching-on inhibited(1=Yes/0=No)
+   Driver2_Receive_15 : BOOL ;	//Alarm present(1=Yes/0=No)
+   Driver2_Receive_Speed : INT ;	//Speed actual value
+   Driver2_Receive_Current : INT ;	//Current actual value
+   Driver2_Receive_Torque : INT ;	//Torque actual value
+   Driver2_AlarmCode : INT ;	//Alarm Code
+   Driver2_FaultCode : INT ;	//Fault Code
+   Speed_Set : REAL ;	//Speed_Set
+   Trackslip1_Alarm : BOOL ;	//打滑1报警
+   Trackslip2_Alarm : BOOL ;	//打滑2报警
+  END_STRUCT ;	
+BEGIN
+   Infeed_Send_0 := FALSE; 
+   Infeed_Send_1 := FALSE; 
+   Infeed_Send_2 := FALSE; 
+   Infeed_Send_3 := FALSE; 
+   Infeed_Send_4 := FALSE; 
+   Infeed_Send_5 := FALSE; 
+   Infeed_Send_6 := FALSE; 
+   Infeed_Send_7 := FALSE; 
+   Infeed_Send_8 := FALSE; 
+   Infeed_Send_9 := FALSE; 
+   Infeed_Send_10 := FALSE; 
+   Infeed_Send_11 := FALSE; 
+   Infeed_Send_12 := FALSE; 
+   Infeed_Send_13 := FALSE; 
+   Infeed_Send_14 := FALSE; 
+   Infeed_Send_15 := FALSE; 
+   Infeed_Receive_0 := FALSE; 
+   Infeed_Receive_1 := FALSE; 
+   Infeed_Receive_2 := FALSE; 
+   Infeed_Receive_3 := FALSE; 
+   Infeed_Receive_4 := FALSE; 
+   Infeed_Receive_5 := FALSE; 
+   Infeed_Receive_6 := FALSE; 
+   Infeed_Receive_7 := FALSE; 
+   Infeed_Receive_8 := FALSE; 
+   Infeed_Receive_9 := FALSE; 
+   Infeed_Receive_10 := FALSE; 
+   Infeed_Receive_11 := FALSE; 
+   Infeed_Receive_12 := FALSE; 
+   Infeed_Receive_13 := FALSE; 
+   Infeed_Receive_14 := FALSE; 
+   Infeed_Receive_15 := FALSE; 
+   Driver1_Send_0 := FALSE; 
+   Driver1_Send_1 := FALSE; 
+   Driver1_Send_2 := FALSE; 
+   Driver1_Send_3 := FALSE; 
+   Driver1_Send_4 := FALSE; 
+   Driver1_Send_5 := FALSE; 
+   Driver1_Send_6 := FALSE; 
+   Driver1_Send_7 := FALSE; 
+   Driver1_Send_8 := FALSE; 
+   Driver1_Send_9 := FALSE; 
+   Driver1_Send_10 := FALSE; 
+   Driver1_Send_11 := FALSE; 
+   Driver1_Send_12 := FALSE; 
+   Driver1_Send_13 := FALSE; 
+   Driver1_Send_14 := FALSE; 
+   Driver1_Send_15 := FALSE; 
+   Driver1_Send_setpoint := 281; 
+   Driver1_Receive_0 := FALSE; 
+   Driver1_Receive_1 := FALSE; 
+   Driver1_Receive_2 := FALSE; 
+   Driver1_Receive_3 := FALSE; 
+   Driver1_Receive_4 := FALSE; 
+   Driver1_Receive_5 := FALSE; 
+   Driver1_Receive_6 := FALSE; 
+   Driver1_Receive_7 := FALSE; 
+   Driver1_Receive_8 := FALSE; 
+   Driver1_Receive_9 := FALSE; 
+   Driver1_Receive_10 := FALSE; 
+   Driver1_Receive_11 := FALSE; 
+   Driver1_Receive_12 := FALSE; 
+   Driver1_Receive_13 := FALSE; 
+   Driver1_Receive_14 := FALSE; 
+   Driver1_Receive_15 := FALSE; 
+   Driver1_Receive_Speed := 0; 
+   Driver1_Receive_Current := 0; 
+   Driver1_Receive_Torque := 0; 
+   Driver1_AlarmCode := 0; 
+   Driver1_FaultCode := 0; 
+   Driver2_Send_0 := FALSE; 
+   Driver2_Send_1 := FALSE; 
+   Driver2_Send_2 := FALSE; 
+   Driver2_Send_3 := FALSE; 
+   Driver2_Send_4 := FALSE; 
+   Driver2_Send_5 := FALSE; 
+   Driver2_Send_6 := FALSE; 
+   Driver2_Send_7 := FALSE; 
+   Driver2_Send_8 := FALSE; 
+   Driver2_Send_9 := FALSE; 
+   Driver2_Send_10 := FALSE; 
+   Driver2_Send_11 := FALSE; 
+   Driver2_Send_12 := FALSE; 
+   Driver2_Send_13 := FALSE; 
+   Driver2_Send_14 := FALSE; 
+   Driver2_Send_15 := FALSE; 
+   Driver2_Send_setpoint := 0; 
+   Driver2_Receive_0 := FALSE; 
+   Driver2_Receive_1 := FALSE; 
+   Driver2_Receive_2 := FALSE; 
+   Driver2_Receive_3 := FALSE; 
+   Driver2_Receive_4 := FALSE; 
+   Driver2_Receive_5 := FALSE; 
+   Driver2_Receive_6 := FALSE; 
+   Driver2_Receive_7 := FALSE; 
+   Driver2_Receive_8 := FALSE; 
+   Driver2_Receive_9 := FALSE; 
+   Driver2_Receive_10 := FALSE; 
+   Driver2_Receive_11 := FALSE; 
+   Driver2_Receive_12 := FALSE; 
+   Driver2_Receive_13 := FALSE; 
+   Driver2_Receive_14 := FALSE; 
+   Driver2_Receive_15 := FALSE; 
+   Driver2_Receive_Speed := 0; 
+   Driver2_Receive_Current := 0; 
+   Driver2_Receive_Torque := 0; 
+   Driver2_AlarmCode := 0; 
+   Driver2_FaultCode := 0; 
+   Speed_Set := 2.813684e+002; 
+   Trackslip1_Alarm := FALSE; 
+   Trackslip2_Alarm := FALSE; 
+END_DATA_BLOCK
+
