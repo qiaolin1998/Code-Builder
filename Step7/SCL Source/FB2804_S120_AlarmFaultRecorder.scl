@@ -1,0 +1,567 @@
+﻿
+
+// ============================================================
+// S120报警/故障代码映射数据块
+// ============================================================
+// 说明：本数据块为全局共享数据块，定义了S120常见报警/故障代码
+//       对应的bool标志位及中文名称说明。
+//       当FB2804检测到设备停机时，根据读取到的代码值将对应的
+//       bool变量置位，HMI可直接读取bool变量并显示名称。
+//       每个bool变量旁的注释即为该代码的中文名称说明。
+//
+// 代码格式说明：
+//   报警代码(Alarm) ：S120中以"A"开头，如A0500，此处变量名Alarm_0500
+//   故障代码(Fault) ：S120中以"F"开头，如F0001，此处变量名Fault_0001
+//
+DATA_BLOCK DB2804_S120_Codes
+
+STRUCT
+    // ============================================================
+    // 报警代码组 (A-codes)
+    // ============================================================
+    Alarm_0500:BOOL;   // 编码器1信号丢失 (Encoder 1 signal lost)
+    Alarm_0501:BOOL;   // 编码器2信号丢失 (Encoder 2 signal lost)
+    Alarm_0502:BOOL;   // 编码器1信号幅值过低
+    Alarm_0503:BOOL;   // 编码器2信号幅值过低
+    Alarm_0504:BOOL;   // 编码器1信号频率超限
+    Alarm_0505:BOOL;   // 编码器2信号频率超限
+    Alarm_0506:BOOL;   // 编码器1零脉冲缺失
+    Alarm_0507:BOOL;   // 编码器2零脉冲缺失
+    Alarm_0508:BOOL;   // 编码器1信号极性错误
+    Alarm_0509:BOOL;   // 编码器2信号极性错误
+    Alarm_0510:BOOL;   // 编码器1通讯故障
+    Alarm_0511:BOOL;   // 编码器2通讯故障
+    Alarm_0512:BOOL;   // 编码器1参数配置错误
+    Alarm_0513:BOOL;   // 编码器2参数配置错误
+    Alarm_0514:BOOL;   // 编码器1超速
+    Alarm_0515:BOOL;   // 编码器2超速
+
+    // ============================================================
+    // 故障代码组 (F-codes)
+    // ============================================================
+    Fault_0001:BOOL;   // 电机过温 (Motor overtemperature)
+    Fault_0002:BOOL;   // 功率单元过温 (Power unit overtemperature)
+    Fault_0003:BOOL;   // 直流母线过压 (DC link overvoltage)
+    Fault_0004:BOOL;   // 直流母线欠压 (DC link undervoltage)
+    Fault_0005:BOOL;   // 电机I2t过载 (Motor I2t overload)
+    Fault_0006:BOOL;   // 功率单元I2t过载 (Power unit I2t overload)
+    Fault_0009:BOOL;   // 功率元件超温 (Excess temperature power component)
+    Fault_0011:BOOL;   // 电机堵转 (Motor blocked)
+    Fault_0012:BOOL;   // 电机温度传感器故障 (Motor temp sensor fault)
+    Fault_0015:BOOL;   // 外部故障1 (External fault 1)
+    Fault_0021:BOOL;   // 电机接地故障 (Ground fault motor)
+    Fault_0030:BOOL;   // 冷却风机故障 (Cooling fan failure)
+    Fault_0035:BOOL;   // 功率单元故障 (Power unit failed)
+    Fault_0036:BOOL;   // 功率单元内部故障 (Fault in power unit)
+    Fault_0041:BOOL;   // 编码器1故障 (Encoder 1 faulty)
+    Fault_0042:BOOL;   // 速度偏差超限 (Speed deviation)
+    Fault_0044:BOOL;   // 速度控制器阈值超限 (Speed ctrl threshold exceeded)
+    Fault_0052:BOOL;   // 功率元件故障 (Power component failed)
+    Fault_0054:BOOL;   // IPD故障 (IPD failed)
+    Fault_0060:BOOL;   // 通讯故障 (Communication error)
+    Fault_0061:BOOL;   // PROFIBUS通讯故障
+    Fault_0062:BOOL;   // CAN通讯故障
+    Fault_0063:BOOL;   // USS通讯故障
+    Fault_0064:BOOL;   // 编码器通讯故障
+    Fault_0065:BOOL;   // 模拟量输入故障
+    Fault_0066:BOOL;   // 数字量输入故障
+    Fault_0070:BOOL;   // 参数设置故障
+    Fault_0071:BOOL;   // 参数EEPROM故障
+    Fault_0072:BOOL;   // 参数RAM故障
+    Fault_0073:BOOL;   // 参数校验错误
+    Fault_0074:BOOL;   // 参数范围超限
+    Fault_0075:BOOL;   // 参数兼容性错误
+    Fault_0076:BOOL;   // 参数依赖关系错误
+    Fault_0077:BOOL;   // 参数值无效
+    Fault_0078:BOOL;   // 参数写入被禁止
+    Fault_0079:BOOL;   // 参数计算错误
+    Fault_0080:BOOL;   // 参数数量超限
+    Fault_0085:BOOL;   // 电机数据识别故障
+    Fault_0090:BOOL;   // 速度设定值故障
+    Fault_0100:BOOL;   // 转矩设定值故障
+
+    // ============================================================
+    // 名称说明字符串组（供HMI显示，可按需扩展）
+    // ============================================================
+    // 说明：每个字符串与对应bool变量一一对应，HMI可根据bool状态
+    //       读取相应字符串显示报警/故障名称。
+    //       字符串长度限制为STRING[32]，共约64字节。
+    Name_Alarm_0500:STRING[32];   // '编码器1信号丢失'
+    Name_Alarm_0501:STRING[32];   // '编码器2信号丢失'
+    Name_Alarm_0502:STRING[32];   // '编码器1信号幅值过低'
+    Name_Alarm_0503:STRING[32];   // '编码器2信号幅值过低'
+    Name_Alarm_0504:STRING[32];   // '编码器1信号频率超限'
+    Name_Alarm_0505:STRING[32];   // '编码器2信号频率超限'
+    Name_Alarm_0506:STRING[32];   // '编码器1零脉冲缺失'
+    Name_Alarm_0507:STRING[32];   // '编码器2零脉冲缺失'
+    Name_Alarm_0508:STRING[32];   // '编码器1信号极性错误'
+    Name_Alarm_0509:STRING[32];   // '编码器2信号极性错误'
+    Name_Alarm_0510:STRING[32];   // '编码器1通讯故障'
+    Name_Alarm_0511:STRING[32];   // '编码器2通讯故障'
+    Name_Alarm_0512:STRING[32];   // '编码器1参数配置错误'
+    Name_Alarm_0513:STRING[32];   // '编码器2参数配置错误'
+    Name_Alarm_0514:STRING[32];   // '编码器1超速'
+    Name_Alarm_0515:STRING[32];   // '编码器2超速'
+
+    Name_Fault_0001:STRING[32];   // '电机过温'
+    Name_Fault_0002:STRING[32];   // '功率单元过温'
+    Name_Fault_0003:STRING[32];   // '直流母线过压'
+    Name_Fault_0004:STRING[32];   // '直流母线欠压'
+    Name_Fault_0005:STRING[32];   // '电机I2t过载'
+    Name_Fault_0006:STRING[32];   // '功率单元I2t过载'
+    Name_Fault_0009:STRING[32];   // '功率元件超温'
+    Name_Fault_0011:STRING[32];   // '电机堵转'
+    Name_Fault_0012:STRING[32];   // '电机温度传感器故障'
+    Name_Fault_0015:STRING[32];   // '外部故障1'
+    Name_Fault_0021:STRING[32];   // '电机接地故障'
+    Name_Fault_0030:STRING[32];   // '冷却风机故障'
+    Name_Fault_0035:STRING[32];   // '功率单元故障'
+    Name_Fault_0036:STRING[32];   // '功率单元内部故障'
+    Name_Fault_0041:STRING[32];   // '编码器1故障'
+    Name_Fault_0042:STRING[32];   // '速度偏差超限'
+    Name_Fault_0044:STRING[32];   // '速度控制器阈值超限'
+    Name_Fault_0052:STRING[32];   // '功率元件故障'
+    Name_Fault_0054:STRING[32];   // 'IPD故障'
+    Name_Fault_0060:STRING[32];   // '通讯故障'
+    Name_Fault_0061:STRING[32];   // 'PROFIBUS通讯故障'
+    Name_Fault_0062:STRING[32];   // 'CAN通讯故障'
+    Name_Fault_0063:STRING[32];   // 'USS通讯故障'
+    Name_Fault_0064:STRING[32];   // '编码器通讯故障'
+    Name_Fault_0065:STRING[32];   // '模拟量输入故障'
+    Name_Fault_0066:STRING[32];   // '数字量输入故障'
+    Name_Fault_0070:STRING[32];   // '参数设置故障'
+    Name_Fault_0071:STRING[32];   // '参数EEPROM故障'
+    Name_Fault_0072:STRING[32];   // '参数RAM故障'
+    Name_Fault_0073:STRING[32];   // '参数校验错误'
+    Name_Fault_0074:STRING[32];   // '参数范围超限'
+    Name_Fault_0075:STRING[32];   // '参数兼容性错误'
+    Name_Fault_0076:STRING[32];   // '参数依赖关系错误'
+    Name_Fault_0077:STRING[32];   // '参数值无效'
+    Name_Fault_0078:STRING[32];   // '参数写入被禁止'
+    Name_Fault_0079:STRING[32];   // '参数计算错误'
+    Name_Fault_0080:STRING[32];   // '参数数量超限'
+    Name_Fault_0085:STRING[32];   // '电机数据识别故障'
+    Name_Fault_0090:STRING[32];   // '速度设定值故障'
+    Name_Fault_0100:STRING[32];   // '转矩设定值故障'
+END_STRUCT
+
+BEGIN
+    // ============================================================
+    // 初始化报警代码名称字符串
+    // ============================================================
+    Name_Alarm_0500:='编码器1信号丢失';
+    Name_Alarm_0501:='编码器2信号丢失';
+    Name_Alarm_0502:='编码器1信号幅值过低';
+    Name_Alarm_0503:='编码器2信号幅值过低';
+    Name_Alarm_0504:='编码器1信号频率超限';
+    Name_Alarm_0505:='编码器2信号频率超限';
+    Name_Alarm_0506:='编码器1零脉冲缺失';
+    Name_Alarm_0507:='编码器2零脉冲缺失';
+    Name_Alarm_0508:='编码器1信号极性错误';
+    Name_Alarm_0509:='编码器2信号极性错误';
+    Name_Alarm_0510:='编码器1通讯故障';
+    Name_Alarm_0511:='编码器2通讯故障';
+    Name_Alarm_0512:='编码器1参数配置错误';
+    Name_Alarm_0513:='编码器2参数配置错误';
+    Name_Alarm_0514:='编码器1超速';
+    Name_Alarm_0515:='编码器2超速';
+
+    // ============================================================
+    // 初始化故障代码名称字符串
+    // ============================================================
+    Name_Fault_0001:='电机过温';
+    Name_Fault_0002:='功率单元过温';
+    Name_Fault_0003:='直流母线过压';
+    Name_Fault_0004:='直流母线欠压';
+    Name_Fault_0005:='电机I2t过载';
+    Name_Fault_0006:='功率单元I2t过载';
+    Name_Fault_0009:='功率元件超温';
+    Name_Fault_0011:='电机堵转';
+    Name_Fault_0012:='电机温度传感器故障';
+    Name_Fault_0015:='外部故障1';
+    Name_Fault_0021:='电机接地故障';
+    Name_Fault_0030:='冷却风机故障';
+    Name_Fault_0035:='功率单元故障';
+    Name_Fault_0036:='功率单元内部故障';
+    Name_Fault_0041:='编码器1故障';
+    Name_Fault_0042:='速度偏差超限';
+    Name_Fault_0044:='速度控制器阈值超限';
+    Name_Fault_0052:='功率元件故障';
+    Name_Fault_0054:='IPD故障';
+    Name_Fault_0060:='通讯故障';
+    Name_Fault_0061:='PROFIBUS通讯故障';
+    Name_Fault_0062:='CAN通讯故障';
+    Name_Fault_0063:='USS通讯故障';
+    Name_Fault_0064:='编码器通讯故障';
+    Name_Fault_0065:='模拟量输入故障';
+    Name_Fault_0066:='数字量输入故障';
+    Name_Fault_0070:='参数设置故障';
+    Name_Fault_0071:='参数EEPROM故障';
+    Name_Fault_0072:='参数RAM故障';
+    Name_Fault_0073:='参数校验错误';
+    Name_Fault_0074:='参数范围超限';
+    Name_Fault_0075:='参数兼容性错误';
+    Name_Fault_0076:='参数依赖关系错误';
+    Name_Fault_0077:='参数值无效';
+    Name_Fault_0078:='参数写入被禁止';
+    Name_Fault_0079:='参数计算错误';
+    Name_Fault_0080:='参数数量超限';
+    Name_Fault_0085:='电机数据识别故障';
+    Name_Fault_0090:='速度设定值故障';
+    Name_Fault_0100:='转矩设定值故障';
+END_DATA_BLOCK
+
+FUNCTION_BLOCK FB2804
+
+TITLE = 'S120_AlarmFaultRecorder'
+//
+// 功能块名称：FB2804 S120变频器报警故障记录功能块
+// 版本：V1.0
+// 作者：QIAO
+// 创建日期：2026-10-01
+//
+// 功能概述：
+//   本功能块用于在设备每次停机时，自动记录S120变频器的报警代码(AlarmCode)
+//   与故障代码(FaultCode)，并将代码值映射到DB2804中对应的bool标志位，
+//   便于HMI直接显示具体的报警/故障名称说明。
+//
+// 核心原理：
+//   1. 检测设备运行信号(Drive_Run)的下降沿，判定为一次停机事件；
+//   2. 停机瞬间读取S120的报警代码与故障代码并锁定保存；
+//   3. 通过CASE语句将代码值映射到DB2804中对应的bool变量置位；
+//   4. 同时将停机时间与代码写入最近16次历史记录数组，便于追溯。
+//
+// 与S120通信数据关联（参考CV05_DB2）：
+//   Drive_AlarmCode  ← "CV05MainMotor".Driver1_AlarmCode (INT)
+//   Drive_FaultCode  ← "CV05MainMotor".Driver1_FaultCode (INT)
+//
+// 适用场景：
+//   - S120变频器驱动的皮带/电机设备，需要记录每次停机的报警/故障原因
+//   - 需要在HMI上以bool点位方式直接显示具体报警/故障名称的场合
+//
+VERSION: '1.0'
+AUTHOR: QIAO
+NAME:S120Rec
+FAMILY:QFam
+
+
+// ============================================================
+// 输入参数（VAR_INPUT）
+// ============================================================
+VAR_INPUT
+    // 设备运行信号
+    // 说明：来自S120状态字"运行使能"或接触器反馈，TRUE表示设备正在运行。
+    //       下降沿(FALSE→TRUE的反向)触发一次停机记录。
+    Drive_Run:BOOL;
+
+    // S120报警代码（A-code，INT整数）
+    // 说明：来自S120通讯读取的AlarmCode，如A0500对应代码500。
+    //       取值范围0~9999，0表示无报警。
+    Drive_AlarmCode:INT;
+
+    // S120故障代码（F-code，INT整数）
+    // 说明：来自S120通讯读取的FaultCode，如F0001对应代码1。
+    //       取值范围0~9999，0表示无故障。
+    Drive_FaultCode:INT;
+
+    // 初始化信号（电平有效）
+    // 说明：TRUE时清零所有历史记录与bool标志位，重新开始记录。
+    Initialize:BOOL;
+
+    // ============================================================
+    // 系统时间输入（用于记录停机时刻）
+    // 说明：建议由OB1中读取系统时钟(READ_CLK)后传入，BCD转INT。
+    // ============================================================
+    Year:INT;
+    Month:INT;
+    Day:INT;
+    Hour:INT;
+    Minute:INT;
+    Second:INT;
+END_VAR
+
+
+// ============================================================
+// 输出参数（VAR_OUTPUT）
+// ============================================================
+VAR_OUTPUT
+    // 上次停机时的报警代码
+    // 说明：最近一次停机瞬间锁定的Drive_AlarmCode值。
+    Last_Stop_AlarmCode:INT:=0;
+
+    // 上次停机时的故障代码
+    // 说明：最近一次停机瞬间锁定的Drive_FaultCode值。
+    Last_Stop_FaultCode:INT:=0;
+
+    // 累计停机次数
+    // 说明：自上次初始化以来的设备停机总次数。
+    Stop_Count:DINT:=0;
+
+    // 初始化完成标志
+    Init_Done:BOOL:=FALSE;
+END_VAR
+
+// ============================================================
+// 临时变量（VAR_TEMP）
+// ============================================================
+// 说明：临时变量在每次扫描周期结束后清除，用于循环计数等。
+VAR_TEMP
+    i:INT;                          // 循环索引
+END_VAR
+
+// ============================================================
+// 静态变量（VAR）
+// ============================================================
+// 说明：静态变量跨扫描周期保持，用于保存历史记录与边沿检测。
+VAR
+    Drive_Run_Last:BOOL;            // 上一扫描周期的运行信号
+                                    // 用于下降沿检测
+
+    IsFirstScan:BOOL:=TRUE;         // 首次扫描标志
+
+    // ============================================================
+    // 最近16次停机历史记录
+    // 说明：数组下标1为最近一次停机，下标16为最旧一次。
+    //       新停机发生时整体后移（右移），新记录写入下标1。
+    // ============================================================
+    Hist_Alarm:ARRAY[1..16] OF INT;     // 历史报警代码
+    Hist_Fault:ARRAY[1..16] OF INT;     // 历史故障代码
+    Hist_Year:ARRAY[1..16] OF INT;      // 停机年份
+    Hist_Month:ARRAY[1..16] OF INT;     // 停机月份
+    Hist_Day:ARRAY[1..16] OF INT;       // 停机日期
+    Hist_Hour:ARRAY[1..16] OF INT;      // 停机小时
+    Hist_Minute:ARRAY[1..16] OF INT;    // 停机分钟
+END_VAR
+
+// ============================================================
+// 程序主逻辑开始
+// ============================================================
+
+// ------------------------------------------------------------
+// 第一步：首次扫描初始化
+// ------------------------------------------------------------
+IF IsFirstScan THEN
+    Drive_Run_Last:=Drive_Run;
+    Stop_Count:=0;
+    Last_Stop_AlarmCode:=0;
+    Last_Stop_FaultCode:=0;
+
+    // 清零历史记录数组
+    FOR i:=1 TO 16 DO
+        Hist_Alarm[i]:=0;
+        Hist_Fault[i]:=0;
+        Hist_Year[i]:=0;
+        Hist_Month[i]:=0;
+        Hist_Day[i]:=0;
+        Hist_Hour[i]:=0;
+        Hist_Minute[i]:=0;
+    END_FOR;
+
+    IsFirstScan:=FALSE;
+    Init_Done:=TRUE;
+END_IF;
+
+// ------------------------------------------------------------
+// 第二步：手动初始化清零
+// ------------------------------------------------------------
+IF Initialize THEN
+    Stop_Count:=0;
+    Last_Stop_AlarmCode:=0;
+    Last_Stop_FaultCode:=0;
+
+    FOR i:=1 TO 16 DO
+        Hist_Alarm[i]:=0;
+        Hist_Fault[i]:=0;
+        Hist_Year[i]:=0;
+        Hist_Month[i]:=0;
+        Hist_Day[i]:=0;
+        Hist_Hour[i]:=0;
+        Hist_Minute[i]:=0;
+    END_FOR;
+
+    // 清零DB2804中所有报警/故障bool标志位
+    DB2804_S120_Codes.Alarm_0500:=FALSE;
+    DB2804_S120_Codes.Alarm_0501:=FALSE;
+    DB2804_S120_Codes.Alarm_0502:=FALSE;
+    DB2804_S120_Codes.Alarm_0503:=FALSE;
+    DB2804_S120_Codes.Alarm_0504:=FALSE;
+    DB2804_S120_Codes.Alarm_0505:=FALSE;
+    DB2804_S120_Codes.Alarm_0506:=FALSE;
+    DB2804_S120_Codes.Alarm_0507:=FALSE;
+    DB2804_S120_Codes.Alarm_0508:=FALSE;
+    DB2804_S120_Codes.Alarm_0509:=FALSE;
+    DB2804_S120_Codes.Alarm_0510:=FALSE;
+    DB2804_S120_Codes.Alarm_0511:=FALSE;
+    DB2804_S120_Codes.Alarm_0512:=FALSE;
+    DB2804_S120_Codes.Alarm_0513:=FALSE;
+    DB2804_S120_Codes.Alarm_0514:=FALSE;
+    DB2804_S120_Codes.Alarm_0515:=FALSE;
+
+    DB2804_S120_Codes.Fault_0001:=FALSE;
+    DB2804_S120_Codes.Fault_0002:=FALSE;
+    DB2804_S120_Codes.Fault_0003:=FALSE;
+    DB2804_S120_Codes.Fault_0004:=FALSE;
+    DB2804_S120_Codes.Fault_0005:=FALSE;
+    DB2804_S120_Codes.Fault_0006:=FALSE;
+    DB2804_S120_Codes.Fault_0009:=FALSE;
+    DB2804_S120_Codes.Fault_0011:=FALSE;
+    DB2804_S120_Codes.Fault_0012:=FALSE;
+    DB2804_S120_Codes.Fault_0015:=FALSE;
+    DB2804_S120_Codes.Fault_0021:=FALSE;
+    DB2804_S120_Codes.Fault_0030:=FALSE;
+    DB2804_S120_Codes.Fault_0035:=FALSE;
+    DB2804_S120_Codes.Fault_0036:=FALSE;
+    DB2804_S120_Codes.Fault_0041:=FALSE;
+    DB2804_S120_Codes.Fault_0042:=FALSE;
+    DB2804_S120_Codes.Fault_0044:=FALSE;
+    DB2804_S120_Codes.Fault_0052:=FALSE;
+    DB2804_S120_Codes.Fault_0054:=FALSE;
+    DB2804_S120_Codes.Fault_0060:=FALSE;
+    DB2804_S120_Codes.Fault_0061:=FALSE;
+    DB2804_S120_Codes.Fault_0062:=FALSE;
+    DB2804_S120_Codes.Fault_0063:=FALSE;
+    DB2804_S120_Codes.Fault_0064:=FALSE;
+    DB2804_S120_Codes.Fault_0065:=FALSE;
+    DB2804_S120_Codes.Fault_0066:=FALSE;
+    DB2804_S120_Codes.Fault_0070:=FALSE;
+    DB2804_S120_Codes.Fault_0071:=FALSE;
+    DB2804_S120_Codes.Fault_0072:=FALSE;
+    DB2804_S120_Codes.Fault_0073:=FALSE;
+    DB2804_S120_Codes.Fault_0074:=FALSE;
+    DB2804_S120_Codes.Fault_0075:=FALSE;
+    DB2804_S120_Codes.Fault_0076:=FALSE;
+    DB2804_S120_Codes.Fault_0077:=FALSE;
+    DB2804_S120_Codes.Fault_0078:=FALSE;
+    DB2804_S120_Codes.Fault_0079:=FALSE;
+    DB2804_S120_Codes.Fault_0080:=FALSE;
+    DB2804_S120_Codes.Fault_0085:=FALSE;
+    DB2804_S120_Codes.Fault_0090:=FALSE;
+    DB2804_S120_Codes.Fault_0100:=FALSE;
+
+    Init_Done:=TRUE;
+END_IF;
+
+// ------------------------------------------------------------
+// 第三步：检测停机下降沿并记录报警/故障代码
+// ------------------------------------------------------------
+// 下降沿判定：上一周期为TRUE，本周期为FALSE，即设备从运行变为停止
+IF Drive_Run_Last AND NOT Drive_Run THEN
+
+    // 停机次数加1
+    Stop_Count:=Stop_Count + 1;
+
+    // 锁定本次停机的报警与故障代码
+    Last_Stop_AlarmCode:=Drive_AlarmCode;
+    Last_Stop_FaultCode:=Drive_FaultCode;
+
+    // ============================================================
+    // 报警代码映射：将INT代码置位DB2804中对应的bool标志
+    // ============================================================
+    // 说明：S120报警代码为Axxxx格式，此处取数值部分。
+    //       例如A0500 → 代码500 → Alarm_0500 := TRUE
+    CASE Drive_AlarmCode OF
+        500: DB2804_S120_Codes.Alarm_0500:=TRUE;
+        501: DB2804_S120_Codes.Alarm_0501:=TRUE;
+        502: DB2804_S120_Codes.Alarm_0502:=TRUE;
+        503: DB2804_S120_Codes.Alarm_0503:=TRUE;
+        504: DB2804_S120_Codes.Alarm_0504:=TRUE;
+        505: DB2804_S120_Codes.Alarm_0505:=TRUE;
+        506: DB2804_S120_Codes.Alarm_0506:=TRUE;
+        507: DB2804_S120_Codes.Alarm_0507:=TRUE;
+        508: DB2804_S120_Codes.Alarm_0508:=TRUE;
+        509: DB2804_S120_Codes.Alarm_0509:=TRUE;
+        510: DB2804_S120_Codes.Alarm_0510:=TRUE;
+        511: DB2804_S120_Codes.Alarm_0511:=TRUE;
+        512: DB2804_S120_Codes.Alarm_0512:=TRUE;
+        513: DB2804_S120_Codes.Alarm_0513:=TRUE;
+        514: DB2804_S120_Codes.Alarm_0514:=TRUE;
+        515: DB2804_S120_Codes.Alarm_0515:=TRUE;
+    END_CASE;
+
+    // ============================================================
+    // 故障代码映射：将INT代码置位DB2804中对应的bool标志
+    // ============================================================
+    // 说明：S120故障代码为Fxxxx格式，此处取数值部分。
+    //       例如F0001 → 代码1 → Fault_0001 := TRUE
+    CASE Drive_FaultCode OF
+        1:   DB2804_S120_Codes.Fault_0001:=TRUE;
+        2:   DB2804_S120_Codes.Fault_0002:=TRUE;
+        3:   DB2804_S120_Codes.Fault_0003:=TRUE;
+        4:   DB2804_S120_Codes.Fault_0004:=TRUE;
+        5:   DB2804_S120_Codes.Fault_0005:=TRUE;
+        6:   DB2804_S120_Codes.Fault_0006:=TRUE;
+        9:   DB2804_S120_Codes.Fault_0009:=TRUE;
+        11:  DB2804_S120_Codes.Fault_0011:=TRUE;
+        12:  DB2804_S120_Codes.Fault_0012:=TRUE;
+        15:  DB2804_S120_Codes.Fault_0015:=TRUE;
+        21:  DB2804_S120_Codes.Fault_0021:=TRUE;
+        30:  DB2804_S120_Codes.Fault_0030:=TRUE;
+        35:  DB2804_S120_Codes.Fault_0035:=TRUE;
+        36:  DB2804_S120_Codes.Fault_0036:=TRUE;
+        41:  DB2804_S120_Codes.Fault_0041:=TRUE;
+        42:  DB2804_S120_Codes.Fault_0042:=TRUE;
+        44:  DB2804_S120_Codes.Fault_0044:=TRUE;
+        52:  DB2804_S120_Codes.Fault_0052:=TRUE;
+        54:  DB2804_S120_Codes.Fault_0054:=TRUE;
+        60:  DB2804_S120_Codes.Fault_0060:=TRUE;
+        61:  DB2804_S120_Codes.Fault_0061:=TRUE;
+        62:  DB2804_S120_Codes.Fault_0062:=TRUE;
+        63:  DB2804_S120_Codes.Fault_0063:=TRUE;
+        64:  DB2804_S120_Codes.Fault_0064:=TRUE;
+        65:  DB2804_S120_Codes.Fault_0065:=TRUE;
+        66:  DB2804_S120_Codes.Fault_0066:=TRUE;
+        70:  DB2804_S120_Codes.Fault_0070:=TRUE;
+        71:  DB2804_S120_Codes.Fault_0071:=TRUE;
+        72:  DB2804_S120_Codes.Fault_0072:=TRUE;
+        73:  DB2804_S120_Codes.Fault_0073:=TRUE;
+        74:  DB2804_S120_Codes.Fault_0074:=TRUE;
+        75:  DB2804_S120_Codes.Fault_0075:=TRUE;
+        76:  DB2804_S120_Codes.Fault_0076:=TRUE;
+        77:  DB2804_S120_Codes.Fault_0077:=TRUE;
+        78:  DB2804_S120_Codes.Fault_0078:=TRUE;
+        79:  DB2804_S120_Codes.Fault_0079:=TRUE;
+        80:  DB2804_S120_Codes.Fault_0080:=TRUE;
+        85:  DB2804_S120_Codes.Fault_0085:=TRUE;
+        90:  DB2804_S120_Codes.Fault_0090:=TRUE;
+        100: DB2804_S120_Codes.Fault_0100:=TRUE;
+    END_CASE;
+
+    // ============================================================
+    // 历史记录数组右移（最旧记录丢弃，最新记录写入下标1）
+    // ============================================================
+    FOR i:=16 DOWNTO 2 DO
+        Hist_Alarm[i]:=Hist_Alarm[i-1];
+        Hist_Fault[i]:=Hist_Fault[i-1];
+        Hist_Year[i]:=Hist_Year[i-1];
+        Hist_Month[i]:=Hist_Month[i-1];
+        Hist_Day[i]:=Hist_Day[i-1];
+        Hist_Hour[i]:=Hist_Hour[i-1];
+        Hist_Minute[i]:=Hist_Minute[i-1];
+    END_FOR;
+
+    // 写入本次停机记录到下标1（最近一次）
+    Hist_Alarm[1]:=Drive_AlarmCode;
+    Hist_Fault[1]:=Drive_FaultCode;
+    Hist_Year[1]:=Year;
+    Hist_Month[1]:=Month;
+    Hist_Day[1]:=Day;
+    Hist_Hour[1]:=Hour;
+    Hist_Minute[1]:=Minute;
+END_IF;
+
+// ------------------------------------------------------------
+// 第四步：保存本周期运行信号（供下一周期边沿检测使用）
+// ------------------------------------------------------------
+Drive_Run_Last:=Drive_Run;
+
+END_FUNCTION_BLOCK
+
+
+
+// ============================================================
+// 背景数据块
+// ============================================================
+// 说明：FB2804的背景数据块，存储运行时静态变量
+DATA_BLOCK DB2804 FB2804
+BEGIN
+END_DATA_BLOCK
