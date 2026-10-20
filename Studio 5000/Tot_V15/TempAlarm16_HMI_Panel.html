@@ -72,11 +72,45 @@
   .t1{color:var(--warn);} .t2{color:var(--ok);} .t3{color:var(--trip);} .t4{color:var(--ok);}
   .t5{color:var(--acc);} .t6{color:#c678dd;}
   .foot{margin-top:10px; color:var(--dim); font-size:11px; display:flex; justify-content:space-between;}
+
+  /* 一级报警: 顶部横幅(非强制提示) */
+  .banner{display:none; background:rgba(255,176,32,.12); border:1px solid var(--warn); color:var(--warn);
+          border-radius:8px; padding:10px 14px; margin-bottom:12px; font-weight:600; align-items:center; gap:10px;}
+  .banner.show{display:flex; animation:blinkB 1.2s infinite;}
+  @keyframes blinkB{50%{background:rgba(255,176,32,.28)}}
+
+  /* 二级报警: 强制介入弹窗 */
+  .overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:99;
+           align-items:center; justify-content:center;}
+  .overlay.show{display:flex;}
+  .modal{background:#2a1215; border:2px solid var(--trip); border-radius:12px; padding:26px 30px;
+         width:520px; box-shadow:0 0 40px rgba(255,77,79,.5); animation:shake .5s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .modal h2{color:var(--trip); font-size:18px; margin-bottom:12px;}
+  .modal ul{margin:10px 0 18px 18px; line-height:1.9;}
+  .modal .btn{background:var(--trip); color:#fff;}
 </style>
 </head>
 <body>
 
 <h1>16路温度测点 二级超温报警监视 <span class="tag">AOI: TempAlarm16_L2 &nbsp;|&nbsp; HMI_CMD: TempAlarm16_L2_Type</span></h1>
+
+<!-- 一级报警横幅(非强制提示): Any_Alm1=1 时显示, 不弹窗不鸣笛 -->
+<div class="banner" id="banner1">
+  <div class="led on-warn"></div>
+  <span id="bannerTxt">提示: 存在一级报警, 请关注对应测点状态变化</span>
+</div>
+
+<!-- 二级报警弹窗(强制介入): Any_Alm2_UnAck=1 时弹出并鸣响, 确认前不消失 -->
+<div class="overlay" id="overlay2">
+  <div class="modal">
+    <h2>⚠ 二级超温报警 — 请立即处理</h2>
+    <div>以下测点触发二级报警(警告/高报), 停机联锁已动作, 请值班人员立即到现场处理:</div>
+    <ul id="modalList"></ul>
+    <button class="btn" onclick="ackAlm2()">确认处理 (Ack_Alm2)</button>
+    <div class="hint" style="margin-top:10px">确认前弹窗与声响将持续保持(Alm2_UnAck 锁存), 处理完毕现场确认后点击上方按钮。</div>
+  </div>
+</div>
 
 <!-- 汇总 -->
 <div class="summary">
@@ -137,10 +171,10 @@
 <div class="box evt">
   <h2>事件记录（环形缓冲 32 条，Evt_Head 循环覆盖）</h2>
   <table>
-    <thead><tr><th>#</th><th>时间</th><th>通道</th><th>事件类型</th><th>当时PV(℃)</th></tr></thead>
+    <thead><tr><th>#</th><th>时间</th><th>测点标识</th><th>通道</th><th>事件类型</th><th>当时PV(℃)</th></tr></thead>
     <tbody id="evtBody"></tbody>
   </table>
-  <div class="foot"><span>类型: 1=一级产生 2=一级解除 3=二级产生 4=二级解除 5=参数修改 6=越权拒绝</span><span class="tag">Evt_Ch/Evt_Type/Evt_PV/Evt_H/Evt_M/Evt_S[32]</span></div>
+  <div class="foot"><span>类型: 1=一级产生 2=一级解除 3=二级产生 4=二级解除 5=参数修改 6=越权拒绝</span><span class="tag">Evt_ChName/Evt_Ch/Evt_Type/Evt_PV/Evt_H/Evt_M/Evt_S[32] — 测点标识随记录存储, 可查询/导出</span></div>
 </div>
 
 <script>
@@ -158,6 +192,9 @@ const GROUPS = [
 ];
 const HMI = {
   PV:        [131.5,128.2,127.6,126.0,125.4,124.8, 96.2,82.1,80.5,79.8, 71.0,70.2,69.5,68.8, 62.0,61.5],
+  Cfg_Name:  ["StatorU1","StatorV1","StatorW1","StatorU2","StatorV2","StatorW2",
+              "MtrBrgDE","MtrBrgNDE","MtrBrg3","MtrBrg4",
+              "PumpBrg1","PumpBrg2","PumpBrg3","PumpBrg4","GearOil1","GearOil2"],
   Cfg_Enable:Array(16).fill(1),
   Cfg_SP1:   [130,130,130,130,130,130, 85,85,85,85, 80,80,80,80, 75,75],
   Cfg_SP2:   [145,145,145,145,145,145, 95,95,95,95, 90,90,90,90, 85,85],
@@ -166,15 +203,16 @@ const HMI = {
   Cfg_Dly2:  Array(16).fill(2),
   Sta_Alm1:  [1,0,0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0],
   Sta_Alm2:  [0,0,0,0,0,0, 1,0,0,0, 0,0,0,0, 0,0],
-  Alm1_Count:1, Alm2_Count:1, Any_Alm1:true, Any_Alm2:true,
+  Alm2_UnAck:[0,0,0,0,0,0, 1,0,0,0, 0,0,0,0, 0,0],
+  Alm1_Count:1, Alm2_Count:1, Any_Alm1:true, Any_Alm2:true, Any_Alm2_UnAck:true,
   User_Level:2, Evt_Head:5
 };
 let EVT = [
-  {ch:0,type:1,pv:131.2,h:14,m:2,s:11},
-  {ch:0,type:2,pv:126.8,h:14,m:5,s:40},
-  {ch:0,type:1,pv:131.5,h:15,m:1,s:3},
-  {ch:6,type:3,pv:96.0,h:15,m:7,s:26},
-  {ch:0,type:5,pv:0,h:15,m:10,s:2}
+  {ch:0,name:"StatorU1",type:1,pv:131.2,h:14,m:2,s:11},
+  {ch:0,name:"StatorU1",type:2,pv:126.8,h:14,m:5,s:40},
+  {ch:0,name:"StatorU1",type:1,pv:131.5,h:15,m:1,s:3},
+  {ch:6,name:"MtrBrgDE",type:3,pv:96.0,h:15,m:7,s:26},
+  {ch:0,name:"BATCH",type:5,pv:0,h:15,m:10,s:2}
 ];
 const EVT_NAME = {1:"一级产生",2:"一级解除",3:"二级产生",4:"二级解除",5:"参数修改",6:"越权拒绝"};
 
@@ -192,8 +230,8 @@ function render(){
       const pct=Math.min(100, pv/max*100);
       const cls=!en?"dis":(a2?"alm2":(a1?"alm1":""));
       const barCls=a2?"a2":(a1?"a1":"");
-      html += `<div class="ch ${cls}">
-        <div class="ch-h"><span class="ch-name">[${i}] ${CH_NAMES[i]}</span>
+      html += `<div class="ch ${cls}" title="测点标识: ${HMI.Cfg_Name[i]}">
+        <div class="ch-h"><span class="ch-name">[${i}] ${HMI.Cfg_Name[i]} <span class="tag">${CH_NAMES[i]}</span></span>
           <span class="leds">
             <div class="led ${a1?'on-warn':''}" title="一级 Sta_Alm1[${i}]"></div>
             <div class="led ${a2?'on-trip':''}" title="二级 Sta_Alm2[${i}]"></div>
@@ -213,23 +251,56 @@ function render(){
   HMI.Alm1_Count = HMI.Sta_Alm1.filter(x=>x).length;
   HMI.Alm2_Count = HMI.Sta_Alm2.filter(x=>x).length;
   HMI.Any_Alm1 = HMI.Alm1_Count>0; HMI.Any_Alm2 = HMI.Alm2_Count>0;
+  HMI.Any_Alm2_UnAck = HMI.Alm2_UnAck.some(x=>x);
   document.getElementById("cnt1").textContent = HMI.Alm1_Count;
   document.getElementById("cnt2").textContent = HMI.Alm2_Count;
   document.getElementById("ledWarn").className = "led"+(HMI.Any_Alm1?" on-warn":"");
   document.getElementById("ledTrip").className = "led"+(HMI.Any_Alm2?" on-trip":"");
   document.getElementById("ledTripOut").className = "led"+(HMI.Any_Alm2?" on-trip":" on-ok");
   document.getElementById("tripTxt").textContent = HMI.Any_Alm2?"ON":"OFF";
-  document.getElementById("sysState").textContent = HMI.Any_Alm2?"停机联锁":(HMI.Any_Alm1?"预警":"正常");
+  document.getElementById("sysState").textContent = HMI.Any_Alm2?"停机联锁":(HMI.Any_Alm1?"提示":"正常");
   document.getElementById("lvlShow").textContent = HMI.User_Level;
 
-  // 事件表（最新在前）
+  // 一级报警: 非强制横幅(不弹窗不鸣笛), 列出当前一级报警测点
+  const a1pts = HMI.Sta_Alm1.map((v,i)=>v?HMI.Cfg_Name[i]:null).filter(x=>x);
+  document.getElementById("banner1").className = "banner"+(HMI.Any_Alm1?" show":"");
+  document.getElementById("bannerTxt").textContent =
+    HMI.Any_Alm1 ? `提示: 测点 ${a1pts.join("、")} 存在一级报警, 请关注其状态变化` : "";
+
+  // 二级报警: 强制介入弹窗 + 声响, 由"未确认锁存"驱动, 确认前不消失
+  const unAckPts = HMI.Alm2_UnAck.map((v,i)=>v?i:null).filter(x=>x!==null);
+  document.getElementById("overlay2").className = "overlay"+(HMI.Any_Alm2_UnAck?" show":"");
+  document.getElementById("modalList").innerHTML = unAckPts.map(i=>
+    `<li><b style="color:var(--trip)">${HMI.Cfg_Name[i]}</b>（${CH_NAMES[i]}） 当前 ${HMI.PV[i].toFixed(1)}℃ / SP2=${HMI.Cfg_SP2[i]}℃</li>`).join("");
+  setHorn(HMI.Any_Alm2_UnAck);
+
+  // 事件表（最新在前, 含测点标识列）
   const rows=[...EVT].reverse().map((e,idx)=>`<tr>
     <td>${EVT.length-idx}</td><td>${pad(e.h)}:${pad(e.m)}:${pad(e.s)}</td>
+    <td><b>${e.name}</b></td>
     <td>${e.type<5?"ch"+e.ch+" "+CH_NAMES[e.ch]:"组"+e.ch}</td>
     <td class="t${e.type}">${EVT_NAME[e.type]}</td><td>${e.type<5?e.pv.toFixed(1):"-"}</td></tr>`).join("");
   document.getElementById("evtBody").innerHTML=rows;
 }
 const pad=n=>String(n).padStart(2,"0");
+
+// ============ 声响提醒(二级报警未确认时循环鸣响) ============
+let hornCtx=null, hornTimer=null;
+function setHorn(on){
+  if(on && !hornTimer){
+    if(!hornCtx) hornCtx=new (window.AudioContext||window.webkitAudioContext)();
+    hornTimer=setInterval(()=>{
+      const o=hornCtx.createOscillator(), g=hornCtx.createGain();
+      o.type="square"; o.frequency.value=880; g.gain.value=0.08;
+      o.connect(g); g.connect(hornCtx.destination); o.start();
+      g.gain.exponentialRampToValueAtTime(0.0001, hornCtx.currentTime+0.35);
+      o.stop(hornCtx.currentTime+0.4);
+    }, 600);
+  } else if(!on && hornTimer){ clearInterval(hornTimer); hornTimer=null; }
+}
+
+// ============ 二级报警确认(Ack_Alm2): 清除全部未确认锁存 ============
+function ackAlm2(){ HMI.Alm2_UnAck.fill(0); render(); }
 
 // ============ 批量下发（演示 PLC 侧校验逻辑） ============
 function applyBatch(){
@@ -248,7 +319,7 @@ function applyBatch(){
   }
   pushEvt(g,5); render();
 }
-function pushEvt(g,t){ const n=new Date(); EVT.push({ch:g,type:t,pv:0,h:n.getHours(),m:n.getMinutes(),s:n.getSeconds()}); if(EVT.length>32)EVT.shift(); }
+function pushEvt(g,t){ const n=new Date(); EVT.push({ch:g,name:"BATCH",type:t,pv:0,h:n.getHours(),m:n.getMinutes(),s:n.getSeconds()}); if(EVT.length>32)EVT.shift(); }
 function resetLog(){ EVT=[]; render(); }
 
 // 权限按钮
