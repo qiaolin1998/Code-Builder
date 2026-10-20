@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16路温度二级报警 批量参数配置面板 - TempAlarm16_L2</title>
+<style>
+  :root{
+    --bg:#0f1720; --panel:#16222e; --panel2:#1c2b3a; --line:#2a3b4d;
+    --txt:#dbe6f0; --dim:#7f93a6; --acc:#2ea6ff;
+    --ok:#2ecc71; --warn:#ffb020; --trip:#ff4d4f; --off:#4a5b6b;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; font-family:"Microsoft YaHei",sans-serif;}
+  body{background:var(--bg); color:var(--txt); padding:14px; font-size:13px;}
+  h1{font-size:18px; font-weight:600;}
+  h2{font-size:14px; color:var(--acc); margin-bottom:8px; font-weight:600;}
+  .tag{color:var(--dim); font-size:11px; font-family:Consolas,monospace;}
+
+  /* 顶部汇总条 */
+  .summary{display:flex; gap:12px; align-items:stretch; margin:12px 0;}
+  .sum-card{flex:1; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 14px; display:flex; align-items:center; gap:10px;}
+  .led{width:16px; height:16px; border-radius:50%; background:var(--off); box-shadow:0 0 6px rgba(0,0,0,.5) inset;}
+  .led.on-warn{background:var(--warn); box-shadow:0 0 10px var(--warn); animation:blink 1s infinite;}
+  .led.on-trip{background:var(--trip); box-shadow:0 0 10px var(--trip); animation:blink .6s infinite;}
+  .led.on-ok{background:var(--ok); box-shadow:0 0 8px var(--ok);}
+  @keyframes blink{50%{opacity:.35}}
+  .sum-num{font-size:22px; font-weight:700;}
+  .sum-lbl{color:var(--dim); font-size:12px;}
+
+  .layout{display:grid; grid-template-columns:340px 1fr; gap:12px;}
+
+  /* 批量配置区 */
+  .box{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px;}
+  .row{display:flex; align-items:center; margin-bottom:10px; gap:8px;}
+  .row label{width:96px; color:var(--dim);}
+  .row input,.row select{flex:1; background:var(--panel2); border:1px solid var(--line); color:var(--txt); border-radius:5px; padding:6px 8px; font-size:13px;}
+  .row input:focus,.row select:focus{outline:1px solid var(--acc);}
+  .perm{display:flex; gap:6px; margin-bottom:10px;}
+  .perm button{flex:1; padding:6px; border-radius:5px; border:1px solid var(--line); background:var(--panel2); color:var(--dim); cursor:pointer;}
+  .perm button.sel{border-color:var(--acc); color:var(--acc); background:rgba(46,166,255,.12);}
+  .btn{width:100%; padding:10px; border:none; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; background:var(--acc); color:#04283f;}
+  .btn:disabled{background:var(--off); color:#9fb0bf; cursor:not-allowed;}
+  .btn.small{width:auto; padding:6px 12px; font-size:12px;}
+  .hint{font-size:11px; color:var(--dim); margin-top:8px; line-height:1.6;}
+  .hint b{color:var(--warn); font-weight:600;}
+
+  /* 通道网格 */
+  .group{margin-bottom:12px;}
+  .group-h{display:flex; justify-content:space-between; align-items:baseline; margin:4px 2px 8px;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px;}
+  .ch{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 12px; position:relative;}
+  .ch.alm1{border-color:var(--warn);}
+  .ch.alm2{border-color:var(--trip); box-shadow:0 0 8px rgba(255,77,79,.35);}
+  .ch.dis{opacity:.45;}
+  .ch-h{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+  .ch-name{font-weight:600;}
+  .ch-pv{font-size:20px; font-weight:700; font-family:Consolas,monospace;}
+  .ch-pv small{font-size:11px; color:var(--dim);}
+  .leds{display:flex; gap:6px;}
+  .bar{height:6px; background:var(--panel2); border-radius:3px; margin:8px 0 6px; position:relative; overflow:hidden;}
+  .bar i{position:absolute; left:0; top:0; bottom:0; background:var(--acc); border-radius:3px;}
+  .bar i.a1{background:var(--warn);} .bar i.a2{background:var(--trip);}
+  .bar mark{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--warn);}
+  .bar mark.sp2{background:var(--trip);}
+  .ch-cfg{display:flex; justify-content:space-between; color:var(--dim); font-size:11px; font-family:Consolas,monospace;}
+
+  /* 事件记录 */
+  .evt{margin-top:12px;}
+  table{width:100%; border-collapse:collapse; font-size:12px;}
+  th,td{padding:6px 8px; border-bottom:1px solid var(--line); text-align:left;}
+  th{color:var(--dim); font-weight:600; background:var(--panel2);}
+  .t1{color:var(--warn);} .t2{color:var(--ok);} .t3{color:var(--trip);} .t4{color:var(--ok);}
+  .t5{color:var(--acc);} .t6{color:#c678dd;}
+  .foot{margin-top:10px; color:var(--dim); font-size:11px; display:flex; justify-content:space-between;}
+</style>
+</head>
+<body>
+
+<h1>16路温度测点 二级超温报警监视 <span class="tag">AOI: TempAlarm16_L2 &nbsp;|&nbsp; HMI_CMD: TempAlarm16_L2_Type</span></h1>
+
+<!-- 汇总 -->
+<div class="summary">
+  <div class="sum-card"><div class="led on-ok" id="ledRun"></div><div><div class="sum-lbl">系统状态</div><div id="sysState">正常</div></div></div>
+  <div class="sum-card"><div class="led" id="ledWarn"></div><div><div class="sum-num" id="cnt1">0</div><div class="sum-lbl">一级报警(预警) 通道数 Alm1_Count</div></div></div>
+  <div class="sum-card"><div class="led" id="ledTrip"></div><div><div class="sum-num" id="cnt2">0</div><div class="sum-lbl">二级报警(停机) 通道数 Alm2_Count</div></div></div>
+  <div class="sum-card"><div class="led" id="ledTripOut"></div><div><div class="sum-lbl">停机联锁输出</div><div>Out_Trip <span class="tag" id="tripTxt">OFF</span></div></div></div>
+  <div class="sum-card"><div><div class="sum-lbl">当前操作员权限 User_Level</div><div class="sum-num" id="lvlShow">2</div></div></div>
+</div>
+
+<div class="layout">
+  <!-- 批量参数配置 -->
+  <div class="box">
+    <h2>批量参数配置（权限校验后下发）</h2>
+    <div class="perm" id="permBtns">
+      <button data-l="1">操作员 Lv1</button>
+      <button data-l="2" class="sel">工程师 Lv2</button>
+      <button data-l="3">管理员 Lv3</button>
+    </div>
+    <div class="row"><label>目标组 B_Group</label>
+      <select id="bGroup">
+        <option value="0">0 - 全部16路</option>
+        <option value="1">1 - 电机定子(0..5)</option>
+        <option value="2">2 - 电机轴承(6..9)</option>
+        <option value="3">3 - 渣浆泵轴承(10..13)</option>
+        <option value="4">4 - 减速机油温(14..15)</option>
+      </select>
+    </div>
+    <div class="row"><label>一级阈值 B_SP1</label><input id="bSP1" type="number" value="130" step="0.5"><span>℃</span></div>
+    <div class="row"><label>二级阈值 B_SP2</label><input id="bSP2" type="number" value="145" step="0.5"><span>℃</span></div>
+    <div class="row"><label>回差 B_Hys</label><input id="bHys" type="number" value="3" step="0.5" min="0"><span>℃</span></div>
+    <div class="row"><label>一级延时 B_Dly1</label><input id="bDly1" type="number" value="3" min="0"><span>s</span></div>
+    <div class="row"><label>二级延时 B_Dly2</label><input id="bDly2" type="number" value="2" min="0"><span>s</span></div>
+    <div class="row"><label>使能选项</label>
+      <select id="bEnOpt">
+        <option value="0">0 - 不修改使能</option>
+        <option value="1">1 - 批量启用</option>
+        <option value="2">2 - 批量禁用</option>
+      </select>
+    </div>
+    <button class="btn" id="btnApply" onclick="applyBatch()">下发批量参数 (Apply_Batch)</button>
+    <button class="btn small" style="margin-top:8px;background:var(--panel2);color:var(--txt);border:1px solid var(--line)" onclick="resetLog()">清空事件记录 (Reset_Log)</button>
+    <div class="hint">
+      · 权限等级 &lt; 2 时，PLC 拒绝写入并记录<b>越权事件(类型6)</b><br>
+      · 要求 SP2 &gt; SP1 且 Hys ≥ 0，否则拒绝写入<br>
+      · 写入成功记录<b>参数修改事件(类型5)</b>，配置掉电保持<br>
+      · 单点微调可直接修改通道卡片上的 Cfg_SP1[i] 等成员
+    </div>
+  </div>
+
+  <!-- 通道状态 -->
+  <div>
+    <div id="groups"></div>
+  </div>
+</div>
+
+<!-- 事件记录 -->
+<div class="box evt">
+  <h2>事件记录（环形缓冲 32 条，Evt_Head 循环覆盖）</h2>
+  <table>
+    <thead><tr><th>#</th><th>时间</th><th>通道</th><th>事件类型</th><th>当时PV(℃)</th></tr></thead>
+    <tbody id="evtBody"></tbody>
+  </table>
+  <div class="foot"><span>类型: 1=一级产生 2=一级解除 3=二级产生 4=二级解除 5=参数修改 6=越权拒绝</span><span class="tag">Evt_Ch/Evt_Type/Evt_PV/Evt_H/Evt_M/Evt_S[32]</span></div>
+</div>
+
+<script>
+// ============ 模拟数据（与 HMI_CMD UDT 成员一一对应） ============
+const CH_NAMES = [
+  "定子U1","定子V1","定子W1","定子U2","定子V2","定子W2",
+  "电机驱动端轴承","电机非驱动端轴承","电机轴承3","电机轴承4",
+  "泵轴承1","泵轴承2","泵轴承3","泵轴承4","减速机油温1","减速机油温2"
+];
+const GROUPS = [
+  {name:"组1 电机定子温度 (ch 0..5)",   range:[0,5]},
+  {name:"组2 电机轴承温度 (ch 6..9)",   range:[6,9]},
+  {name:"组3 渣浆泵轴承温度 (ch 10..13)", range:[10,13]},
+  {name:"组4 减速机油温 (ch 14..15)",   range:[14,15]}
+];
+const HMI = {
+  PV:        [131.5,128.2,127.6,126.0,125.4,124.8, 96.2,82.1,80.5,79.8, 71.0,70.2,69.5,68.8, 62.0,61.5],
+  Cfg_Enable:Array(16).fill(1),
+  Cfg_SP1:   [130,130,130,130,130,130, 85,85,85,85, 80,80,80,80, 75,75],
+  Cfg_SP2:   [145,145,145,145,145,145, 95,95,95,95, 90,90,90,90, 85,85],
+  Cfg_Hys:   Array(16).fill(3),
+  Cfg_Dly1:  Array(16).fill(3),
+  Cfg_Dly2:  Array(16).fill(2),
+  Sta_Alm1:  [1,0,0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0],
+  Sta_Alm2:  [0,0,0,0,0,0, 1,0,0,0, 0,0,0,0, 0,0],
+  Alm1_Count:1, Alm2_Count:1, Any_Alm1:true, Any_Alm2:true,
+  User_Level:2, Evt_Head:5
+};
+let EVT = [
+  {ch:0,type:1,pv:131.2,h:14,m:2,s:11},
+  {ch:0,type:2,pv:126.8,h:14,m:5,s:40},
+  {ch:0,type:1,pv:131.5,h:15,m:1,s:3},
+  {ch:6,type:3,pv:96.0,h:15,m:7,s:26},
+  {ch:0,type:5,pv:0,h:15,m:10,s:2}
+];
+const EVT_NAME = {1:"一级产生",2:"一级解除",3:"二级产生",4:"二级解除",5:"参数修改",6:"越权拒绝"};
+
+// ============ 渲染通道卡片 ============
+function render(){
+  let html="";
+  GROUPS.forEach(g=>{
+    html += `<div class="group"><div class="group-h"><h2>${g.name}</h2>
+      <span class="tag">SP1=${HMI.Cfg_SP1[g.range[0]]} SP2=${HMI.Cfg_SP2[g.range[0]]} Hys=${HMI.Cfg_Hys[g.range[0]]} Dly=${HMI.Cfg_Dly1[g.range[0]]}/${HMI.Cfg_Dly2[g.range[0]]}s</span></div>
+      <div class="grid">`;
+    for(let i=g.range[0]; i<=g.range[1]; i++){
+      const pv=HMI.PV[i], sp1=HMI.Cfg_SP1[i], sp2=HMI.Cfg_SP2[i];
+      const a1=HMI.Sta_Alm1[i], a2=HMI.Sta_Alm2[i], en=HMI.Cfg_Enable[i];
+      const max=Math.ceil(sp2*1.15);
+      const pct=Math.min(100, pv/max*100);
+      const cls=!en?"dis":(a2?"alm2":(a1?"alm1":""));
+      const barCls=a2?"a2":(a1?"a1":"");
+      html += `<div class="ch ${cls}">
+        <div class="ch-h"><span class="ch-name">[${i}] ${CH_NAMES[i]}</span>
+          <span class="leds">
+            <div class="led ${a1?'on-warn':''}" title="一级 Sta_Alm1[${i}]"></div>
+            <div class="led ${a2?'on-trip':''}" title="二级 Sta_Alm2[${i}]"></div>
+          </span></div>
+        <div class="ch-pv">${pv.toFixed(1)}<small> ℃ ${en?'':'(已禁用)'}</small></div>
+        <div class="bar"><i class="${barCls}" style="width:${pct}%"></i>
+          <mark style="left:${sp1/max*100}%" title="SP1"></mark>
+          <mark class="sp2" style="left:${sp2/max*100}%" title="SP2"></mark></div>
+        <div class="ch-cfg"><span>SP1 ${sp1}</span><span>SP2 ${sp2}</span><span>Hys ${HMI.Cfg_Hys[i]}</span></div>
+      </div>`;
+    }
+    html += "</div></div>";
+  });
+  document.getElementById("groups").innerHTML=html;
+
+  // 汇总
+  HMI.Alm1_Count = HMI.Sta_Alm1.filter(x=>x).length;
+  HMI.Alm2_Count = HMI.Sta_Alm2.filter(x=>x).length;
+  HMI.Any_Alm1 = HMI.Alm1_Count>0; HMI.Any_Alm2 = HMI.Alm2_Count>0;
+  document.getElementById("cnt1").textContent = HMI.Alm1_Count;
+  document.getElementById("cnt2").textContent = HMI.Alm2_Count;
+  document.getElementById("ledWarn").className = "led"+(HMI.Any_Alm1?" on-warn":"");
+  document.getElementById("ledTrip").className = "led"+(HMI.Any_Alm2?" on-trip":"");
+  document.getElementById("ledTripOut").className = "led"+(HMI.Any_Alm2?" on-trip":" on-ok");
+  document.getElementById("tripTxt").textContent = HMI.Any_Alm2?"ON":"OFF";
+  document.getElementById("sysState").textContent = HMI.Any_Alm2?"停机联锁":(HMI.Any_Alm1?"预警":"正常");
+  document.getElementById("lvlShow").textContent = HMI.User_Level;
+
+  // 事件表（最新在前）
+  const rows=[...EVT].reverse().map((e,idx)=>`<tr>
+    <td>${EVT.length-idx}</td><td>${pad(e.h)}:${pad(e.m)}:${pad(e.s)}</td>
+    <td>${e.type<5?"ch"+e.ch+" "+CH_NAMES[e.ch]:"组"+e.ch}</td>
+    <td class="t${e.type}">${EVT_NAME[e.type]}</td><td>${e.type<5?e.pv.toFixed(1):"-"}</td></tr>`).join("");
+  document.getElementById("evtBody").innerHTML=rows;
+}
+const pad=n=>String(n).padStart(2,"0");
+
+// ============ 批量下发（演示 PLC 侧校验逻辑） ============
+function applyBatch(){
+  const g=+document.getElementById("bGroup").value;
+  const b1=+document.getElementById("bSP1").value, b2=+document.getElementById("bSP2").value;
+  const h=+document.getElementById("bHys").value, d1=+document.getElementById("bDly1").value, d2=+document.getElementById("bDly2").value;
+  const eo=+document.getElementById("bEnOpt").value;
+  const now=new Date();
+  if(HMI.User_Level<2){ alert("权限不足 (User_Level<2)，已记录越权事件"); pushEvt(g,6); return; }
+  if(!(b2>b1 && h>=0)){ alert("参数非法：要求 SP2>SP1 且 Hys≥0，PLC 已拒绝"); return; }
+  const R={1:[0,5],2:[6,9],3:[10,13],4:[14,15]}[g]||[0,15];
+  for(let i=R[0];i<=R[1];i++){
+    HMI.Cfg_SP1[i]=b1; HMI.Cfg_SP2[i]=b2; HMI.Cfg_Hys[i]=h;
+    HMI.Cfg_Dly1[i]=d1; HMI.Cfg_Dly2[i]=d2;
+    if(eo===1)HMI.Cfg_Enable[i]=1; if(eo===2)HMI.Cfg_Enable[i]=0;
+  }
+  pushEvt(g,5); render();
+}
+function pushEvt(g,t){ const n=new Date(); EVT.push({ch:g,type:t,pv:0,h:n.getHours(),m:n.getMinutes(),s:n.getSeconds()}); if(EVT.length>32)EVT.shift(); }
+function resetLog(){ EVT=[]; render(); }
+
+// 权限按钮
+document.getElementById("permBtns").addEventListener("click",e=>{
+  if(e.target.dataset.l){ HMI.User_Level=+e.target.dataset.l;
+    document.querySelectorAll("#permBtns button").forEach(b=>b.classList.toggle("sel",b===e.target));
+    render(); }
+});
+
+render();
+</script>
+</body>
+</html>
