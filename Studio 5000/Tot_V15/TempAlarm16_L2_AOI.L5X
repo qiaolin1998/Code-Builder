@@ -1,1429 +1,414 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="36.00" TargetName="TempAlarm16_L2" TargetType="AddOnInstructionDefinition" TargetRevision="1.1 " TargetLastEdited="2026-10-20T00:00:00.000Z" ContainsContext="true" ExportDate="Tue Oct 20 00:00:00 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="36.00" TargetName="TempAlarm16_L2" TargetType="AddOnInstructionDefinition" TargetRevision="2.0" TargetLastEdited="2026-10-22T00:00:00.000Z" ContainsContext="true" ExportDate="Thu Oct 22 00:00:00 2026" ExportOptions="References NoRawData L5KData DecoratedData Context Dependencies ForceProtectedEncoding AllProjDocTrans">
 <Controller Use="Context" Name="TempAlarm16_L2">
 <DataTypes Use="Context">
-<DataType Name="TempAlarm16_L2_Type" Family="NoFamily" Class="User">
-<Members>
+<DataType Name="TempAlarm16_L2_Cfg_Type" Family="NoFamily" Class="User"><Members>
+<Member Name="SP1" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[L1 threshold Input MOVable]]></Description></Member>
+<Member Name="SP2" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[L2 threshold SP2>0 means configured]]></Description></Member>
+<Member Name="Hys" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Hysteresis release=SP-Hys]]></Description></Member>
+<Member Name="Dly1" DataType="DINT" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[L1 debounce delay s]]></Description></Member>
+<Member Name="Dly2" DataType="DINT" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[L2 debounce delay s]]></Description></Member>
+<Member Name="Enable" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Channel enable 1=on 0=off]]></Description></Member>
+<Member Name="Name" DataType="STRING" Dimension="16" Radix="NullType" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Channel tag name event log source]]></Description></Member>
+</Members></DataType>
+<DataType Name="TempAlarm16_L2_Type" Family="NoFamily" Class="User"><Members>
 <Member Name="ZZZZZZZZZZTempAlarm16_L20" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
-<Member Name="Apply_Batch" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZTempAlarm16_L20" BitNumber="0" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[批量参数写入命令(点动置位, 处理完自动复位)]]>
-</Description>
-</Member>
-<Member Name="Reset_Log" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZTempAlarm16_L20" BitNumber="1" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[清空事件记录命令(点动置位, 处理完自动复位)]]>
-</Description>
-</Member>
-<Member Name="Ack_Alm2" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZTempAlarm16_L20" BitNumber="2" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[二级报警确认命令(弹窗确认按钮, 清除全部未确认锁存)]]>
-</Description>
-</Member>
-<Member Name="PV" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[16路实时温度(由模拟量换算程序写入)]]>
-</Description>
-</Member>
-<Member Name="Cfg_Name" DataType="STRING" Dimension="16" Radix="NullType" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[测点标识名(事件记录快照源, HMI可修改)]]>
-</Description>
-</Member>
-<Member Name="Cfg_Enable" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[各通道使能(1=投入 0=退出)]]>
-</Description>
-</Member>
-<Member Name="Cfg_SP1" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[一级报警阈值(提示/高报)]]>
-</Description>
-</Member>
-<Member Name="Cfg_SP2" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[二级报警阈值(警告/高报)]]>
-</Description>
-</Member>
-<Member Name="Cfg_Hys" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[回差值(解除阈值=SP-Hys)]]>
-</Description>
-</Member>
-<Member Name="Cfg_Dly1" DataType="DINT" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[一级报警防抖延时(秒)]]>
-</Description>
-</Member>
-<Member Name="Cfg_Dly2" DataType="DINT" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[二级报警防抖延时(秒)]]>
-</Description>
-</Member>
-<Member Name="Sta_Alm1" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[一级报警状态(1=报警中, 非强制提示)]]>
-</Description>
-</Member>
-<Member Name="Sta_Alm2" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[二级报警状态(1=报警中, 强制介入)]]>
-</Description>
-</Member>
-<Member Name="Alm2_UnAck" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[二级报警未确认锁存(确认前保持, 驱动弹窗/声响)]]>
-</Description>
-</Member>
-<Member Name="Any_Alm1" DataType="BOOL" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[任一路一级报警总标志(横幅提示)]]>
-</Description>
-</Member>
-<Member Name="Any_Alm2" DataType="BOOL" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[任一路二级报警总标志]]>
-</Description>
-</Member>
-<Member Name="Any_Alm2_UnAck" DataType="BOOL" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[任一二级报警未确认总标志(弹窗+声响)]]>
-</Description>
-</Member>
-<Member Name="Alm1_Count" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[当前一级报警通道数]]>
-</Description>
-</Member>
-<Member Name="Alm2_Count" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[当前二级报警通道数]]>
-</Description>
-</Member>
-<Member Name="User_Level" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[当前操作员权限等级(>=2允许修改参数)]]>
-</Description>
-</Member>
-<Member Name="B_Group" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[批量目标组(0=全部 1=定子 2=电机轴承 3=泵轴承 4=减速机油)]]>
-</Description>
-</Member>
-<Member Name="B_SP1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[批量下发: 一级阈值]]>
-</Description>
-</Member>
-<Member Name="B_SP2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[批量下发: 二级阈值]]>
-</Description>
-</Member>
-<Member Name="B_Hys" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[批量下发: 回差值]]>
-</Description>
-</Member>
-<Member Name="B_Dly1" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[批量下发: 一级延时(秒)]]>
-</Description>
-</Member>
-<Member Name="B_Dly2" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[批量下发: 二级延时(秒)]]>
-</Description>
-</Member>
-<Member Name="B_EnableOpt" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[批量使能选项(0=不修改 1=全部启用 2=全部禁用)]]>
-</Description>
-</Member>
-<Member Name="Evt_Head" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[事件环形缓冲写指针(0..31)]]>
-</Description>
-</Member>
-<Member Name="Evt_Ch" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[事件通道号(参数事件记录组号)]]>
-</Description>
-</Member>
-<Member Name="Evt_ChName" DataType="STRING" Dimension="32" Radix="NullType" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[事件测点标识名快照(精准定位测点)]]>
-</Description>
-</Member>
-<Member Name="Evt_Type" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[事件类型(1=一级产生 2=一级解除 3=二级产生 4=二级解除 5=参数修改 6=越权拒绝)]]>
-</Description>
-</Member>
-<Member Name="Evt_PV" DataType="REAL" Dimension="32" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[事件发生时的温度值]]>
-</Description>
-</Member>
-<Member Name="Evt_H" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[事件时标-时]]>
-</Description>
-</Member>
-<Member Name="Evt_M" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[事件时标-分]]>
-</Description>
-</Member>
-<Member Name="Evt_S" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[事件时标-秒]]>
-</Description>
-</Member>
-</Members>
-</DataType>
+<Member Name="Apply_Batch" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZTempAlarm16_L20" BitNumber="0" ExternalAccess="Read/Write"><Description><![CDATA[Batch apply command pulse]]></Description></Member>
+<Member Name="Reset_Log" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZTempAlarm16_L20" BitNumber="1" ExternalAccess="Read/Write"><Description><![CDATA[Clear event log command pulse]]></Description></Member>
+<Member Name="Ack_Alm2" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZTempAlarm16_L20" BitNumber="2" ExternalAccess="Read/Write"><Description><![CDATA[Ack L2 alarms]]></Description></Member>
+<Member Name="Eff_SP1" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Effective L1 threshold]]></Description></Member>
+<Member Name="Eff_SP2" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Effective L2 threshold]]></Description></Member>
+<Member Name="Eff_Hys" DataType="REAL" Dimension="16" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Effective hysteresis]]></Description></Member>
+<Member Name="Eff_Dly1" DataType="DINT" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Effective L1 delay s]]></Description></Member>
+<Member Name="Eff_Dly2" DataType="DINT" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Effective L2 delay s]]></Description></Member>
+<Member Name="Eff_Enable" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Effective enable]]></Description></Member>
+<Member Name="Eff_Name" DataType="STRING" Dimension="16" Radix="NullType" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Effective channel tag name]]></Description></Member>
+<Member Name="Sta_Alm1" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[L1 alarm status]]></Description></Member>
+<Member Name="Sta_Alm2" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[L2 alarm status]]></Description></Member>
+<Member Name="Alm2_UnAck" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[L2 unack latch popup horn]]></Description></Member>
+<Member Name="Acc1" DataType="DINT" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Internal L1 debounce sec counter]]></Description></Member>
+<Member Name="Acc2" DataType="DINT" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Internal L2 debounce sec counter]]></Description></Member>
+<Member Name="PrevAlm1" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Internal L1 edge prev cycle]]></Description></Member>
+<Member Name="PrevAlm2" DataType="BOOL" Dimension="16" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Internal L2 edge prev cycle]]></Description></Member>
+<Member Name="Any_Alm1" DataType="BOOL" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Any L1 alarm total]]></Description></Member>
+<Member Name="Any_Alm2" DataType="BOOL" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Any L2 alarm total]]></Description></Member>
+<Member Name="Any_Alm2_UnAck" DataType="BOOL" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Any L2 unack total]]></Description></Member>
+<Member Name="Alm1_Count" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[L1 alarm count]]></Description></Member>
+<Member Name="Alm2_Count" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[L2 alarm count]]></Description></Member>
+<Member Name="User_Level" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Operator privilege GE2 allows batch]]></Description></Member>
+<Member Name="B_Group" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Batch target group 0all 1stator 2motor 3pump 4gear]]></Description></Member>
+<Member Name="B_SP1" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Batch L1 threshold]]></Description></Member>
+<Member Name="B_SP2" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Batch L2 threshold]]></Description></Member>
+<Member Name="B_Hys" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Batch hysteresis]]></Description></Member>
+<Member Name="B_Dly1" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Batch L1 delay s]]></Description></Member>
+<Member Name="B_Dly2" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Batch L2 delay s]]></Description></Member>
+<Member Name="Evt_Head" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Event ring write pointer 0..31]]></Description></Member>
+<Member Name="Evt_Ch" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Event channel number]]></Description></Member>
+<Member Name="Evt_ChName" DataType="STRING" Dimension="32" Radix="NullType" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Event channel tag name snapshot]]></Description></Member>
+<Member Name="Evt_Type" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Event type 1L1on 2L1off 3L2on 4L2off 5batch 6denied]]></Description></Member>
+<Member Name="Evt_PV" DataType="REAL" Dimension="32" Radix="Float" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[PV at event]]></Description></Member>
+<Member Name="Evt_H" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Event timestamp hour]]></Description></Member>
+<Member Name="Evt_M" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Event timestamp min]]></Description></Member>
+<Member Name="Evt_S" DataType="DINT" Dimension="32" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write"><Description><![CDATA[Event timestamp sec]]></Description></Member>
+</Members></DataType>
 </DataTypes>
 <AddOnInstructionDefinitions Use="Context">
-<AddOnInstructionDefinition Use="Target" Name="TempAlarm16_L2" Revision="1.1" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2026-10-20T00:00:00.000Z" CreatedBy="Trae" EditedDate="2026-10-20T00:00:00.000Z" EditedBy="Trae" SoftwareRevision="v36.00">
+<AddOnInstructionDefinition Use="Target" Name="TempAlarm16_L2" Revision="2.0" ExecutePrescan="false" ExecutePostscan="false" ExecuteEnableInFalse="false" CreatedDate="2026-10-20T00:00:00.000Z" CreatedBy="Trae" EditedDate="2026-10-22T00:00:00.000Z" EditedBy="Trae" SoftwareRevision="v36.00">
 <Parameters>
-<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
-<Description>
-<![CDATA[使能输入]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
-<Description>
-<![CDATA[使能输出]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[系统时钟-时(事件记录时标)]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[系统时钟-分(事件记录时标)]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="Second" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write">
-<Description>
-<![CDATA[系统时钟-秒(事件记录时标)]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="Out_Warn" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
-<Description>
-<![CDATA[一级报警总出口(非强制提示横幅, 任一路一级报警时置位)]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="Out_Trip" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
-<Description>
-<![CDATA[二级报警总出口(停机联锁, 任一路二级报警时置位)]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="Out_Horn" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only">
-<Description>
-<![CDATA[声响提醒输出(任一二级报警未确认时置位, 确认后复位)]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
-</DefaultData>
-</Parameter>
-<Parameter Name="HMI_CMD" TagType="Base" DataType="TempAlarm16_L2_Type" Usage="InOut" Required="true" Visible="true" Constant="false">
-<Description>
-<![CDATA[HMI批量配置/状态/未确认锁存/事件记录(掉电保持)]]>
-</Description>
-</Parameter>
+<Parameter Name="EnableIn" TagType="Base" DataType="BOOL" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only"><Description><![CDATA[Enable input]]></Description><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0"/></DefaultData></Parameter>
+<Parameter Name="EnableOut" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only"><Description><![CDATA[Enable output]]></Description><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0"/></DefaultData></Parameter>
+<Parameter Name="Hour" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><Description><![CDATA[Clock hour event log]]></Description><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
+<Parameter Name="Minute" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><Description><![CDATA[Clock minute event log]]></Description><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
+<Parameter Name="Second" TagType="Base" DataType="DINT" Usage="Input" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read/Write"><Description><![CDATA[Clock second event log plus debounce tick]]></Description><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="DINT" Radix="Decimal" Value="0"/></DefaultData></Parameter>
+<Parameter Name="PV" TagType="Base" DataType="REAL" Dimension="16" Usage="Input" Radix="Float" Required="false" Visible="false" ExternalAccess="Read/Write"><Description><![CDATA[16x PV input PV0 through PV15]]></Description></Parameter>
+<Parameter Name="In_Cfg" TagType="Base" DataType="TempAlarm16_L2_Cfg_Type" Usage="Input" Required="false" Visible="true" Constant="false"><Description><![CDATA[Input config UDT SP1 SP2 Hys Dly1 Dly2 Enable Name 16 each external MOV]]></Description></Parameter>
+<Parameter Name="Out_Warn" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only"><Description><![CDATA[L1 total output non forced banner]]></Description><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0"/></DefaultData></Parameter>
+<Parameter Name="Out_Trip" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only"><Description><![CDATA[L2 total output shutdown trip]]></Description><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0"/></DefaultData></Parameter>
+<Parameter Name="Out_Horn" TagType="Base" DataType="BOOL" Usage="Output" Radix="Decimal" Required="false" Visible="false" ExternalAccess="Read Only"><Description><![CDATA[Horn any L2 unack]]></Description><DefaultData Format="L5K"><![CDATA[0]]></DefaultData><DefaultData Format="Decorated"><DataValue DataType="BOOL" Radix="Decimal" Value="0"/></DefaultData></Parameter>
+<Parameter Name="HMI_CMD" TagType="Base" DataType="TempAlarm16_L2_Type" Usage="InOut" Required="true" Visible="true" Constant="false"><Description><![CDATA[Runtime state Eff mirror Sta Alm2 UnAck event ring B batch params Apply Batch Reset Log Ack Alm2]]></Description></Parameter>
 </Parameters>
 <LocalTags>
-<LocalTag Name="Tmr1" DataType="TIMER" Dimension="16" Radix="NullType" ExternalAccess="None">
-<Description>
-<![CDATA[各通道一级报警防抖定时器]]>
-</Description>
-</LocalTag>
-<LocalTag Name="Tmr2" DataType="TIMER" Dimension="16" Radix="NullType" ExternalAccess="None">
-<Description>
-<![CDATA[各通道二级报警防抖定时器]]>
-</Description>
-</LocalTag>
-<LocalTag Name="PrevAlm1" DataType="BOOL" Dimension="16" Radix="Decimal" ExternalAccess="None">
-<Description>
-<![CDATA[一级报警状态边沿检测(上一周期值)]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[[0,0]]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
-</DefaultData>
-</LocalTag>
-<LocalTag Name="PrevAlm2" DataType="BOOL" Dimension="16" Radix="Decimal" ExternalAccess="None">
-<Description>
-<![CDATA[二级报警状态边沿检测(上一周期值)]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[[0,0]]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
-</DefaultData>
-</LocalTag>
-<LocalTag Name="i" DataType="DINT" Radix="Decimal" ExternalAccess="None">
-<Description>
-<![CDATA[FOR循环索引]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
-</DefaultData>
-</LocalTag>
-<LocalTag Name="GS" DataType="DINT" Radix="Decimal" ExternalAccess="None">
-<Description>
-<![CDATA[批量写入起始通道下标]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
-</DefaultData>
-</LocalTag>
-<LocalTag Name="GE" DataType="DINT" Radix="Decimal" ExternalAccess="None">
-<Description>
-<![CDATA[批量写入结束通道下标]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
-</DefaultData>
-</LocalTag>
-<LocalTag Name="IsFirstScan" DataType="BOOL" Radix="Decimal" ExternalAccess="None">
-<Description>
-<![CDATA[首次扫描标志(上电写入默认整定值与测点名)]]>
-</Description>
-<DefaultData Format="L5K">
-<![CDATA[0]]>
-</DefaultData>
-<DefaultData Format="Decorated">
-<DataValue DataType="BOOL" Radix="Decimal" Value="0"/>
-</DefaultData>
-</LocalTag>
+<LocalTag Name="Tick" DataType="BOOL" Radix="Decimal" ExternalAccess="None"><Description><![CDATA[1s tick Second changes]]></Description></LocalTag>
+<LocalTag Name="Prev_Second" DataType="DINT" Radix="Decimal" ExternalAccess="None"><Description><![CDATA[Previous Second value]]></Description></LocalTag>
+<LocalTag Name="i" DataType="DINT" Radix="Decimal" ExternalAccess="None"><Description><![CDATA[FOR loop index]]></Description></LocalTag>
+<LocalTag Name="GS" DataType="DINT" Radix="Decimal" ExternalAccess="None"><Description><![CDATA[Batch start channel idx]]></Description></LocalTag>
+<LocalTag Name="GE" DataType="DINT" Radix="Decimal" ExternalAccess="None"><Description><![CDATA[Batch end channel idx]]></Description></LocalTag>
+<LocalTag Name="IsFirstScan" DataType="BOOL" Radix="Decimal" ExternalAccess="None"><Description><![CDATA[First scan flag]]></Description></LocalTag>
 </LocalTags>
-<Routines>
-<Routine Name="Logic" Type="ST">
-<STContent>
-<Line Number="0">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="1">
-<![CDATA[// AOI 名称: TempAlarm16_L2 (16路温度测点二级超温报警批量处理)]]>
-</Line>
-<Line Number="2">
-<![CDATA[// 版本: 1.0]]>
-</Line>
-<Line Number="3">
-<![CDATA[// 编程语言: Structured Text (ST)]]>
-</Line>
-<Line Number="4">
-<![CDATA[// 适用平台: Studio 5000 (ControlLogix/CompactLogix)]]>
-</Line>
-<Line Number="5">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="6">
-<![CDATA[// 功能概述:]]>
-</Line>
-<Line Number="7">
-<![CDATA[// 1. 对全部 16 路温度测点进行批量二级超温监视:]]>
-</Line>
-<Line Number="8">
-<![CDATA[//      一级报警(提示/高报) -> 非强制提示: HMI 顶部醒目横幅 + 测点卡片高亮,]]>
-</Line>
-<Line Number="9">
-<![CDATA[//                             不弹窗不鸣笛, 提醒值班人员关注该测点变化趋势;]]>
-</Line>
-<Line Number="10">
-<![CDATA[//      二级报警(警告/高报) -> 强制介入提示: HMI 弹窗 + 声响提醒,]]>
-</Line>
-<Line Number="11">
-<![CDATA[//                             且"未确认"状态被锁存, 值班人员必须按下确认键]]>
-</Line>
-<Line Number="12">
-<![CDATA[//                             (Ack_Alm2) 才能解除弹窗与声响;]]>
-</Line>
-<Line Number="13">
-<![CDATA[// 2. 所有测点配置与状态均采用数组存储, 核心逻辑用一个 FOR 循环]]>
-</Line>
-<Line Number="14">
-<![CDATA[//    统一处理, 16 路共用同一份代码, 无任何重复逻辑;]]>
-</Line>
-<Line Number="15">
-<![CDATA[// 3. 每路独立配置: 使能 / 测点标识名 / 一级阈值 / 二级阈值 / 回差 / 延时;]]>
-</Line>
-<Line Number="16">
-<![CDATA[// 4. 全部报警通道统一具备:]]>
-</Line>
-<Line Number="17">
-<![CDATA[//      - 回差过滤: 报警产生阈值 = SP, 解除阈值 = SP - Hys,]]>
-</Line>
-<Line Number="18">
-<![CDATA[//        防止 PV 在阈值附近小幅波动时报警反复抖动;]]>
-</Line>
-<Line Number="19">
-<![CDATA[//      - 延时防抖: 报警条件须连续成立达到设定延时后才真正置位,]]>
-</Line>
-<Line Number="20">
-<![CDATA[//        瞬时尖峰/干扰不会误触发; 解除为立即动作(经回差判定);]]>
-</Line>
-<Line Number="21">
-<![CDATA[// 5. 事件记录: 环形缓冲保存最近 32 条事件, 每条记录包含:]]>
-</Line>
-<Line Number="22">
-<![CDATA[//      测点标识名(快照) + 通道号 + 事件类型 + 当时 PV + 时标,]]>
-</Line>
-<Line Number="23">
-<![CDATA[//      可凭测点标识直接追溯到对应测点的实时数据与历史状态,]]>
-</Line>
-<Line Number="24">
-<![CDATA[//      记录数组整体可供 HMI/上位机查询与导出(测点信息随记录同步);]]>
-</Line>
-<Line Number="25">
-<![CDATA[// 6. 批量参数配置: HMI 可按"组"统一下发阈值/回差/延时,]]>
-</Line>
-<Line Number="26">
-<![CDATA[//    写入前校验操作权限等级(User_Level >= 2 才允许修改);]]>
-</Line>
-<Line Number="27">
-<![CDATA[// 7. 掉电保持: 全部配置与状态保存在 HMI_CMD(InOut) 对应的]]>
-</Line>
-<Line Number="28">
-<![CDATA[//    控制器标签中, ControlLogix 标签值掉电保持, 重启后参数不丢失。]]>
-</Line>
-<Line Number="29">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="30">
-<![CDATA[// 测点通道分配表(下标 0..15):]]>
-</Line>
-<Line Number="31">
-<![CDATA[//   组1 电机定子温度(6点): 0=定子U1  1=定子V1  2=定子W1]]>
-</Line>
-<Line Number="32">
-<![CDATA[//                          3=定子U2  4=定子V2  5=定子W2]]>
-</Line>
-<Line Number="33">
-<![CDATA[//   组2 电机轴承温度(4点): 6=驱动端轴承  7=非驱动端轴承]]>
-</Line>
-<Line Number="34">
-<![CDATA[//                          8=轴承3        9=轴承4]]>
-</Line>
-<Line Number="35">
-<![CDATA[//   组3 渣浆泵轴承温度(4点): 10=泵轴承1  11=泵轴承2]]>
-</Line>
-<Line Number="36">
-<![CDATA[//                            12=泵轴承3  13=泵轴承4]]>
-</Line>
-<Line Number="37">
-<![CDATA[//   组4 减速机油温(2点):   14=油温1     15=油温2]]>
-</Line>
-<Line Number="38">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="39">
-<![CDATA[// 默认整定值(首次上电自动写入, 之后可在 HMI 修改):]]>
-</Line>
-<Line Number="40">
-<![CDATA[//   组1 定子:      SP1=130  SP2=145  Hys=3  Dly1=3s  Dly2=2s]]>
-</Line>
-<Line Number="41">
-<![CDATA[//   组2 电机轴承:  SP1=85   SP2=95   Hys=3  Dly1=3s  Dly2=2s]]>
-</Line>
-<Line Number="42">
-<![CDATA[//   组3 泵轴承:    SP1=80   SP2=90   Hys=3  Dly1=3s  Dly2=2s]]>
-</Line>
-<Line Number="43">
-<![CDATA[//   组4 减速机油:  SP1=75   SP2=85   Hys=3  Dly1=3s  Dly2=2s]]>
-</Line>
-<Line Number="44">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="45">
-<![CDATA[// 报警动作逻辑(单通道, 一级/二级结构相同):]]>
-</Line>
-<Line Number="46">
-<![CDATA[//        产生: PV >= SP 且连续保持 Dly 秒  -> Alm = 1 (记录事件)]]>
-</Line>
-<Line Number="47">
-<![CDATA[//        解除: PV <  SP - Hys (立即)       -> Alm = 0 (记录事件)]]>
-</Line>
-<Line Number="48">
-<![CDATA[//   SP-Hys ──────┐]]>
-</Line>
-<Line Number="49">
-<![CDATA[//                │ 解除区(回差带内保持原状态)]]>
-</Line>
-<Line Number="50">
-<![CDATA[//   SP    ───────┴── 产生线]]>
-</Line>
-<Line Number="51">
-<![CDATA[// 变量约定:]]>
-</Line>
-<Line Number="52">
-<![CDATA[//   输入  : Hour / Minute / Second (DINT) -- 事件记录时标]]>
-</Line>
-<Line Number="53">
-<![CDATA[//   输出  : Out_Warn(BOOL) 任一路一级报警总出口(非强制提示横幅)]]>
-</Line>
-<Line Number="54">
-<![CDATA[//           Out_Trip(BOOL) 任一路二级报警总出口(停机联锁)]]>
-</Line>
-<Line Number="55">
-<![CDATA[//           Out_Horn(BOOL) 声响提醒输出(任一二级报警"未确认"时置位,]]>
-</Line>
-<Line Number="56">
-<![CDATA[//                          接 HMI 声音/现场电铃, 确认后自动复位)]]>
-</Line>
-<Line Number="57">
-<![CDATA[//   InOut : HMI_CMD - 详见 UDT 注释(PV/测点名/配置/状态/未确认锁存/]]>
-</Line>
-<Line Number="58">
-<![CDATA[//                     批量参数/事件记录含测点标识快照)]]>
-</Line>
-<Line Number="59">
-<![CDATA[//   本地  : Tmr1/Tmr2 TIMER[16] 每路独立的防抖定时器]]>
-</Line>
-<Line Number="60">
-<![CDATA[//           PrevAlm1/PrevAlm2 BOOL[16] 报警状态边沿检测]]>
-</Line>
-<Line Number="61">
-<![CDATA[//           i, GS, GE (DINT) / IsFirstScan (BOOL)]]>
-</Line>
-<Line Number="62">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="63">
-<![CDATA[]]>
-</Line>
-<Line Number="64">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="65">
-<![CDATA[// 功能段 1: 首次扫描初始化(写入默认整定值)]]>
-</Line>
-<Line Number="66">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="67">
-<![CDATA[// 判据: 若某通道 Cfg_SP2 <= 0 视为"未整定", 按所属组写入默认值。]]>
-</Line>
-<Line Number="68">
-<![CDATA[// 仅在上电后第一个扫描周期执行, 此后参数由 HMI 维护并掉电保持。]]>
-</Line>
-<Line Number="69">
-<![CDATA[IF IsFirstScan THEN]]>
-</Line>
-<Line Number="70">
-<![CDATA[    FOR i := 0 TO 15 DO]]>
-</Line>
-<Line Number="71">
-<![CDATA[        IF HMI_CMD.Cfg_SP2[i] <= 0.0 THEN]]>
-</Line>
-<Line Number="72">
-<![CDATA[            IF i <= 5 THEN]]>
-</Line>
-<Line Number="73">
-<![CDATA[                HMI_CMD.Cfg_SP1[i] := 130.0;  HMI_CMD.Cfg_SP2[i] := 145.0;]]>
-</Line>
-<Line Number="74">
-<![CDATA[            ELSIF i <= 9 THEN]]>
-</Line>
-<Line Number="75">
-<![CDATA[                HMI_CMD.Cfg_SP1[i] := 85.0;   HMI_CMD.Cfg_SP2[i] := 95.0;]]>
-</Line>
-<Line Number="76">
-<![CDATA[            ELSIF i <= 13 THEN]]>
-</Line>
-<Line Number="77">
-<![CDATA[                HMI_CMD.Cfg_SP1[i] := 80.0;   HMI_CMD.Cfg_SP2[i] := 90.0;]]>
-</Line>
-<Line Number="78">
-<![CDATA[            ELSE]]>
-</Line>
-<Line Number="79">
-<![CDATA[                HMI_CMD.Cfg_SP1[i] := 75.0;   HMI_CMD.Cfg_SP2[i] := 85.0;]]>
-</Line>
-<Line Number="80">
-<![CDATA[            END_IF;]]>
-</Line>
-<Line Number="81">
-<![CDATA[            HMI_CMD.Cfg_Hys[i]  := 3.0;]]>
-</Line>
-<Line Number="82">
-<![CDATA[            HMI_CMD.Cfg_Dly1[i] := 3;]]>
-</Line>
-<Line Number="83">
-<![CDATA[            HMI_CMD.Cfg_Dly2[i] := 2;]]>
-</Line>
-<Line Number="84">
-<![CDATA[            HMI_CMD.Cfg_Enable[i] := 1;]]>
-</Line>
-<Line Number="85">
-<![CDATA[        END_IF;]]>
-</Line>
-<Line Number="86">
-<![CDATA[    END_FOR;]]>
-</Line>
-<Line Number="87">
-<![CDATA[]]>
-</Line>
-<Line Number="88">
-<![CDATA[    // 默认测点标识名(点名为空时写入; 默认用英文代号避免控制器内中文乱码,]]>
-</Line>
-<Line Number="89">
-<![CDATA[    // HMI 侧可改为中文点名, 事件记录保存的是写入时刻的快照)]]>
-</Line>
-<Line Number="90">
-<![CDATA[    FOR i := 0 TO 15 DO]]>
-</Line>
-<Line Number="91">
-<![CDATA[        IF LEN(HMI_CMD.Cfg_Name[i]) = 0 THEN]]>
-</Line>
-<Line Number="92">
-<![CDATA[            CASE i OF]]>
-</Line>
-<Line Number="93">
-<![CDATA[                0:  HMI_CMD.Cfg_Name[0]  := 'StatorU1';]]>
-</Line>
-<Line Number="94">
-<![CDATA[                1:  HMI_CMD.Cfg_Name[1]  := 'StatorV1';]]>
-</Line>
-<Line Number="95">
-<![CDATA[                2:  HMI_CMD.Cfg_Name[2]  := 'StatorW1';]]>
-</Line>
-<Line Number="96">
-<![CDATA[                3:  HMI_CMD.Cfg_Name[3]  := 'StatorU2';]]>
-</Line>
-<Line Number="97">
-<![CDATA[                4:  HMI_CMD.Cfg_Name[4]  := 'StatorV2';]]>
-</Line>
-<Line Number="98">
-<![CDATA[                5:  HMI_CMD.Cfg_Name[5]  := 'StatorW2';]]>
-</Line>
-<Line Number="99">
-<![CDATA[                6:  HMI_CMD.Cfg_Name[6]  := 'MtrBrgDE';]]>
-</Line>
-<Line Number="100">
-<![CDATA[                7:  HMI_CMD.Cfg_Name[7]  := 'MtrBrgNDE';]]>
-</Line>
-<Line Number="101">
-<![CDATA[                8:  HMI_CMD.Cfg_Name[8]  := 'MtrBrg3';]]>
-</Line>
-<Line Number="102">
-<![CDATA[                9:  HMI_CMD.Cfg_Name[9]  := 'MtrBrg4';]]>
-</Line>
-<Line Number="103">
-<![CDATA[                10: HMI_CMD.Cfg_Name[10] := 'PumpBrg1';]]>
-</Line>
-<Line Number="104">
-<![CDATA[                11: HMI_CMD.Cfg_Name[11] := 'PumpBrg2';]]>
-</Line>
-<Line Number="105">
-<![CDATA[                12: HMI_CMD.Cfg_Name[12] := 'PumpBrg3';]]>
-</Line>
-<Line Number="106">
-<![CDATA[                13: HMI_CMD.Cfg_Name[13] := 'PumpBrg4';]]>
-</Line>
-<Line Number="107">
-<![CDATA[                14: HMI_CMD.Cfg_Name[14] := 'GearOil1';]]>
-</Line>
-<Line Number="108">
-<![CDATA[                15: HMI_CMD.Cfg_Name[15] := 'GearOil2';]]>
-</Line>
-<Line Number="109">
-<![CDATA[            END_CASE;]]>
-</Line>
-<Line Number="110">
-<![CDATA[        END_IF;]]>
-</Line>
-<Line Number="111">
-<![CDATA[    END_FOR;]]>
-</Line>
-<Line Number="112">
-<![CDATA[    IsFirstScan := 0;]]>
-</Line>
-<Line Number="113">
-<![CDATA[END_IF;]]>
-</Line>
-<Line Number="114">
-<![CDATA[]]>
-</Line>
-<Line Number="115">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="116">
-<![CDATA[// 功能段 2: 批量参数写入(权限校验 + 按组下发)]]>
-</Line>
-<Line Number="117">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="118">
-<![CDATA[// HMI 置位 Apply_Batch 发起批量修改:]]>
-</Line>
-<Line Number="119">
-<![CDATA[//   B_Group 选择目标组: 0=全部16路 1=定子 2=电机轴承 3=泵轴承 4=减速机油]]>
-</Line>
-<Line Number="120">
-<![CDATA[//   B_SP1/B_SP2/B_Hys/B_Dly1/B_Dly2 为统一下发的整定值]]>
-</Line>
-<Line Number="121">
-<![CDATA[//   B_EnableOpt: 0=不修改使能 1=批量启用 2=批量禁用]]>
-</Line>
-<Line Number="122">
-<![CDATA[// 安全规则:]]>
-</Line>
-<Line Number="123">
-<![CDATA[//   - User_Level < 2 时拒绝写入(事件类型6: 越权操作);]]>
-</Line>
-<Line Number="124">
-<![CDATA[//   - 合法性检查: 要求 SP2 > SP1 且 Hys >= 0, 防止误设颠倒阈值;]]>
-</Line>
-<Line Number="125">
-<![CDATA[//   - 写入成功后记录事件(类型5), 便于参数修改审计追溯。]]>
-</Line>
-<Line Number="126">
-<![CDATA[IF HMI_CMD.Apply_Batch THEN]]>
-</Line>
-<Line Number="127">
-<![CDATA[    IF HMI_CMD.User_Level >= 2 THEN]]>
-</Line>
-<Line Number="128">
-<![CDATA[        IF (HMI_CMD.B_SP2 > HMI_CMD.B_SP1) AND (HMI_CMD.B_Hys >= 0.0) THEN]]>
-</Line>
-<Line Number="129">
-<![CDATA[]]>
-</Line>
-<Line Number="130">
-<![CDATA[            // 由组号换算通道下标范围 [GS, GE]]]>
-</Line>
-<Line Number="131">
-<![CDATA[            CASE HMI_CMD.B_Group OF]]>
-</Line>
-<Line Number="132">
-<![CDATA[                1: GS := 0;   GE := 5;     // 电机定子]]>
-</Line>
-<Line Number="133">
-<![CDATA[                2: GS := 6;   GE := 9;     // 电机轴承]]>
-</Line>
-<Line Number="134">
-<![CDATA[                3: GS := 10;  GE := 13;    // 渣浆泵轴承]]>
-</Line>
-<Line Number="135">
-<![CDATA[                4: GS := 14;  GE := 15;    // 减速机油]]>
-</Line>
-<Line Number="136">
-<![CDATA[                ELSE GS := 0; GE := 15;    // 0 及其他: 全部]]>
-</Line>
-<Line Number="137">
-<![CDATA[            END_CASE;]]>
-</Line>
-<Line Number="138">
-<![CDATA[]]>
-</Line>
-<Line Number="139">
-<![CDATA[            FOR i := GS TO GE DO]]>
-</Line>
-<Line Number="140">
-<![CDATA[                HMI_CMD.Cfg_SP1[i] := HMI_CMD.B_SP1;]]>
-</Line>
-<Line Number="141">
-<![CDATA[                HMI_CMD.Cfg_SP2[i] := HMI_CMD.B_SP2;]]>
-</Line>
-<Line Number="142">
-<![CDATA[                HMI_CMD.Cfg_Hys[i] := HMI_CMD.B_Hys;]]>
-</Line>
-<Line Number="143">
-<![CDATA[                HMI_CMD.Cfg_Dly1[i] := HMI_CMD.B_Dly1;]]>
-</Line>
-<Line Number="144">
-<![CDATA[                HMI_CMD.Cfg_Dly2[i] := HMI_CMD.B_Dly2;]]>
-</Line>
-<Line Number="145">
-<![CDATA[                IF HMI_CMD.B_EnableOpt = 1 THEN]]>
-</Line>
-<Line Number="146">
-<![CDATA[                    HMI_CMD.Cfg_Enable[i] := 1;]]>
-</Line>
-<Line Number="147">
-<![CDATA[                ELSIF HMI_CMD.B_EnableOpt = 2 THEN]]>
-</Line>
-<Line Number="148">
-<![CDATA[                    HMI_CMD.Cfg_Enable[i] := 0;]]>
-</Line>
-<Line Number="149">
-<![CDATA[                END_IF;]]>
-</Line>
-<Line Number="150">
-<![CDATA[            END_FOR;]]>
-</Line>
-<Line Number="151">
-<![CDATA[]]>
-</Line>
-<Line Number="152">
-<![CDATA[            // 事件: 类型5 = 批量参数修改成功 (Evt_Ch 记录目标组号)]]>
-</Line>
-<Line Number="153">
-<![CDATA[            HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := HMI_CMD.B_Group;]]>
-</Line>
-<Line Number="154">
-<![CDATA[            HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := 'BATCH';]]>
-</Line>
-<Line Number="155">
-<![CDATA[            HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 5;]]>
-</Line>
-<Line Number="156">
-<![CDATA[            HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := 0.0;]]>
-</Line>
-<Line Number="157">
-<![CDATA[            HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]>
-</Line>
-<Line Number="158">
-<![CDATA[            HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]>
-</Line>
-<Line Number="159">
-<![CDATA[            HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]>
-</Line>
-<Line Number="160">
-<![CDATA[            HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]>
-</Line>
-<Line Number="161">
-<![CDATA[        END_IF;]]>
-</Line>
-<Line Number="162">
-<![CDATA[    ELSE]]>
-</Line>
-<Line Number="163">
-<![CDATA[        // 事件: 类型6 = 越权修改被拒绝]]>
-</Line>
-<Line Number="164">
-<![CDATA[        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := HMI_CMD.B_Group;]]>
-</Line>
-<Line Number="165">
-<![CDATA[        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := 'BATCH';]]>
-</Line>
-<Line Number="166">
-<![CDATA[        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 6;]]>
-</Line>
-<Line Number="167">
-<![CDATA[        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := 0.0;]]>
-</Line>
-<Line Number="168">
-<![CDATA[        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]>
-</Line>
-<Line Number="169">
-<![CDATA[        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]>
-</Line>
-<Line Number="170">
-<![CDATA[        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]>
-</Line>
-<Line Number="171">
-<![CDATA[        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]>
-</Line>
-<Line Number="172">
-<![CDATA[    END_IF;]]>
-</Line>
-<Line Number="173">
-<![CDATA[    HMI_CMD.Apply_Batch := 0;]]>
-</Line>
-<Line Number="174">
-<![CDATA[END_IF;]]>
-</Line>
-<Line Number="175">
-<![CDATA[]]>
-</Line>
-<Line Number="176">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="177">
-<![CDATA[// 功能段 3: 16 路报警核心批量处理(FOR 循环统一逻辑)]]>
-</Line>
-<Line Number="178">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="179">
-<![CDATA[// 每路通道依次执行:]]>
-</Line>
-<Line Number="180">
-<![CDATA[//   1) 使能判断: 禁用通道强制解除报警并复位定时器;]]>
-</Line>
-<Line Number="181">
-<![CDATA[//   2) 一级报警: 条件(PV>=SP1)驱动 TON 防抖, 延时到后置位;]]>
-</Line>
-<Line Number="182">
-<![CDATA[//                 PV < SP1-Hys 时立即解除(回差);]]>
-</Line>
-<Line Number="183">
-<![CDATA[//   3) 二级报警: 与一级同构, 但使用 SP2/Dly2;]]>
-</Line>
-<Line Number="184">
-<![CDATA[//   4) 边沿检测: 置位/解除瞬间写入事件环形缓冲(类型1..4)。]]>
-</Line>
-<Line Number="185">
-<![CDATA[// 说明: 每路使用独立的 Tmr1[i]/Tmr2[i] 与 PrevAlm*[i],]]>
-</Line>
-<Line Number="186">
-<![CDATA[//       16 路互不影响, 任何一路动作不改变其余通道状态。]]>
-</Line>
-<Line Number="187">
-<![CDATA[FOR i := 0 TO 15 DO]]>
-</Line>
-<Line Number="188">
-<![CDATA[]]>
-</Line>
-<Line Number="189">
-<![CDATA[    // ---------- 通道禁用时: 强制安全状态 ----------]]>
-</Line>
-<Line Number="190">
-<![CDATA[    IF NOT HMI_CMD.Cfg_Enable[i] THEN]]>
-</Line>
-<Line Number="191">
-<![CDATA[        HMI_CMD.Sta_Alm1[i] := 0;]]>
-</Line>
-<Line Number="192">
-<![CDATA[        HMI_CMD.Sta_Alm2[i] := 0;]]>
-</Line>
-<Line Number="193">
-<![CDATA[        Tmr1[i].TimerEnable := 0;]]>
-</Line>
-<Line Number="194">
-<![CDATA[        Tmr1[i].PRE := 0;]]>
-</Line>
-<Line Number="195">
-<![CDATA[        TON(Tmr1[i]);]]>
-</Line>
-<Line Number="196">
-<![CDATA[        Tmr2[i].TimerEnable := 0;]]>
-</Line>
-<Line Number="197">
-<![CDATA[        Tmr2[i].PRE := 0;]]>
-</Line>
-<Line Number="198">
-<![CDATA[        TON(Tmr2[i]);]]>
-</Line>
-<Line Number="199">
-<![CDATA[]]>
-</Line>
-<Line Number="200">
-<![CDATA[    ELSE]]>
-</Line>
-<Line Number="201">
-<![CDATA[        // ---------- 一级报警(预警) ----------]]>
-</Line>
-<Line Number="202">
-<![CDATA[        // 防抖定时器: PV 连续 >= SP1 达到 Dly1 秒后 DN 置位]]>
-</Line>
-<Line Number="203">
-<![CDATA[        Tmr1[i].PRE := HMI_CMD.Cfg_Dly1[i] * 1000;   // 秒 -> 毫秒]]>
-</Line>
-<Line Number="204">
-<![CDATA[        Tmr1[i].TimerEnable := (HMI_CMD.PV[i] >= HMI_CMD.Cfg_SP1[i]);]]>
-</Line>
-<Line Number="205">
-<![CDATA[        TON(Tmr1[i]);]]>
-</Line>
-<Line Number="206">
-<![CDATA[]]>
-</Line>
-<Line Number="207">
-<![CDATA[        // 回差解除: PV 跌回 SP1-Hys 以下, 立即解除并复位定时器]]>
-</Line>
-<Line Number="208">
-<![CDATA[        IF HMI_CMD.PV[i] < (HMI_CMD.Cfg_SP1[i] - HMI_CMD.Cfg_Hys[i]) THEN]]>
-</Line>
-<Line Number="209">
-<![CDATA[            HMI_CMD.Sta_Alm1[i] := 0;]]>
-</Line>
-<Line Number="210">
-<![CDATA[            Tmr1[i].TimerEnable := 0;]]>
-</Line>
-<Line Number="211">
-<![CDATA[            TON(Tmr1[i]);]]>
-</Line>
-<Line Number="212">
-<![CDATA[        ELSIF Tmr1[i].DN THEN]]>
-</Line>
-<Line Number="213">
-<![CDATA[            HMI_CMD.Sta_Alm1[i] := 1;]]>
-</Line>
-<Line Number="214">
-<![CDATA[        END_IF;]]>
-</Line>
-<Line Number="215">
-<![CDATA[]]>
-</Line>
-<Line Number="216">
-<![CDATA[        // ---------- 二级报警(停机) ----------]]>
-</Line>
-<Line Number="217">
-<![CDATA[        Tmr2[i].PRE := HMI_CMD.Cfg_Dly2[i] * 1000;]]>
-</Line>
-<Line Number="218">
-<![CDATA[        Tmr2[i].TimerEnable := (HMI_CMD.PV[i] >= HMI_CMD.Cfg_SP2[i]);]]>
-</Line>
-<Line Number="219">
-<![CDATA[        TON(Tmr2[i]);]]>
-</Line>
-<Line Number="220">
-<![CDATA[]]>
-</Line>
-<Line Number="221">
-<![CDATA[        IF HMI_CMD.PV[i] < (HMI_CMD.Cfg_SP2[i] - HMI_CMD.Cfg_Hys[i]) THEN]]>
-</Line>
-<Line Number="222">
-<![CDATA[            HMI_CMD.Sta_Alm2[i] := 0;]]>
-</Line>
-<Line Number="223">
-<![CDATA[            Tmr2[i].TimerEnable := 0;]]>
-</Line>
-<Line Number="224">
-<![CDATA[            TON(Tmr2[i]);]]>
-</Line>
-<Line Number="225">
-<![CDATA[        ELSIF Tmr2[i].DN THEN]]>
-</Line>
-<Line Number="226">
-<![CDATA[            HMI_CMD.Sta_Alm2[i] := 1;]]>
-</Line>
-<Line Number="227">
-<![CDATA[        END_IF;]]>
-</Line>
-<Line Number="228">
-<![CDATA[    END_IF;]]>
-</Line>
-<Line Number="229">
-<![CDATA[]]>
-</Line>
-<Line Number="230">
-<![CDATA[    // ---------- 事件记录: 边沿检测(类型1..4) ----------]]>
-</Line>
-<Line Number="231">
-<![CDATA[    // 类型1=一级产生 2=一级解除 3=二级产生 4=二级解除]]>
-</Line>
-<Line Number="232">
-<![CDATA[    // 每条记录同时保存"测点标识名快照"(Evt_ChName), 即使日后修改点名,]]>
-</Line>
-<Line Number="233">
-<![CDATA[    // 历史记录仍能精准定位到产生报警的具体测点。]]>
-</Line>
-<Line Number="234">
-<![CDATA[    IF HMI_CMD.Sta_Alm1[i] AND NOT PrevAlm1[i] THEN]]>
-</Line>
-<Line Number="235">
-<![CDATA[        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := i;]]>
-</Line>
-<Line Number="236">
-<![CDATA[        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := HMI_CMD.Cfg_Name[i];]]>
-</Line>
-<Line Number="237">
-<![CDATA[        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 1;]]>
-</Line>
-<Line Number="238">
-<![CDATA[        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := HMI_CMD.PV[i];]]>
-</Line>
-<Line Number="239">
-<![CDATA[        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]>
-</Line>
-<Line Number="240">
-<![CDATA[        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]>
-</Line>
-<Line Number="241">
-<![CDATA[        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]>
-</Line>
-<Line Number="242">
-<![CDATA[        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]>
-</Line>
-<Line Number="243">
-<![CDATA[    ELSIF (NOT HMI_CMD.Sta_Alm1[i]) AND PrevAlm1[i] THEN]]>
-</Line>
-<Line Number="244">
-<![CDATA[        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := i;]]>
-</Line>
-<Line Number="245">
-<![CDATA[        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := HMI_CMD.Cfg_Name[i];]]>
-</Line>
-<Line Number="246">
-<![CDATA[        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 2;]]>
-</Line>
-<Line Number="247">
-<![CDATA[        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := HMI_CMD.PV[i];]]>
-</Line>
-<Line Number="248">
-<![CDATA[        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]>
-</Line>
-<Line Number="249">
-<![CDATA[        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]>
-</Line>
-<Line Number="250">
-<![CDATA[        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]>
-</Line>
-<Line Number="251">
-<![CDATA[        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]>
-</Line>
-<Line Number="252">
-<![CDATA[    END_IF;]]>
-</Line>
-<Line Number="253">
-<![CDATA[]]>
-</Line>
-<Line Number="254">
-<![CDATA[    IF HMI_CMD.Sta_Alm2[i] AND NOT PrevAlm2[i] THEN]]>
-</Line>
-<Line Number="255">
-<![CDATA[        // 二级报警属于"强制介入"级: 置位的同时锁存"未确认"标志,]]>
-</Line>
-<Line Number="256">
-<![CDATA[        // 该标志不因 PV 恢复而自动消失, 必须由值班人员按 Ack_Alm2 确认,]]>
-</Line>
-<Line Number="257">
-<![CDATA[        // HMI 据此驱动弹窗 + 声响(见功能段 4/5)]]>
-</Line>
-<Line Number="258">
-<![CDATA[        HMI_CMD.Alm2_UnAck[i] := 1;]]>
-</Line>
-<Line Number="259">
-<![CDATA[        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := i;]]>
-</Line>
-<Line Number="260">
-<![CDATA[        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := HMI_CMD.Cfg_Name[i];]]>
-</Line>
-<Line Number="261">
-<![CDATA[        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 3;]]>
-</Line>
-<Line Number="262">
-<![CDATA[        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := HMI_CMD.PV[i];]]>
-</Line>
-<Line Number="263">
-<![CDATA[        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]>
-</Line>
-<Line Number="264">
-<![CDATA[        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]>
-</Line>
-<Line Number="265">
-<![CDATA[        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]>
-</Line>
-<Line Number="266">
-<![CDATA[        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]>
-</Line>
-<Line Number="267">
-<![CDATA[    ELSIF (NOT HMI_CMD.Sta_Alm2[i]) AND PrevAlm2[i] THEN]]>
-</Line>
-<Line Number="268">
-<![CDATA[        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := i;]]>
-</Line>
-<Line Number="269">
-<![CDATA[        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := HMI_CMD.Cfg_Name[i];]]>
-</Line>
-<Line Number="270">
-<![CDATA[        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 4;]]>
-</Line>
-<Line Number="271">
-<![CDATA[        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := HMI_CMD.PV[i];]]>
-</Line>
-<Line Number="272">
-<![CDATA[        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]>
-</Line>
-<Line Number="273">
-<![CDATA[        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]>
-</Line>
-<Line Number="274">
-<![CDATA[        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]>
-</Line>
-<Line Number="275">
-<![CDATA[        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]>
-</Line>
-<Line Number="276">
-<![CDATA[    END_IF;]]>
-</Line>
-<Line Number="277">
-<![CDATA[]]>
-</Line>
-<Line Number="278">
-<![CDATA[    PrevAlm1[i] := HMI_CMD.Sta_Alm1[i];]]>
-</Line>
-<Line Number="279">
-<![CDATA[    PrevAlm2[i] := HMI_CMD.Sta_Alm2[i];]]>
-</Line>
-<Line Number="280">
-<![CDATA[END_FOR;]]>
-</Line>
-<Line Number="281">
-<![CDATA[]]>
-</Line>
-<Line Number="282">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="283">
-<![CDATA[// 功能段 4: 报警汇总与分级提示输出]]>
-</Line>
-<Line Number="284">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="285">
-<![CDATA[// 统计当前处于一级/二级报警的通道数, 并生成分级提示出口:]]>
-</Line>
-<Line Number="286">
-<![CDATA[//   Out_Warn: >=1 路一级报警 -> HMI 顶部横幅(非强制提示);]]>
-</Line>
-<Line Number="287">
-<![CDATA[//   Out_Trip: >=1 路二级报警 -> 接停机联锁回路;]]>
-</Line>
-<Line Number="288">
-<![CDATA[//   Out_Horn: >=1 路二级报警"未确认" -> HMI 弹窗 + 声响(强制介入),]]>
-</Line>
-<Line Number="289">
-<![CDATA[//             由 Alm2_UnAck 锁存驱动, 确认前不消失。]]>
-</Line>
-<Line Number="290">
-<![CDATA[HMI_CMD.Alm1_Count := 0;]]>
-</Line>
-<Line Number="291">
-<![CDATA[HMI_CMD.Alm2_Count := 0;]]>
-</Line>
-<Line Number="292">
-<![CDATA[HMI_CMD.Any_Alm2_UnAck := 0;]]>
-</Line>
-<Line Number="293">
-<![CDATA[FOR i := 0 TO 15 DO]]>
-</Line>
-<Line Number="294">
-<![CDATA[    IF HMI_CMD.Sta_Alm1[i] THEN]]>
-</Line>
-<Line Number="295">
-<![CDATA[        HMI_CMD.Alm1_Count := HMI_CMD.Alm1_Count + 1;]]>
-</Line>
-<Line Number="296">
-<![CDATA[    END_IF;]]>
-</Line>
-<Line Number="297">
-<![CDATA[    IF HMI_CMD.Sta_Alm2[i] THEN]]>
-</Line>
-<Line Number="298">
-<![CDATA[        HMI_CMD.Alm2_Count := HMI_CMD.Alm2_Count + 1;]]>
-</Line>
-<Line Number="299">
-<![CDATA[    END_IF;]]>
-</Line>
-<Line Number="300">
-<![CDATA[    IF HMI_CMD.Alm2_UnAck[i] THEN]]>
-</Line>
-<Line Number="301">
-<![CDATA[        HMI_CMD.Any_Alm2_UnAck := 1;]]>
-</Line>
-<Line Number="302">
-<![CDATA[    END_IF;]]>
-</Line>
-<Line Number="303">
-<![CDATA[END_FOR;]]>
-</Line>
-<Line Number="304">
-<![CDATA[]]>
-</Line>
-<Line Number="305">
-<![CDATA[HMI_CMD.Any_Alm1 := (HMI_CMD.Alm1_Count > 0);]]>
-</Line>
-<Line Number="306">
-<![CDATA[HMI_CMD.Any_Alm2 := (HMI_CMD.Alm2_Count > 0);]]>
-</Line>
-<Line Number="307">
-<![CDATA[Out_Warn := HMI_CMD.Any_Alm1;]]>
-</Line>
-<Line Number="308">
-<![CDATA[Out_Trip := HMI_CMD.Any_Alm2;]]>
-</Line>
-<Line Number="309">
-<![CDATA[Out_Horn := HMI_CMD.Any_Alm2_UnAck;]]>
-</Line>
-<Line Number="310">
-<![CDATA[]]>
-</Line>
-<Line Number="311">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="312">
-<![CDATA[// 功能段 5: 二级报警确认(Ack)处理]]>
-</Line>
-<Line Number="313">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="314">
-<![CDATA[// HMI 弹窗上的"确认处理"按钮置位 Ack_Alm2 后:]]>
-</Line>
-<Line Number="315">
-<![CDATA[//   清除全部通道的"未确认"锁存 -> 弹窗与声响随之解除;]]>
-</Line>
-<Line Number="316">
-<![CDATA[//   若报警条件仍存在(Sta_Alm2 仍为 1), 由于边沿已记录过,]]>
-</Line>
-<Line Number="317">
-<![CDATA[//   不会重复触发未确认锁存, 除非出现新的二级报警边沿。]]>
-</Line>
-<Line Number="318">
-<![CDATA[IF HMI_CMD.Ack_Alm2 THEN]]>
-</Line>
-<Line Number="319">
-<![CDATA[    FOR i := 0 TO 15 DO]]>
-</Line>
-<Line Number="320">
-<![CDATA[        HMI_CMD.Alm2_UnAck[i] := 0;]]>
-</Line>
-<Line Number="321">
-<![CDATA[    END_FOR;]]>
-</Line>
-<Line Number="322">
-<![CDATA[    HMI_CMD.Ack_Alm2 := 0;]]>
-</Line>
-<Line Number="323">
-<![CDATA[END_IF;]]>
-</Line>
-<Line Number="324">
-<![CDATA[]]>
-</Line>
-<Line Number="325">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="326">
-<![CDATA[// 功能段 6: 事件记录清空命令]]>
-</Line>
-<Line Number="327">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="328">
-<![CDATA[// HMI 置位 Reset_Log 时清空环形缓冲与写指针, 用于检修后重新起录。]]>
-</Line>
-<Line Number="329">
-<![CDATA[IF HMI_CMD.Reset_Log THEN]]>
-</Line>
-<Line Number="330">
-<![CDATA[    FOR i := 0 TO 31 DO]]>
-</Line>
-<Line Number="331">
-<![CDATA[        HMI_CMD.Evt_Ch[i]     := 0;]]>
-</Line>
-<Line Number="332">
-<![CDATA[        HMI_CMD.Evt_ChName[i] := '';]]>
-</Line>
-<Line Number="333">
-<![CDATA[        HMI_CMD.Evt_Type[i] := 0;]]>
-</Line>
-<Line Number="334">
-<![CDATA[        HMI_CMD.Evt_PV[i]   := 0.0;]]>
-</Line>
-<Line Number="335">
-<![CDATA[        HMI_CMD.Evt_H[i]    := 0;]]>
-</Line>
-<Line Number="336">
-<![CDATA[        HMI_CMD.Evt_M[i]    := 0;]]>
-</Line>
-<Line Number="337">
-<![CDATA[        HMI_CMD.Evt_S[i]    := 0;]]>
-</Line>
-<Line Number="338">
-<![CDATA[    END_FOR;]]>
-</Line>
-<Line Number="339">
-<![CDATA[    HMI_CMD.Evt_Head := 0;]]>
-</Line>
-<Line Number="340">
-<![CDATA[    HMI_CMD.Reset_Log := 0;]]>
-</Line>
-<Line Number="341">
-<![CDATA[END_IF;]]>
-</Line>
-<Line Number="342">
-<![CDATA[]]>
-</Line>
-<Line Number="343">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="344">
-<![CDATA[// 功能段 7: 启用状态输出]]>
-</Line>
-<Line Number="345">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="346">
-<![CDATA[// EnableOut 跟随 EnableIn, 用于在梯形图中级联使能]]>
-</Line>
-<Line Number="347">
-<![CDATA[EnableOut := EnableIn;]]>
-</Line>
-<Line Number="348">
-<![CDATA[]]>
-</Line>
-<Line Number="349">
-<![CDATA[// ===============================================================]]>
-</Line>
-<Line Number="350">
-<![CDATA[// 程序结束]]>
-</Line>
-<Line Number="351">
-<![CDATA[// ===============================================================]]>
-</Line>
-</STContent>
-</Routine>
-</Routines>
-<Dependencies>
-<Dependency Type="DataType" Name="TempAlarm16_L2_Type"/>
-</Dependencies>
-</AddOnInstructionDefinition>
-</AddOnInstructionDefinitions>
-</Controller>
-</RSLogix5000Content>
+<Routines><Routine Name="Logic" Type="ST"><STContent>
+<Line Number="0"><![CDATA[1	// ===============================================================]]></Line>
+<Line Number="1"><![CDATA[2	// AOI 名称: TempAlarm16_L2 (16路温度测点二级超温报警批量处理)]]></Line>
+<Line Number="2"><![CDATA[3	// 版本: 2.0]]></Line>
+<Line Number="3"><![CDATA[4	// 编程语言: Structured Text (ST)]]></Line>
+<Line Number="4"><![CDATA[5	// 适用平台: Studio 5000 (ControlLogix/CompactLogix)]]></Line>
+<Line Number="5"><![CDATA[6	// ===============================================================]]></Line>
+<Line Number="6"><![CDATA[7	// 功能概述:]]></Line>
+<Line Number="7"><![CDATA[8	// 1. 对全部 16 路温度测点进行批量二级超温监视:]]></Line>
+<Line Number="8"><![CDATA[9	//      一级报警(提示/高报) -> 非强制提示: HMI 顶部醒目横幅 + 测点卡片高亮,]]></Line>
+<Line Number="9"><![CDATA[10	//                             不弹窗不鸣笛, 提醒值班人员关注该测点变化趋势;]]></Line>
+<Line Number="10"><![CDATA[11	//      二级报警(警告/高报) -> 强制介入提示: HMI 弹窗 + 声响提醒,]]></Line>
+<Line Number="11"><![CDATA[12	//                             且"未确认"状态被锁存, 值班人员必须按下确认键]]></Line>
+<Line Number="12"><![CDATA[13	//                             (Ack_Alm2) 才能解除弹窗与声响;]]></Line>
+<Line Number="13"><![CDATA[14	// 2. 所有测点配置由调用方通过 Input 参数 In_Cfg 直接传入(阈值/回差/延时]]></Line>
+<Line Number="14"><![CDATA[15	//    / 使能/测点标识), 外部程序可按通道单独修改, 也可数组整体 MOV;]]></Line>
+<Line Number="15"><![CDATA[16	// 3. 全部 16 路共用一个 FOR 循环, 无任何重复逻辑;]]></Line>
+<Line Number="16"><![CDATA[17	// 4. 报警通道统一具备回差过滤 + 秒时基防抖;]]></Line>
+<Line Number="17"><![CDATA[18	// 5. 环形缓冲保存最近 32 条事件(测点标识快照 + 类型 + PV + 时标);]]></Line>
+<Line Number="18"><![CDATA[19	// 6. 若 Input 参数某通道整定值为 0(未配置), AOI 自动写入默认值作为]]></Line>
+<Line Number="19"><![CDATA[20	//    "生效配置", 存于 HMI_CMD 内(可被外部程序实时读取)。]]></Line>
+<Line Number="20"><![CDATA[21	// ===============================================================]]></Line>
+<Line Number="21"><![CDATA[22	// 测点通道分配表(下标 0..15):]]></Line>
+<Line Number="22"><![CDATA[23	//   组1 电机定子温度(6点): 0=定子U1  1=定子V1  2=定子W1]]></Line>
+<Line Number="23"><![CDATA[24	//                          3=定子U2  4=定子V2  5=定子W2]]></Line>
+<Line Number="24"><![CDATA[25	//   组2 电机轴承温度(4点): 6=驱动端轴承  7=非驱动端轴承]]></Line>
+<Line Number="25"><![CDATA[26	//                          8=轴承3        9=轴承4]]></Line>
+<Line Number="26"><![CDATA[27	//   组3 渣浆泵轴承温度(4点): 10=泵轴承1  11=泵轴承2]]></Line>
+<Line Number="27"><![CDATA[28	//                            12=泵轴承3  13=泵轴承4]]></Line>
+<Line Number="28"><![CDATA[29	//   组4 减速机油温(2点):   14=油温1     15=油温2]]></Line>
+<Line Number="29"><![CDATA[30	// ===============================================================]]></Line>
+<Line Number="30"><![CDATA[31	// 默认整定值(Input 参数对应通道 SP2<=0 时自动作为生效值):]]></Line>
+<Line Number="31"><![CDATA[32	//   组1 定子:      SP1=130  SP2=145  Hys=3  Dly1=3s  Dly2=2s]]></Line>
+<Line Number="32"><![CDATA[33	//   组2 电机轴承:  SP1=85   SP2=95   Hys=3  Dly1=3s  Dly2=2s]]></Line>
+<Line Number="33"><![CDATA[34	//   组3 泵轴承:    SP1=80   SP2=90   Hys=3  Dly1=3s  Dly2=2s]]></Line>
+<Line Number="34"><![CDATA[35	//   组4 减速机油:  SP1=75   SP2=85   Hys=3  Dly1=3s  Dly2=2s]]></Line>
+<Line Number="35"><![CDATA[36	// 默认测点标识名:]]></Line>
+<Line Number="36"><![CDATA[37	//   StatorU1,V1,W1,U2,V2,W2 / MtrBrgDE,NDE,3,4 / PumpBrg1..4 / GearOil1,2]]></Line>
+<Line Number="37"><![CDATA[38	// ===============================================================]]></Line>
+<Line Number="38"><![CDATA[39	// 报警动作逻辑(单通道, 一级/二级结构相同):]]></Line>
+<Line Number="39"><![CDATA[40	//        产生: PV >= SP 且连续保持 Dly 秒  -> Alm = 1 (记录事件)]]></Line>
+<Line Number="40"><![CDATA[41	//        解除: PV <  SP - Hys (立即)       -> Alm = 0 (记录事件)]]></Line>
+<Line Number="41"><![CDATA[42	// ===============================================================]]></Line>
+<Line Number="42"><![CDATA[43	// 变量约定:]]></Line>
+<Line Number="43"><![CDATA[44	//   输入  : Hour / Minute / Second (DINT) -- 事件记录时标; Second 同时作为]]></Line>
+<Line Number="44"><![CDATA[45	//                                              防抖秒节拍(Tick := Second <> Prev_Second)]]></Line>
+<Line Number="45"><![CDATA[46	//           PV(REAL[16])                    16 路实时温度]]></Line>
+<Line Number="46"><![CDATA[47	//           In_Cfg(TempAlarm16_L2_Cfg_Type) 全部可配置参数的输入配置块]]></Line>
+<Line Number="47"><![CDATA[48	//                                              (由外部程序/MOV 直接传入)]]></Line>
+<Line Number="48"><![CDATA[49	//   输出  : Out_Warn(BOOL)  任一路一级报警总出口(非强制提示横幅)]]></Line>
+<Line Number="49"><![CDATA[50	//           Out_Trip(BOOL)  任一路二级报警总出口(停机联锁)]]></Line>
+<Line Number="50"><![CDATA[51	//           Out_Horn(BOOL)  声响提醒输出(任一二级报警"未确认"时置位)]]></Line>
+<Line Number="51"><![CDATA[52	//   InOut : HMI_CMD - 运行时状态(报警状态/未确认锁存/防抖计数/边沿记录/]]></Line>
+<Line Number="52"><![CDATA[53	//                     事件记录/生效配置镜像/批量下发命令/权限等级)]]></Line>
+<Line Number="53"><![CDATA[54	//   本地  : Tick(BOOL) 秒节拍 / Prev_Second(DINT) 上一秒]]></Line>
+<Line Number="54"><![CDATA[55	//           i, GS, GE (DINT) / IsFirstScan (BOOL)]]></Line>
+<Line Number="55"><![CDATA[56	//   注意: AOI 的本地变量只能是原子标量, 不支持数组,]]></Line>
+<Line Number="56"><![CDATA[57	//         因此防抖计数与边沿状态数组放在 InOut HMI_CMD 内]]></Line>
+<Line Number="57"><![CDATA[58	//         (Acc1[16] / Acc2[16] / PrevAlm1[16] / PrevAlm2[16])。]]></Line>
+<Line Number="58"><![CDATA[59	//]]></Line>
+<Line Number="59"><![CDATA[60	// ===== 输入配置 UDT 结构 TempAlarm16_L2_Cfg_Type =====]]></Line>
+<Line Number="60"><![CDATA[61	// 成员               类型          说明]]></Line>
+<Line Number="61"><![CDATA[62	//   SP1[16]          REAL          一级报警阈值]]></Line>
+<Line Number="62"><![CDATA[63	//   SP2[16]          REAL          二级报警阈值]]></Line>
+<Line Number="63"><![CDATA[64	//   Hys[16]          REAL          回差值]]></Line>
+<Line Number="64"><![CDATA[65	//   Dly1[16]         DINT          一级延时(秒)]]></Line>
+<Line Number="65"><![CDATA[66	//   Dly2[16]         DINT          二级延时(秒)]]></Line>
+<Line Number="66"><![CDATA[67	//   Enable[16]       BOOL          各通道使能(1=投入 0=退出)]]></Line>
+<Line Number="67"><![CDATA[68	//   Name[16]         STRING        测点标识名(事件记录快照源)]]></Line>
+<Line Number="68"><![CDATA[69	// ===============================================================]]></Line>
+<Line Number="69"><![CDATA[70	]]></Line>
+<Line Number="70"><![CDATA[71	// ===============================================================]]></Line>
+<Line Number="71"><![CDATA[72	// 功能段 1: 生效配置计算(Input 参数 vs 默认值)]]></Line>
+<Line Number="72"><![CDATA[73	// ===============================================================]]></Line>
+<Line Number="73"><![CDATA[74	// 判定规则:]]></Line>
+<Line Number="74"><![CDATA[75	//   In_Cfg.SP2[i] > 0.0  -> 使用 Input 参数值(用户已配置);]]></Line>
+<Line Number="75"><![CDATA[76	//   否则                 -> 使用按所属组确定的默认值;]]></Line>
+<Line Number="76"><![CDATA[77	// 结果存入 HMI_CMD.Eff_* 数组, 判定逻辑统一引用 Eff_*,]]></Line>
+<Line Number="77"><![CDATA[78	// 这样既支持外部程序直接 Input 接线修改, 也支持首次上电零值自动填充。]]></Line>
+<Line Number="78"><![CDATA[79	// 批量下发命令(功能段 2)会同时写入 Input 参数和 Eff_*,]]></Line>
+<Line Number="79"><![CDATA[80	// 两种改法等价, 外部程序可任选其一。]]></Line>
+<Line Number="80"><![CDATA[81	]]></Line>
+<Line Number="81"><![CDATA[82	FOR i := 0 TO 15 DO]]></Line>
+<Line Number="82"><![CDATA[83	    IF In_Cfg.SP2[i] > 0.0 THEN]]></Line>
+<Line Number="83"><![CDATA[84	        // 外部已配置: 直接同步到生效配置(使外部 MOV 立即可见)]]></Line>
+<Line Number="84"><![CDATA[85	        HMI_CMD.Eff_SP1[i]    := In_Cfg.SP1[i];]]></Line>
+<Line Number="85"><![CDATA[86	        HMI_CMD.Eff_SP2[i]    := In_Cfg.SP2[i];]]></Line>
+<Line Number="86"><![CDATA[87	        HMI_CMD.Eff_Hys[i]    := In_Cfg.Hys[i];]]></Line>
+<Line Number="87"><![CDATA[88	        HMI_CMD.Eff_Dly1[i]   := In_Cfg.Dly1[i];]]></Line>
+<Line Number="88"><![CDATA[89	        HMI_CMD.Eff_Dly2[i]   := In_Cfg.Dly2[i];]]></Line>
+<Line Number="89"><![CDATA[90	        HMI_CMD.Eff_Enable[i] := In_Cfg.Enable[i];]]></Line>
+<Line Number="90"><![CDATA[91	        HMI_CMD.Eff_Name[i]   := In_Cfg.Name[i];]]></Line>
+<Line Number="91"><![CDATA[92	    ELSE]]></Line>
+<Line Number="92"><![CDATA[93	        // 外部未配置: 写入生效默认值(供判定逻辑使用)]]></Line>
+<Line Number="93"><![CDATA[94	        IF i <= 5 THEN]]></Line>
+<Line Number="94"><![CDATA[95	            HMI_CMD.Eff_SP1[i] := 130.0; HMI_CMD.Eff_SP2[i] := 145.0;]]></Line>
+<Line Number="95"><![CDATA[96	        ELSIF i <= 9 THEN]]></Line>
+<Line Number="96"><![CDATA[97	            HMI_CMD.Eff_SP1[i] := 85.0;  HMI_CMD.Eff_SP2[i] := 95.0;]]></Line>
+<Line Number="97"><![CDATA[98	        ELSIF i <= 13 THEN]]></Line>
+<Line Number="98"><![CDATA[99	            HMI_CMD.Eff_SP1[i] := 80.0;  HMI_CMD.Eff_SP2[i] := 90.0;]]></Line>
+<Line Number="99"><![CDATA[100	        ELSE]]></Line>
+<Line Number="100"><![CDATA[101	            HMI_CMD.Eff_SP1[i] := 75.0;  HMI_CMD.Eff_SP2[i] := 85.0;]]></Line>
+<Line Number="101"><![CDATA[102	        END_IF;]]></Line>
+<Line Number="102"><![CDATA[103	        HMI_CMD.Eff_Hys[i]    := 3.0;]]></Line>
+<Line Number="103"><![CDATA[104	        HMI_CMD.Eff_Dly1[i]   := 3;]]></Line>
+<Line Number="104"><![CDATA[105	        HMI_CMD.Eff_Dly2[i]   := 2;]]></Line>
+<Line Number="105"><![CDATA[106	        HMI_CMD.Eff_Enable[i] := 1;]]></Line>
+<Line Number="106"><![CDATA[107	]]></Line>
+<Line Number="107"><![CDATA[108	        // 默认测点标识名]]></Line>
+<Line Number="108"><![CDATA[109	        CASE i OF]]></Line>
+<Line Number="109"><![CDATA[110	            0:  HMI_CMD.Eff_Name[0]  := 'StatorU1';]]></Line>
+<Line Number="110"><![CDATA[111	            1:  HMI_CMD.Eff_Name[1]  := 'StatorV1';]]></Line>
+<Line Number="111"><![CDATA[112	            2:  HMI_CMD.Eff_Name[2]  := 'StatorW1';]]></Line>
+<Line Number="112"><![CDATA[113	            3:  HMI_CMD.Eff_Name[3]  := 'StatorU2';]]></Line>
+<Line Number="113"><![CDATA[114	            4:  HMI_CMD.Eff_Name[4]  := 'StatorV2';]]></Line>
+<Line Number="114"><![CDATA[115	            5:  HMI_CMD.Eff_Name[5]  := 'StatorW2';]]></Line>
+<Line Number="115"><![CDATA[116	            6:  HMI_CMD.Eff_Name[6]  := 'MtrBrgDE';]]></Line>
+<Line Number="116"><![CDATA[117	            7:  HMI_CMD.Eff_Name[7]  := 'MtrBrgNDE';]]></Line>
+<Line Number="117"><![CDATA[118	            8:  HMI_CMD.Eff_Name[8]  := 'MtrBrg3';]]></Line>
+<Line Number="118"><![CDATA[119	            9:  HMI_CMD.Eff_Name[9]  := 'MtrBrg4';]]></Line>
+<Line Number="119"><![CDATA[120	            10: HMI_CMD.Eff_Name[10] := 'PumpBrg1';]]></Line>
+<Line Number="120"><![CDATA[121	            11: HMI_CMD.Eff_Name[11] := 'PumpBrg2';]]></Line>
+<Line Number="121"><![CDATA[122	            12: HMI_CMD.Eff_Name[12] := 'PumpBrg3';]]></Line>
+<Line Number="122"><![CDATA[123	            13: HMI_CMD.Eff_Name[13] := 'PumpBrg4';]]></Line>
+<Line Number="123"><![CDATA[124	            14: HMI_CMD.Eff_Name[14] := 'GearOil1';]]></Line>
+<Line Number="124"><![CDATA[125	            15: HMI_CMD.Eff_Name[15] := 'GearOil2';]]></Line>
+<Line Number="125"><![CDATA[126	        END_CASE;]]></Line>
+<Line Number="126"><![CDATA[127	    END_IF;]]></Line>
+<Line Number="127"><![CDATA[128	END_FOR;]]></Line>
+<Line Number="128"><![CDATA[129	]]></Line>
+<Line Number="129"><![CDATA[130	// ===============================================================]]></Line>
+<Line Number="130"><![CDATA[131	// 功能段 2: 批量参数下发(InOut 命令 + 权限校验)]]></Line>
+<Line Number="131"><![CDATA[132	// ===============================================================]]></Line>
+<Line Number="132"><![CDATA[133	// 除了外部程序直接 MOV In_Cfg, 也支持 HMI 统一下发:]]></Line>
+<Line Number="133"><![CDATA[134	//   HMI_CMD.Apply_Batch 置位后, 按 B_Group 指定的通道范围,]]></Line>
+<Line Number="134"><![CDATA[135	//   将 B_SP1/B_SP2/B_Hys/B_Dly1/B_Dly2 写入 In_Cfg(Input) 与]]></Line>
+<Line Number="135"><![CDATA[136	//   HMI_CMD.Eff_*, 并记录类型 5/6 事件。]]></Line>
+<Line Number="136"><![CDATA[137	// 安全规则: User_Level >= 2 且 SP2 > SP1 且 Hys >= 0。]]></Line>
+<Line Number="137"><![CDATA[138	// 外部程序绕过权限直接 MOV In_Cfg 也是允许的——]]></Line>
+<Line Number="138"><![CDATA[139	// 权限校验只针对 Apply_Batch 这条批量命令, 直接改 Input 不审计。]]></Line>
+<Line Number="139"><![CDATA[140	IF HMI_CMD.Apply_Batch THEN]]></Line>
+<Line Number="140"><![CDATA[141	    IF HMI_CMD.User_Level >= 2 THEN]]></Line>
+<Line Number="141"><![CDATA[142	        IF (HMI_CMD.B_SP2 > HMI_CMD.B_SP1) AND (HMI_CMD.B_Hys >= 0.0) THEN]]></Line>
+<Line Number="142"><![CDATA[143	            CASE HMI_CMD.B_Group OF]]></Line>
+<Line Number="143"><![CDATA[144	                1: GS := 0;  GE := 5;]]></Line>
+<Line Number="144"><![CDATA[145	                2: GS := 6;  GE := 9;]]></Line>
+<Line Number="145"><![CDATA[146	                3: GS := 10; GE := 13;]]></Line>
+<Line Number="146"><![CDATA[147	                4: GS := 14; GE := 15;]]></Line>
+<Line Number="147"><![CDATA[148	                ELSE GS := 0; GE := 15;]]></Line>
+<Line Number="148"><![CDATA[149	            END_CASE;]]></Line>
+<Line Number="149"><![CDATA[150	            FOR i := GS TO GE DO]]></Line>
+<Line Number="150"><![CDATA[151	                In_Cfg.SP1[i] := HMI_CMD.B_SP1;]]></Line>
+<Line Number="151"><![CDATA[152	                In_Cfg.SP2[i] := HMI_CMD.B_SP2;]]></Line>
+<Line Number="152"><![CDATA[153	                In_Cfg.Hys[i] := HMI_CMD.B_Hys;]]></Line>
+<Line Number="153"><![CDATA[154	                In_Cfg.Dly1[i] := HMI_CMD.B_Dly1;]]></Line>
+<Line Number="154"><![CDATA[155	                In_Cfg.Dly2[i] := HMI_CMD.B_Dly2;]]></Line>
+<Line Number="155"><![CDATA[156	                // 功能段 1 下一次扫描会自动同步 Eff_*]]></Line>
+<Line Number="156"><![CDATA[157	            END_FOR;]]></Line>
+<Line Number="157"><![CDATA[158	            HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := HMI_CMD.B_Group;]]></Line>
+<Line Number="158"><![CDATA[159	            HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := 'BATCH';]]></Line>
+<Line Number="159"><![CDATA[160	            HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 5;]]></Line>
+<Line Number="160"><![CDATA[161	            HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := 0.0;]]></Line>
+<Line Number="161"><![CDATA[162	            HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]></Line>
+<Line Number="162"><![CDATA[163	            HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]></Line>
+<Line Number="163"><![CDATA[164	            HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]></Line>
+<Line Number="164"><![CDATA[165	            HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]></Line>
+<Line Number="165"><![CDATA[166	        END_IF;]]></Line>
+<Line Number="166"><![CDATA[167	    ELSE]]></Line>
+<Line Number="167"><![CDATA[168	        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := HMI_CMD.B_Group;]]></Line>
+<Line Number="168"><![CDATA[169	        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := 'BATCH';]]></Line>
+<Line Number="169"><![CDATA[170	        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 6;]]></Line>
+<Line Number="170"><![CDATA[171	        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := 0.0;]]></Line>
+<Line Number="171"><![CDATA[172	        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]></Line>
+<Line Number="172"><![CDATA[173	        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]></Line>
+<Line Number="173"><![CDATA[174	        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]></Line>
+<Line Number="174"><![CDATA[175	        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]></Line>
+<Line Number="175"><![CDATA[176	    END_IF;]]></Line>
+<Line Number="176"><![CDATA[177	    HMI_CMD.Apply_Batch := 0;]]></Line>
+<Line Number="177"><![CDATA[178	END_IF;]]></Line>
+<Line Number="178"><![CDATA[179	]]></Line>
+<Line Number="179"><![CDATA[180	// ===============================================================]]></Line>
+<Line Number="180"><![CDATA[181	// 功能段 3: 16 路报警核心批量处理(FOR 循环统一逻辑)]]></Line>
+<Line Number="181"><![CDATA[182	// ===============================================================]]></Line>
+<Line Number="182"><![CDATA[183	// 判定逻辑统一引用 HMI_CMD.Eff_* 数组(由功能段 1 从上电零值/]]></Line>
+<Line Number="183"><![CDATA[184	// Input 参数中合成), 对调用方透明, 外部改 Input 立即生效。]]></Line>
+<Line Number="184"><![CDATA[185	]]></Line>
+<Line Number="185"><![CDATA[186	// 秒节拍: 仅在 Second 发生变化的那个扫描周期为 1]]></Line>
+<Line Number="186"><![CDATA[187	Tick := (Second <> Prev_Second);]]></Line>
+<Line Number="187"><![CDATA[188	Prev_Second := Second;]]></Line>
+<Line Number="188"><![CDATA[189	]]></Line>
+<Line Number="189"><![CDATA[190	FOR i := 0 TO 15 DO]]></Line>
+<Line Number="190"><![CDATA[191	]]></Line>
+<Line Number="191"><![CDATA[192	    // ---------- 通道禁用时: 强制安全状态 ----------]]></Line>
+<Line Number="192"><![CDATA[193	    IF NOT HMI_CMD.Eff_Enable[i] THEN]]></Line>
+<Line Number="193"><![CDATA[194	        HMI_CMD.Sta_Alm1[i] := 0;]]></Line>
+<Line Number="194"><![CDATA[195	        HMI_CMD.Sta_Alm2[i] := 0;]]></Line>
+<Line Number="195"><![CDATA[196	        HMI_CMD.Acc1[i] := 0;]]></Line>
+<Line Number="196"><![CDATA[197	        HMI_CMD.Acc2[i] := 0;]]></Line>
+<Line Number="197"><![CDATA[198	]]></Line>
+<Line Number="198"><![CDATA[199	    ELSE]]></Line>
+<Line Number="199"><![CDATA[200	        // ---------- 一级报警(提示/高报) ----------]]></Line>
+<Line Number="200"><![CDATA[201	        IF PV[i] < HMI_CMD.Eff_SP1[i] THEN]]></Line>
+<Line Number="201"><![CDATA[202	            HMI_CMD.Acc1[i] := 0;]]></Line>
+<Line Number="202"><![CDATA[203	        END_IF;]]></Line>
+<Line Number="203"><![CDATA[204	        IF Tick AND (PV[i] >= HMI_CMD.Eff_SP1[i]) THEN]]></Line>
+<Line Number="204"><![CDATA[205	            HMI_CMD.Acc1[i] := HMI_CMD.Acc1[i] + 1;]]></Line>
+<Line Number="205"><![CDATA[206	        END_IF;]]></Line>
+<Line Number="206"><![CDATA[207	        IF PV[i] < (HMI_CMD.Eff_SP1[i] - HMI_CMD.Eff_Hys[i]) THEN]]></Line>
+<Line Number="207"><![CDATA[208	            HMI_CMD.Sta_Alm1[i] := 0;]]></Line>
+<Line Number="208"><![CDATA[209	            HMI_CMD.Acc1[i] := 0;]]></Line>
+<Line Number="209"><![CDATA[210	        ELSIF HMI_CMD.Acc1[i] >= HMI_CMD.Eff_Dly1[i] THEN]]></Line>
+<Line Number="210"><![CDATA[211	            HMI_CMD.Sta_Alm1[i] := 1;]]></Line>
+<Line Number="211"><![CDATA[212	        END_IF;]]></Line>
+<Line Number="212"><![CDATA[213	]]></Line>
+<Line Number="213"><![CDATA[214	        // ---------- 二级报警(警告/高报) ----------]]></Line>
+<Line Number="214"><![CDATA[215	        IF PV[i] < HMI_CMD.Eff_SP2[i] THEN]]></Line>
+<Line Number="215"><![CDATA[216	            HMI_CMD.Acc2[i] := 0;]]></Line>
+<Line Number="216"><![CDATA[217	        END_IF;]]></Line>
+<Line Number="217"><![CDATA[218	        IF Tick AND (PV[i] >= HMI_CMD.Eff_SP2[i]) THEN]]></Line>
+<Line Number="218"><![CDATA[219	            HMI_CMD.Acc2[i] := HMI_CMD.Acc2[i] + 1;]]></Line>
+<Line Number="219"><![CDATA[220	        END_IF;]]></Line>
+<Line Number="220"><![CDATA[221	        IF PV[i] < (HMI_CMD.Eff_SP2[i] - HMI_CMD.Eff_Hys[i]) THEN]]></Line>
+<Line Number="221"><![CDATA[222	            HMI_CMD.Sta_Alm2[i] := 0;]]></Line>
+<Line Number="222"><![CDATA[223	            HMI_CMD.Acc2[i] := 0;]]></Line>
+<Line Number="223"><![CDATA[224	        ELSIF HMI_CMD.Acc2[i] >= HMI_CMD.Eff_Dly2[i] THEN]]></Line>
+<Line Number="224"><![CDATA[225	            HMI_CMD.Sta_Alm2[i] := 1;]]></Line>
+<Line Number="225"><![CDATA[226	        END_IF;]]></Line>
+<Line Number="226"><![CDATA[227	    END_IF;]]></Line>
+<Line Number="227"><![CDATA[228	]]></Line>
+<Line Number="228"><![CDATA[229	    // ---------- 事件记录: 边沿检测(类型1..4) ----------]]></Line>
+<Line Number="229"><![CDATA[230	    // 类型1=一级产生 2=一级解除 3=二级产生 4=二级解除]]></Line>
+<Line Number="230"><![CDATA[231	    // 测点标识名取自 Eff_Name(已是生效配置, 含默认值兜底)]]></Line>
+<Line Number="231"><![CDATA[232	    IF HMI_CMD.Sta_Alm1[i] AND NOT HMI_CMD.PrevAlm1[i] THEN]]></Line>
+<Line Number="232"><![CDATA[233	        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := i;]]></Line>
+<Line Number="233"><![CDATA[234	        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := HMI_CMD.Eff_Name[i];]]></Line>
+<Line Number="234"><![CDATA[235	        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 1;]]></Line>
+<Line Number="235"><![CDATA[236	        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := PV[i];]]></Line>
+<Line Number="236"><![CDATA[237	        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]></Line>
+<Line Number="237"><![CDATA[238	        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]></Line>
+<Line Number="238"><![CDATA[239	        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]></Line>
+<Line Number="239"><![CDATA[240	        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]></Line>
+<Line Number="240"><![CDATA[241	    ELSIF (NOT HMI_CMD.Sta_Alm1[i]) AND HMI_CMD.PrevAlm1[i] THEN]]></Line>
+<Line Number="241"><![CDATA[242	        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := i;]]></Line>
+<Line Number="242"><![CDATA[243	        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := HMI_CMD.Eff_Name[i];]]></Line>
+<Line Number="243"><![CDATA[244	        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 2;]]></Line>
+<Line Number="244"><![CDATA[245	        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := PV[i];]]></Line>
+<Line Number="245"><![CDATA[246	        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]></Line>
+<Line Number="246"><![CDATA[247	        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]></Line>
+<Line Number="247"><![CDATA[248	        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]></Line>
+<Line Number="248"><![CDATA[249	        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]></Line>
+<Line Number="249"><![CDATA[250	    END_IF;]]></Line>
+<Line Number="250"><![CDATA[251	]]></Line>
+<Line Number="251"><![CDATA[252	    IF HMI_CMD.Sta_Alm2[i] AND NOT HMI_CMD.PrevAlm2[i] THEN]]></Line>
+<Line Number="252"><![CDATA[253	        // 二级报警: 强制介入级, 置位同时锁存"未确认"标志,]]></Line>
+<Line Number="253"><![CDATA[254	        // 必须由值班人员按 Ack_Alm2 才能解除弹窗/声响]]></Line>
+<Line Number="254"><![CDATA[255	        HMI_CMD.Alm2_UnAck[i] := 1;]]></Line>
+<Line Number="255"><![CDATA[256	        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := i;]]></Line>
+<Line Number="256"><![CDATA[257	        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := HMI_CMD.Eff_Name[i];]]></Line>
+<Line Number="257"><![CDATA[258	        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 3;]]></Line>
+<Line Number="258"><![CDATA[259	        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := PV[i];]]></Line>
+<Line Number="259"><![CDATA[260	        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]></Line>
+<Line Number="260"><![CDATA[261	        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]></Line>
+<Line Number="261"><![CDATA[262	        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]></Line>
+<Line Number="262"><![CDATA[263	        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]></Line>
+<Line Number="263"><![CDATA[264	    ELSIF (NOT HMI_CMD.Sta_Alm2[i]) AND HMI_CMD.PrevAlm2[i] THEN]]></Line>
+<Line Number="264"><![CDATA[265	        HMI_CMD.Evt_Ch[HMI_CMD.Evt_Head]     := i;]]></Line>
+<Line Number="265"><![CDATA[266	        HMI_CMD.Evt_ChName[HMI_CMD.Evt_Head] := HMI_CMD.Eff_Name[i];]]></Line>
+<Line Number="266"><![CDATA[267	        HMI_CMD.Evt_Type[HMI_CMD.Evt_Head] := 4;]]></Line>
+<Line Number="267"><![CDATA[268	        HMI_CMD.Evt_PV[HMI_CMD.Evt_Head]   := PV[i];]]></Line>
+<Line Number="268"><![CDATA[269	        HMI_CMD.Evt_H[HMI_CMD.Evt_Head]    := Hour;]]></Line>
+<Line Number="269"><![CDATA[270	        HMI_CMD.Evt_M[HMI_CMD.Evt_Head]    := Minute;]]></Line>
+<Line Number="270"><![CDATA[271	        HMI_CMD.Evt_S[HMI_CMD.Evt_Head]    := Second;]]></Line>
+<Line Number="271"><![CDATA[272	        HMI_CMD.Evt_Head := (HMI_CMD.Evt_Head + 1) MOD 32;]]></Line>
+<Line Number="272"><![CDATA[273	    END_IF;]]></Line>
+<Line Number="273"><![CDATA[274	]]></Line>
+<Line Number="274"><![CDATA[275	    HMI_CMD.PrevAlm1[i] := HMI_CMD.Sta_Alm1[i];]]></Line>
+<Line Number="275"><![CDATA[276	    HMI_CMD.PrevAlm2[i] := HMI_CMD.Sta_Alm2[i];]]></Line>
+<Line Number="276"><![CDATA[277	END_FOR;]]></Line>
+<Line Number="277"><![CDATA[278	]]></Line>
+<Line Number="278"><![CDATA[279	// ===============================================================]]></Line>
+<Line Number="279"><![CDATA[280	// 功能段 4: 报警汇总与分级提示输出]]></Line>
+<Line Number="280"><![CDATA[281	// ===============================================================]]></Line>
+<Line Number="281"><![CDATA[282	HMI_CMD.Alm1_Count := 0;]]></Line>
+<Line Number="282"><![CDATA[283	HMI_CMD.Alm2_Count := 0;]]></Line>
+<Line Number="283"><![CDATA[284	HMI_CMD.Any_Alm2_UnAck := 0;]]></Line>
+<Line Number="284"><![CDATA[285	FOR i := 0 TO 15 DO]]></Line>
+<Line Number="285"><![CDATA[286	    IF HMI_CMD.Sta_Alm1[i] THEN]]></Line>
+<Line Number="286"><![CDATA[287	        HMI_CMD.Alm1_Count := HMI_CMD.Alm1_Count + 1;]]></Line>
+<Line Number="287"><![CDATA[288	    END_IF;]]></Line>
+<Line Number="288"><![CDATA[289	    IF HMI_CMD.Sta_Alm2[i] THEN]]></Line>
+<Line Number="289"><![CDATA[290	        HMI_CMD.Alm2_Count := HMI_CMD.Alm2_Count + 1;]]></Line>
+<Line Number="290"><![CDATA[291	    END_IF;]]></Line>
+<Line Number="291"><![CDATA[292	    IF HMI_CMD.Alm2_UnAck[i] THEN]]></Line>
+<Line Number="292"><![CDATA[293	        HMI_CMD.Any_Alm2_UnAck := 1;]]></Line>
+<Line Number="293"><![CDATA[294	    END_IF;]]></Line>
+<Line Number="294"><![CDATA[295	END_FOR;]]></Line>
+<Line Number="295"><![CDATA[296	]]></Line>
+<Line Number="296"><![CDATA[297	HMI_CMD.Any_Alm1 := (HMI_CMD.Alm1_Count > 0);]]></Line>
+<Line Number="297"><![CDATA[298	HMI_CMD.Any_Alm2 := (HMI_CMD.Alm2_Count > 0);]]></Line>
+<Line Number="298"><![CDATA[299	Out_Warn := HMI_CMD.Any_Alm1;]]></Line>
+<Line Number="299"><![CDATA[300	Out_Trip := HMI_CMD.Any_Alm2;]]></Line>
+<Line Number="300"><![CDATA[301	Out_Horn := HMI_CMD.Any_Alm2_UnAck;]]></Line>
+<Line Number="301"><![CDATA[302	]]></Line>
+<Line Number="302"><![CDATA[303	// ===============================================================]]></Line>
+<Line Number="303"><![CDATA[304	// 功能段 5: 二级报警确认(Ack)处理]]></Line>
+<Line Number="304"><![CDATA[305	// ===============================================================]]></Line>
+<Line Number="305"><![CDATA[306	IF HMI_CMD.Ack_Alm2 THEN]]></Line>
+<Line Number="306"><![CDATA[307	    FOR i := 0 TO 15 DO]]></Line>
+<Line Number="307"><![CDATA[308	        HMI_CMD.Alm2_UnAck[i] := 0;]]></Line>
+<Line Number="308"><![CDATA[309	    END_FOR;]]></Line>
+<Line Number="309"><![CDATA[310	    HMI_CMD.Ack_Alm2 := 0;]]></Line>
+<Line Number="310"><![CDATA[311	END_IF;]]></Line>
+<Line Number="311"><![CDATA[312	]]></Line>
+<Line Number="312"><![CDATA[313	// ===============================================================]]></Line>
+<Line Number="313"><![CDATA[314	// 功能段 6: 事件记录清空命令]]></Line>
+<Line Number="314"><![CDATA[315	// ===============================================================]]></Line>
+<Line Number="315"><![CDATA[316	IF HMI_CMD.Reset_Log THEN]]></Line>
+<Line Number="316"><![CDATA[317	    FOR i := 0 TO 31 DO]]></Line>
+<Line Number="317"><![CDATA[318	        HMI_CMD.Evt_Ch[i]     := 0;]]></Line>
+<Line Number="318"><![CDATA[319	        HMI_CMD.Evt_ChName[i] := '';]]></Line>
+<Line Number="319"><![CDATA[320	        HMI_CMD.Evt_Type[i] := 0;]]></Line>
+<Line Number="320"><![CDATA[321	        HMI_CMD.Evt_PV[i]   := 0.0;]]></Line>
+<Line Number="321"><![CDATA[322	        HMI_CMD.Evt_H[i]    := 0;]]></Line>
+<Line Number="322"><![CDATA[323	        HMI_CMD.Evt_M[i]    := 0;]]></Line>
+<Line Number="323"><![CDATA[324	        HMI_CMD.Evt_S[i]    := 0;]]></Line>
+<Line Number="324"><![CDATA[325	    END_FOR;]]></Line>
+<Line Number="325"><![CDATA[326	    HMI_CMD.Evt_Head := 0;]]></Line>
+<Line Number="326"><![CDATA[327	    HMI_CMD.Reset_Log := 0;]]></Line>
+<Line Number="327"><![CDATA[328	END_IF;]]></Line>
+<Line Number="328"><![CDATA[329	]]></Line>
+<Line Number="329"><![CDATA[330	// ===============================================================]]></Line>
+<Line Number="330"><![CDATA[331	// 功能段 7: 启用状态输出]]></Line>
+<Line Number="331"><![CDATA[332	// ===============================================================]]></Line>
+<Line Number="332"><![CDATA[333	EnableOut := EnableIn;]]></Line>
+</STContent></Routine></Routines>
+<Dependencies><Dependency Type="DataType" Name="TempAlarm16_L2_Cfg_Type"/><Dependency Type="DataType" Name="TempAlarm16_L2_Type"/></Dependencies>
+</AddOnInstructionDefinition></AddOnInstructionDefinitions></Controller></RSLogix5000Content>
